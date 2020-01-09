@@ -3,7 +3,7 @@
 <Div Align="right">
 Renesas Electronics Corporation
 
-Sep-24-2019
+Jan-09-2020
 </Div>
 
 The RZ/G2 flash writer is sample software for Renesas RZ/G2 Group MPUs.
@@ -645,7 +645,7 @@ Get the source code of RZ/G2 flash writer.
 cd ~/
 git clone https://github.com/renesas-rz/rzg2_flash_writer.git
 cd rzg2_flash_writer
-git checkout -b v1.00 v1.00
+git checkout -b v1.01 v1.01
 ```
 
 ### 4.3. Build the RZ/G2 flash writer
@@ -655,9 +655,11 @@ S-record file will be built by the following command.
 Linaro toolchain:
 
 ```shell
-make clean
-CROSS_COMPILE=~/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-elf/bin/aarch64-elf- make BOARD=HIHOPE
+make -f makefile.linaro clean
+CROSS_COMPILE=~/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-elf/bin/aarch64-elf- make -f makefile.linaro BOARD=HIHOPE
 ```
+
+*Note) Makefile for linaro toolchain is changed from `makefile` to `makefile.linaro` at v1.01.*
 
 Yocto SDK:
 
@@ -716,7 +718,7 @@ S-record file:
 After the transfer has succeeded, the following log will be shown.
 
 ```text
-Flash writer for RZ/G2M V1.00 Sep.24,2018
+Flash writer for RZ/G2M V1.01 Jan.08,2020
 >
 ```
 
@@ -763,3 +765,9 @@ Describe the revision history of RZ/G2 flash writer.
 ### 7.1. v1.00
 
 - First release.
+
+### 7.2. v1.01
+
+- Support HiHope RZ/G2[MN] Rev.3/Rev.4 boards
+- Improve makefile to support the build by bitbake
+- Add new makefile for the linaro toolchain build
