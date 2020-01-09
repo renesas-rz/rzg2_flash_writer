@@ -4,6 +4,9 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#define	GPIO_INDT5	0xE605500C
+#define	LPDDR4_2RANK	(0x01 << 25)
+
 /*******************************************************************************
  *	NUMBER OF BOARD CONFIGRATION
  *	PLEASE DEFINE
@@ -17,6 +20,7 @@ static uint32_t boardcnf_get_brd_type(void)
 	uint32_t Prr_Product;
 	uint32_t judge = 0;
 	uint32_t reg;
+	uint32_t boardInfo;
 
 	reg = mmio_read_32(PRR);
 	Prr_Product = reg & PRR_PRODUCT_MASK;
@@ -28,7 +32,15 @@ static uint32_t boardcnf_get_brd_type(void)
 		}
 		else
 		{
-			judge = 0;	/* 1rank setting	*/
+			boardInfo = mmio_read_32(GPIO_INDT5);
+			if (boardInfo & LPDDR4_2RANK)
+			{
+				judge = 1;	/* 2rank setting	*/
+			}
+			else
+			{
+				judge = 0;	/* 1rank setting	*/
+			}
 		}
 	}
 	else if (Prr_Product == PRR_PRODUCT_G2N)

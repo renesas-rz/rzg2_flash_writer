@@ -42,8 +42,8 @@
 #include "boardid.h"
 #include "reg_rzg2.h"
 
-#define WRITER_VERSION	" V1.00"		/* Software Version	*/
-#define WRITER_DATE	" Sep.24,2019"		/* Release date		*/
+#define WRITER_VERSION	" V1.01"		/* Software Version	*/
+#define WRITER_DATE	" Jan.08,2020"		/* Release date		*/
 
 extern const com_menu MonCom[COMMAND_UNIT];
 extern uint8_t	gCOMMAND_Area[COMMAND_BUFFER_SIZE];
