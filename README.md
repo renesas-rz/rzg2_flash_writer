@@ -7,7 +7,7 @@ Sep-24-2019
 </Div>
 
 The RZ/G2 flash writer is sample software for Renesas RZ/G2 Group MPUs.
-The RZ/G2 flash writer downloads the some of the raw images from Host PC via SCIF, and writes the raw images to the Serial NOR Flash or eMMC.
+The RZ/G2 flash writer downloads the some of the raw images from Host PC via SCIF and writes the raw images to the Serial NOR Flash or eMMC.
 
 ## 1. Overview
 
@@ -25,9 +25,9 @@ The RZ/G2 flash writer eMMC writing support is High Speed SDR(i.e. 50MHz) and x8
 
 [Chapter 3](#3-software) describes the software.
 
-[Chapter 4](#4-how-to-build-the-flash-writer) explains example of how to build the RZ/G2 flash writer.
+[Chapter 4](#4-how-to-build-the-rzg2-flash-writer) explains example of how to build the RZ/G2 flash writer.
 
-[Chapter 5](#5-how-to-run-flash-writer) explains example of how to perform the RZ/G2 flash writer.
+[Chapter 5](#5-how-to-run-the-rzg2-flash-writer) explains example of how to perform the RZ/G2 flash writer.
 
 [Chapter 6](#6-error-case-to-handle) explains how to handle error case.
 
@@ -45,7 +45,7 @@ The RZ/G2 flash writer is distributed as a sample software from Renesas without 
 
 ## 1.4. Contributing
 
-To contribute to this layer you should email patches to renesas-rz@renesas.com. Please send .patch files as email attachments, not embedded in the email body.
+To contribute to this layer, you should email patches to renesas-rz@renesas.com. Please send .patch files as email attachments, not embedded in the email body.
 
 ## 1.5. References
 
@@ -95,9 +95,9 @@ The following table lists the software required to use this sample software.
 | Name                | Note                                                             |
 |---------------------|------------------------------------------------------------------|
 | Linaro Toolchain *1 | Linaro Binary Toolchain Release GCC 7.3-2018.05 for aarch64-elf. |
-| Yocto SDK *1 *2     | Yocto SDK built from Yocto environemnt for RZ/G2 Series          |
+| Yocto SDK *1 *2     | Yocto SDK built from Yocto environment for RZ/G2 Group           |
 
-\*1: One of the above enviroment is required.
+\*1: One of the above environments is required.
 
 \*2: Regarding how to get the Yocto SDK, refer to [Related Document](#related-document) No.2 or No.3.
 
@@ -639,7 +639,7 @@ source /opt/poky/2.4.3/environment-setup-aarch64-poky-linux
 
 ### 4.2. Prepare the source code
 
-Get the ource code of RZ/G2 flash writer.
+Get the source code of RZ/G2 flash writer.
 
 ```shell
 cd ~/
@@ -713,7 +713,7 @@ S-record file:
 
 - AArch64_output/AArch64_Flash_writer_SCIF_DUMMY_CERT_E6300400_`<board_name>`.mot
 
-After the transfer has suceeded, the following log will be shown.
+After the transfer has succeeded, the following log will be shown.
 
 ```text
 Flash writer for RZ/G2M V1.00 Sep.24,2018
@@ -754,12 +754,12 @@ For details of EXT_CSD, please refer to [Related Document](#related-document) No
 
 After the message "Please Input User Program Start Address" has been displayed, input a start address of the S-record format file to be loaded (smallest value) as the start address of the program. (This address is treated as the start address and branch address of the data transfer destination from the eMMC device in the program.)
 
-Please check the program start address, and write again program using EM_W command.
+Please check the program start address and write again program using EM_W command.
 
 ## 7. Revision history
 
 Describe the revision history of RZ/G2 flash writer.
 
-### 7.1. V1.0.0
+### 7.1. v1.00
 
 - First release.
