@@ -241,7 +241,7 @@ $(OUTPUT_FILE): $(OBJ_FILE_BOOT) $(OBJ_FILE) $(MEMORY_DEF)
 	$(OBJCOPY) -O binary "$(OUTPUT_FILE)" "$(FILE_NAME).bin"
 
 #   Dis assemble
-	$(OBJDMP) -d -S "$(OUTPUT_FILE)" > "$(FILE_NAME)_disasm.txt"
+	$(OBJDUMP) -d -S "$(OUTPUT_FILE)" > "$(FILE_NAME)_disasm.txt"
 
 #	Time Stamp
 	@echo ==========  %date% %time%  ==========
