@@ -29,57 +29,27 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "common.h"
-#include "devdrv.h"
-#include "scifdrv.h"
+#ifndef USB_LIB_H_
+#define USB_LIB_H_
 
-#if USB_ENABLE == 1
-uint32_t gTerminal = SCIF2_TERMINAL;
-#endif /* USB_ENABLE == 1 */
+/* return value for USB_GET_STATUS function */
+typedef enum {
+    ATTACHED,
+    POWERED,
+    DEFAULT,
+    ADDRESS,
+    CONFIGURED,
+    SUSPENDED
+} State;
 
-/************************
-	PutChar		*
-*************************/
 
-int32_t PutChar(char outChar)
-{
-#if USB_ENABLE == 1
-	if (gTerminal == USB_TERMINAL)
-	{
-		PutCharUSB(outChar);
-	}
-	else
-	{
-		PutCharSCIF2(outChar);
-	}
-#else  /* USB_ENABLE == 1 */
-	PutCharSCIF2(outChar);
-#endif /* USB_ENABLE == 1 */
-	return(0);
-}
+int32_t USB_Init(void);
+int32_t USB_TerminalInputCheck(uint8_t *command_area);
+void USB_IntCheck(void);
+int USB_ReadCount(void);
+int USB_ReadData(uint8_t *pBuff, int iDataSize);
+int USB_WriteData(uint8_t *pBuff, int iDataSize);
+void USB_ReadDataWithDMA(unsigned long bufferAddress, uint32_t totalDownloadSize);
+State USB_Get_Status(void);
 
-/************************
-	GetChar		*
-*************************/
-
-int32_t GetChar(char *inChar)
-{
-#if USB_ENABLE == 1
-	if (gTerminal == USB_TERMINAL)
-	{
-		GetCharUSB(inChar);
-	}
-	else
-	{
-		GetCharSCIF2(inChar);
-	}
-#else  /* USB_ENABLE == 1 */
-	GetCharSCIF2(inChar);
-#endif /* USB_ENABLE == 1 */
-	return(0);
-}
-
-int32_t WaitPutCharSendEnd(void)
-{
-	WaitPutScif2SendEnd();
-}
+#endif /* USB_LIB_H_ */

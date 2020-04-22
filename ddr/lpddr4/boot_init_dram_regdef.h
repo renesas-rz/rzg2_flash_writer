@@ -1,44 +1,41 @@
 /*
- * Copyright (c) 2015-2019, Renesas Electronics Corporation. All rights reserved.
+ * Copyright (c) 2015-2020, Renesas Electronics Corporation. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#define RZG2_DDR_VERSION        "rev.0.37"
+#define RZG2_DDR_VERSION        "rev.0.40"
 #define DRAM_CH_CNT		0x04
 #define SLICE_CNT		0x04
 #define CS_CNT			0x02
 /* order : CS0A, CS0B, CS1A, CS1B */
-#define CSAB_CNT		(CS_CNT*2)
+#define CSAB_CNT		(CS_CNT * 2)
 /* order : CH0A, CH0B, CH1A, CH1B, CH2A, CH2B, CH3A, CH3B */
-#define CHAB_CNT		(DRAM_CH_CNT*2)
+#define CHAB_CNT		(DRAM_CH_CNT * 2)
 
 /* for pll setting */
-#define CLK_DIV(a, diva, b, divb) (((a)*(divb))/((b)*(diva)))
-#define CLK_MUL(a, diva, b, divb) (((a)*(b))/((diva)*(divb)))
-
-#define CLK_DIV_RU(a, diva, b, divb) (((a)*(divb)+(b)*(diva)-1)/((b)*(diva)))
-#define CLK_MUL_RU(a, diva, b, divb) (((a)*(b)+(diva)*(divb)-1)/((diva)*(divb)))
+#define CLK_DIV(a, diva, b, divb) (((a) * (divb)) / ((b) * (diva)))
+#define CLK_MUL(a, diva, b, divb) (((a) * (b)) / ((diva) * (divb)))
 
 /* for ddr deisity setting */
-#define DBMEMCONF_REG(d3, row, bank, col, dw) ((d3)<<30 | ((row)<<24) | ((bank)<<16) | ((col)<<8) | (dw))
-#define DBMEMCONF_REGD(density) (DBMEMCONF_REG((density)%2, ((density)+1)/2+(29-3-10-2), 3, 10, 2))
+#define DBMEMCONF_REG(d3, row, bank, col, dw) (((d3) << 30) | ((row) << 24) | ((bank) << 16) | ((col) << 8) | (dw))
+#define DBMEMCONF_REGD(density) (DBMEMCONF_REG((density) % 2, ((density) + 1) / 2 + (29 - 3 - 10 - 2), 3, 10, 2))
 #define DBMEMCONF_VAL(ch, cs) (DBMEMCONF_REGD(DBMEMCONF_DENS(ch, cs)))
 
 /* refresh mode */
-#define DBSC_REFINTS		0x0		// 0: Average interval is REFINT. / 1: Average interval is 1/2 REFINT.
+#define DBSC_REFINTS		0x0		/* 0: Average interval is REFINT. / 1: Average interval is 1/2 REFINT. */
 
 /* system registers */
 #define CPG_BASE		(0xE6150000U)
 #define CPG_FRQCRB		(CPG_BASE + 0x0004U)
 
 #define CPG_PLLECR		(CPG_BASE + 0x00D0U)
-#define CPG_MSTPSR5		(CPG_BASE + 0x003CU)	// R	32	Module stop status register 5
+#define CPG_MSTPSR5		(CPG_BASE + 0x003CU)	/* R	32	Module stop status register 5 */
 #define CPG_SRCR4		(CPG_BASE + 0x00BCU)
 #define CPG_PLL3CR		(CPG_BASE + 0x00DCU)
 #define CPG_ZB3CKCR		(CPG_BASE + 0x0380U)
 #define CPG_FRQCRD		(CPG_BASE + 0x00E4U)
-#define CPG_SMSTPCR5		(CPG_BASE + 0x0144U)	// R/W	32	System module stop control register 5
+#define CPG_SMSTPCR5		(CPG_BASE + 0x0144U)	/* R/W	32	System module stop control register 5 */
 #define CPG_CPGWPR		(CPG_BASE + 0x0900U)
 #define CPG_SRSTCLR4		(CPG_BASE + 0x0950U)
 
@@ -58,6 +55,7 @@
 #define PRR_PRODUCT_MASK	(0x00007F00U)
 #define PRR_CUT_MASK		(0x000000FFU)
 
+#define PRR_PRODUCT_G2H		(0x00004F00U)		/* RZ/G2H	*/
 #define PRR_PRODUCT_G2M		(0x00005200U)           /* RZ/G2M	*/
 #define PRR_PRODUCT_G2N		(0x00005500U)           /* RZ/G2N	*/
 #define PRR_PRODUCT_10		(0x00U)			/*   Ver.1.0	*/
@@ -259,7 +257,7 @@
 #define MSTATQ_WTSETTING0	0xE67E8038U
 #define MSTATQ_WTSETTING1	0xE67E803CU
 
-#define QOS_BASE1		(0xE67F0000U)
+#define QOS_BASE1			(0xE67F0000U)
 #define QOSCTRL_RAS		(QOS_BASE1 + 0x0000U)
 #define QOSCTRL_FIXTH		(QOS_BASE1 + 0x0004U)
 #define QOSCTRL_RAEN		(QOS_BASE1 + 0x0018U)
@@ -277,7 +275,7 @@
 #define THS1_THCTR		0xE6198020U
 #define THS1_TEMP		0xE6198028U
 
-#define	DBSC_BASE		(0xE6790000U)
+#define	DBSC_BASE			(0xE6790000U)
 #define DBSC_DBSCHQOS00		(DBSC_BASE + 0x1030U)
 #define DBSC_DBSCHQOS01		(DBSC_BASE + 0x1034U)
 #define DBSC_DBSCHQOS02		(DBSC_BASE + 0x1038U)

@@ -33,6 +33,9 @@
 #include "types.h"
 #include "common.h"
 #include "devdrv.h"
+#if USB_ENABLE == 1
+#include "usb_lib.h"
+#endif /* USB_ENABLE == 1 */
 
 __attribute__((aligned(32))) uint8_t	gCOMMAND_Area[COMMAND_BUFFER_SIZE];
 
@@ -49,6 +52,19 @@ int32_t PutMess(const char *const mess[])
 	}
 	return(0);
 }
+
+#if USB_ENABLE == 1
+int32_t PutMessUSB(const char *const mess[])
+{
+	int32_t i=0;
+	while(mess[i])
+	{
+		PutStrUSB(mess[i],ENB_RTN);
+		i++;
+	}
+	return(0);
+}
+#endif /* USB_ENABLE == 1 */
 
 /************************************************************************/
 /*NAME		: PutStr						*/
@@ -68,6 +84,56 @@ int32_t PutStr(const char *str,char rtn)
 	return(0);
 
 }
+
+#if USB_ENABLE == 1
+int32_t	PutStrUSB(const char *str,char rtn)
+{
+	while(*str)
+	{
+		PutCharUSB(*str);
+		str++;
+	}
+	if (rtn == 1)
+	{
+		PutCharUSB(CR_CODE);
+		PutCharUSB(LF_CODE);
+	}
+	return(0);
+
+}
+
+int32_t PutCharUSB(char outChar)
+{
+	char outCh;
+	outCh = outChar;
+
+	(void)USB_WriteData(&outCh, 1);
+	USB_IntCheck();
+	return(0);
+}
+
+int32_t GetCharUSB(char *inChar)
+{
+	static int32_t numOfChar = 0;
+	static int32_t index = 0;
+	int32_t length = 0;
+
+	while(numOfChar == 0)
+	{
+		numOfChar = USB_ReadCount();
+		length = USB_ReadData(gCOMMAND_Area, numOfChar);
+		USB_IntCheck();
+	}
+	*inChar = *((char*)(gCOMMAND_Area + index));
+	index++;
+	if (numOfChar == index)
+	{
+		index = 0;
+		numOfChar = 0;
+	}
+	return(0);
+}
+#endif /* USB_ENABLE == 1 */
 
 /************************************************************************/
 /*NAME		: GetStr						*/

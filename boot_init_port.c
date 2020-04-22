@@ -109,6 +109,7 @@ void InitPORT(void)
 			StartRtDma0_Descriptor();
 			/* no break */
 		case PRR_PRODUCT_G2N:
+		case PRR_PRODUCT_G2H:
 			InitMODSEL();
 			InitIPSR_G2M();
 			InitGPSR_G2M();

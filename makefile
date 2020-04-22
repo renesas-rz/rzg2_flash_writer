@@ -33,6 +33,11 @@ ifeq ("$(BOARD)", "")
 BOARD = HIHOPE
 endif
 
+#/* Select USB("ENABLE"or"DISABLE" )********************************************
+ifeq ("$(USB)", "")
+USB = ENABLE
+endif
+
 #/* Select BOOT("WRITER"or"WRITER_WITH_CERT" )*************************
 ifeq ("$(BOOT)", "")
 BOOT = WRITER_WITH_CERT
@@ -92,6 +97,15 @@ else
 endif
 endif
 
+#USB download function can not be used with the starter kit.
+ifeq ("$(USB)", "ENABLE")
+        CFLAGS += -DUSB_ENABLE=1
+endif
+
+ifeq ("$(USB)", "DISABLE")
+        CFLAGS += -DUSB_ENABLE=0
+endif
+
 ifeq ("$(SERIAL_FLASH)", "ENABLE")
 	CFLAGS += -DSERIAL_FLASH=1
 endif
@@ -112,6 +126,9 @@ DDR_DEF = ddr_qos_init_setting
 
 LIBS        = -L$(subst libc.a, ,$(shell $(CC) -print-file-name=libc.a 2> /dev/null)) -lc
 LIBS        += -L$(subst libgcc.a, ,$(shell $(CC) -print-libgcc-file-name 2> /dev/null)) -lgcc
+ifeq ("$(USB)", "ENABLE")
+LIBS        += -L./AArch64_lib/ -lusb
+endif
 
 INCLUDE_DIR = include
 DDR_DIR = ddr

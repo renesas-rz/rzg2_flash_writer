@@ -41,9 +41,16 @@
 #include "devdrv.h"
 #include "boardid.h"
 #include "reg_rzg2.h"
+#if USB_ENABLE == 1
+#include "usb_lib.h"
+#endif /* USB_ENABLE == 1 */
 
-#define WRITER_VERSION	" V1.01"		/* Software Version	*/
-#define WRITER_DATE	" Jan.08,2020"		/* Release date		*/
+#define WRITER_VERSION	" V1.02"		/* Software Version	*/
+#define WRITER_DATE	" Apr.21,2020"		/* Release date		*/
+
+/* This definition sets the delay time in 10 milliseconds unit from */
+/* USB enumeration completion until the message is displayed.       */
+#define USB_BANNER_DELAY_TIME	(10 * 50)	/* 5000ms  */
 
 extern const com_menu MonCom[COMMAND_UNIT];
 extern uint8_t	gCOMMAND_Area[COMMAND_BUFFER_SIZE];
@@ -64,6 +71,9 @@ void InitMain(void)
 #if EMMC == 1
 	dg_init_emmc();
 #endif /* EMMC == 1 */
+#if USB_ENABLE == 1
+	USB_Init();
+#endif /* USB_ENABLE == 1 */
 }
 
 void StartMess( void )
@@ -75,6 +85,9 @@ void StartMess( void )
 	PutStr("Flash writer for ",0);
 	switch (product)
 	{
+		case PRR_PRODUCT_G2H:
+			PutStr("RZ/G2H", 0);
+		break;
 		case PRR_PRODUCT_G2M:
 			PutStr("RZ/G2M", 0);
 		break;
@@ -92,6 +105,34 @@ void StartMess( void )
 	PutStr(">", 0);
 }
 
+#if USB_ENABLE == 1
+void StartMessUSB( void )
+{
+	uint32_t product;
+
+	product = *((volatile uint32_t*)PRR) & PRR_PRODUCT_MASK;
+	PutStrUSB("Flash writer for ",0);
+	switch (product)
+	{
+		case PRR_PRODUCT_G2H:
+			PutStrUSB("RZ/G2H", 0);
+		break;
+		case PRR_PRODUCT_G2M:
+			PutStrUSB("RZ/G2M", 0);
+		break;
+		case PRR_PRODUCT_G2N:
+			PutStrUSB("RZ/G2N", 0);
+		break;
+		case PRR_PRODUCT_G2E:
+			PutStrUSB("RZ/G2E", 0);
+		break;
+		default:
+		break;
+	}
+	PutStrUSB(WRITER_VERSION, 0);
+	PutStrUSB(WRITER_DATE,1);
+}
+#endif
 
 void DecCom(void)
 {
@@ -99,9 +140,69 @@ void DecCom(void)
 	uint32_t rtn = 0;
 	uint32_t res;
 	chCnt = 1;
+#if USB_ENABLE == 1
+	State usb_state;	/* current USB state */
+	State usb_state_before;	/* lase USB state */
+	int USB_banner = 0;	/* 0:no display 1:display 2:displayed  */
+	int cnt;
+
+	usb_state = USB_Get_Status();
+	usb_state_before = usb_state;
+#endif /* USB_ENABLE == 1 */
 
 	while (rtn == 0)
 	{
+#if USB_ENABLE == 1
+		/* Display the boot message for USB connection */
+		usb_state = USB_Get_Status();
+		if (usb_state != usb_state_before)
+		{
+			usb_state_before = usb_state;
+			if (usb_state == CONFIGURED)
+			{
+				if (USB_banner == 0)
+				{
+					USB_banner = 1;
+				}
+			}
+		}
+		else if (usb_state == CONFIGURED)
+		{
+			if (USB_banner == 1)
+			{
+				StartTMU0(1);	/* 10msec delay */
+				cnt++;
+				/* Wait for specified time after USB connection is detected */
+				if (cnt >= USB_BANNER_DELAY_TIME)
+				{
+					USB_banner = 2;
+
+					PutStrUSB("  ",1);
+					StartMessUSB();
+					PutStrUSB(">", 0);
+				}
+			}
+		}
+
+		/* Confirm key input from USB */
+		rtn = USB_TerminalInputCheck(gCOMMAND_Area);
+		if (rtn > 0)
+		{
+			gTerminal = USB_TERMINAL;
+			gKeyBuf[0] = gCOMMAND_Area[0];
+			if (USB_banner == 1)
+			{
+				USB_banner = 2;
+
+				PutStrUSB("  ",1);
+				StartMessUSB();
+				PutStrUSB(">", 0);
+			}
+		}
+		USB_IntCheck();
+
+#endif /* USB_ENABLE == 1 */
+
 		if (rtn == 0)
 		{
 			rtn = SCIF_TerminalInputCheck(gKeyBuf);
@@ -141,6 +242,9 @@ void DecCom(void)
 		}
 		PutStr(">",0);
 		chCnt=0;
+#if USB_ENABLE == 1
+		USB_IntCheck();
+#endif /* USB_ENABLE == 1 */
 	}
 }
 

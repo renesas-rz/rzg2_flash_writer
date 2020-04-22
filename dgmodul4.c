@@ -40,6 +40,9 @@
 #include "devdrv.h"
 #include "dgmodul1.h"
 #include "boardid.h"
+#if USB_ENABLE == 1
+#include "usb_lib.h"
+#endif /* USB_ENABLE == 1 */
 
 uint32_t	gSpiFlashSvArea;
 uint32_t	gUserPrgStartAdd;
@@ -654,12 +657,31 @@ void XLoadSpiflash0_2(uint32_t mode)
 		char bin_data;
 		uint32_t image_offset = 0U;
 		PutStr("please send ! (binary)",1);
+
+#if USB_ENABLE == 1
+		if (gTerminal == USB_TERMINAL)
+		{
+			image_offset = ((gUserPrgSize + (DMA_TRANSFER_SIZE-1)) & ~(DMA_TRANSFER_SIZE-1));
+			USB_ReadDataWithDMA((unsigned long)Load_workStartAdd, image_offset);
+		}
+		else
+		{
+			while (image_offset < gUserPrgSize)
+			{
+				GetChar(&bin_data);
+				*(uint8_t *)(Load_workStartAdd + image_offset) = bin_data;
+				image_offset++;
+			}
+		}
+#else  /* USB_ENABLE == 1 */
 		while (image_offset < gUserPrgSize)
 		{
 			GetChar(&bin_data);
 			*(uint8_t *)(Load_workStartAdd + image_offset) = bin_data;
 			image_offset++;
 		}
+#endif /* USB_ENABLE == 1 */
+
 		workAdd_Min = Load_workStartAdd;
 		workAdd_Max = Load_workStartAdd + gUserPrgSize - 1;
 	}
@@ -1734,8 +1756,17 @@ void dgDdrTest(void)
 				PutStr(" Pass!",1);
 			}
 		break;
+		case PRR_PRODUCT_G2H:
 		case PRR_PRODUCT_G2M:
-			PutStr("=== Memory map RZ/G2M ====",1);
+			if (product == PRR_PRODUCT_G2H)
+			{
+				PutStr("=== Memory map RZ/G2H ====",1);
+
+			}
+			else
+			{
+				PutStr("=== Memory map RZ/G2M ====",1);
+			}
 			//CH0 Check
 			readData = *((volatile uint32_t*)0x0000000410000000);	//Access Check
 			PutStr("Check:0x04_10000000 ... ",0);

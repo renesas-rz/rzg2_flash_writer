@@ -44,6 +44,9 @@
 #include "dgmodul1.h"
 #include "devdrv.h"
 #include "boardid.h"
+#if USB_ENABLE == 1
+#include "usb_lib.h"
+#endif /* USB_ENABLE == 1 */
 
 #define	SIZE2SECTOR(x)			( (x) >> 9 )	/* 512Byte		*/
 
@@ -320,7 +323,19 @@ void	dg_emmc_write(EMMC_WRITE_COMMAND wc)
 		}
 		PutStr("please send binary file!",1);
 
+#if USB_ENABLE == 1
+		if (gTerminal == USB_TERMINAL)
+		{
+			totalDownloadSize = ((fileSize + (DMA_TRANSFER_SIZE - 1)) & DMA_ROUNDUP_VALUE);
+			USB_ReadDataWithDMA((unsigned long)Load_workStartAdd, totalDownloadSize);
+		}
+		else
+		{
+			dg_emmc_write_bin_serial(Load_workStartAdd, fileSize);
+		}
+#else  /* USB_ENABLE == 1 */
 		dg_emmc_write_bin_serial(Load_workStartAdd, fileSize);
+#endif /* USB_ENABLE == 1 */
 
 		workAdd_Min = (uintptr_t)Load_workStartAdd;
 		workAdd_Max = workAdd_Min + fileSize - 1;

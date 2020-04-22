@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2019, Renesas Electronics Corporation. All rights reserved.
+ * Copyright (c) 2015-2020, Renesas Electronics Corporation. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -569,6 +569,7 @@
 #define _reg_PI_TREF_F1                                    0x00000232U
 #define _reg_PI_TRFC_F2                                    0x00000233U
 #define _reg_PI_TREF_F2                                    0x00000234U
+#define _reg_RESERVED_H3VER2                               0x00000235U
 #define _reg_PI_TREF_INTERVAL                              0x00000236U
 #define _reg_PI_FREQ_CHANGE_REG_COPY                       0x00000237U
 #define _reg_PI_FREQ_SEL_FROM_REGIF                        0x00000238U

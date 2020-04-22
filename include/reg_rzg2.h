@@ -1387,6 +1387,7 @@
 #define	PRR				(0xFFF00044U)	// R	32	Product Register
 #define PRR_PRODUCT_MASK		(0x00007F00U)
 #define PRR_CUT_MASK			(0x000000FFU)
+#define PRR_PRODUCT_G2H			(0x00004F00U)	/* RZ/G2H	*/
 #define PRR_PRODUCT_G2M			(0x00005200U)	/* RZ/G2M 	*/
 #define PRR_PRODUCT_G2N			(0x00005500U)	/* RZ/G2N 	*/
 #define PRR_PRODUCT_G2E			(0x00005700U)	/* RZ/G2E	*/

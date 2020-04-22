@@ -43,6 +43,7 @@ void InitScif(void)
 	switch(product)
 	{
 #ifdef RZG2_HIHOPE
+		case PRR_PRODUCT_G2H:
 		case PRR_PRODUCT_G2M:
 		case PRR_PRODUCT_G2N:
 			InitScif2_SCIFCLK();

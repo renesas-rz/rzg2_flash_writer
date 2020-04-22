@@ -76,6 +76,7 @@ static void InitOUTDT(void)
 	switch (product)
 	{
 #ifdef RZG2_HIHOPE
+		case PRR_PRODUCT_G2H:
 		case PRR_PRODUCT_G2M:
 		case PRR_PRODUCT_G2N:
 			*((volatile uint32_t*)GPIO_OUTDT1)=0x00000000;
@@ -102,6 +103,7 @@ static void InitINOUTSEL(void)
 	switch (product)
 	{
 #ifdef RZG2_HIHOPE
+		case PRR_PRODUCT_G2H:
 		case PRR_PRODUCT_G2M:
 		case PRR_PRODUCT_G2N:
 			*((volatile uint32_t*)GPIO_INOUTSEL0)=0x00000000;
