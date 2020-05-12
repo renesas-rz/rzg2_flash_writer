@@ -35,7 +35,11 @@ endif
 
 #/* Select USB("ENABLE"or"DISABLE" )********************************************
 ifeq ("$(USB)", "")
+ifeq ("$(BOARD)", "EK874")
+USB = DISABLE
+else
 USB = ENABLE
+endif
 endif
 
 #/* Select BOOT("WRITER"or"WRITER_WITH_CERT" )*************************
@@ -50,7 +54,11 @@ endif
 
 #/* Select EMMC("ENABLE"or"DISABLE" )*******************************************
 ifeq ("$(EMMC)", "")
+ifeq ("$(BOARD)", "EK874")
+EMMC = DISABLE
+else
 EMMC = ENABLE
+endif
 endif
 
 #CPU
@@ -70,7 +78,6 @@ ifeq ("$(BOARD)", "EK874")
 	BOARD_NAME   =  EK874
 	FILENAME_ADD = _ek874
 	CFLAGS += -DRZG2_EK874=1
-	EMMC = DISABLE
 else
 	BOARD_NAME   =  HIHOPE
 	FILENAME_ADD = _hihope
@@ -97,7 +104,6 @@ else
 endif
 endif
 
-#USB download function can not be used with the starter kit.
 ifeq ("$(USB)", "ENABLE")
         CFLAGS += -DUSB_ENABLE=1
 endif
@@ -108,17 +114,13 @@ endif
 
 ifeq ("$(SERIAL_FLASH)", "ENABLE")
 	CFLAGS += -DSERIAL_FLASH=1
-endif
-
-ifeq ("$(SERIAL_FLASH)", "DISABLE")
+else
 	CFLAGS += -DSERIAL_FLASH=0
 endif
 
 ifeq ("$(EMMC)", "ENABLE")
 	CFLAGS += -DEMMC=1
-endif
-
-ifeq ("$(EMMC)", "DISABLE")
+else
 	CFLAGS += -DEMMC=0
 endif
 
@@ -157,7 +159,8 @@ SRC_FILE :=					\
 	boot_init_lbsc.c			\
 	boot_init_port.c			\
 	boot_init_gpio.c			\
-	micro_wait.c
+	micro_wait.c				\
+	ddrcheck.c
 
 ifeq ("$(SERIAL_FLASH)", "ENABLE")
 SRC_FILE +=					\

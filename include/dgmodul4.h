@@ -129,5 +129,3 @@ void dgG2InfoSpiflash0(void);
 void dgG2InfoSetSpiflash0(void);
 void dgClearSpiflash0(void);
 char dgLS_Load_Offset2(uint32_t *maxADD ,uint32_t *minADD);
-void dgDdrTest(void);
-void dgRamTest(void);

@@ -189,10 +189,16 @@ static void InitIPSR_G2E(void)
 static void InitGPSR_G2E(void)
 {
 	PFC_WR(PFC_GPSR2,0x3f);
+#if EMMC == 1
+	PFC_WR(PFC_GPSR4,0x000007FF);
+#endif /* EMMC == 1 */
 }
 
 static void InitIOCTRL_G2E(void)
 {
+#if EMMC == 1
+	PFC_WR(PFC_IOCTRL30,0x0007FFFF);
+#endif /* EMMC == 1 */
 }
 
 static void InitPUD_G2E(void)

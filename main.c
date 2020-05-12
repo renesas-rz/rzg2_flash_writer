@@ -46,7 +46,7 @@
 #endif /* USB_ENABLE == 1 */
 
 #define WRITER_VERSION	" V1.02"		/* Software Version	*/
-#define WRITER_DATE	" Apr.21,2020"		/* Release date		*/
+#define WRITER_DATE	" May.11,2020"		/* Release date		*/
 
 /* This definition sets the delay time in 10 milliseconds unit from */
 /* USB enumeration completion until the message is displayed.       */

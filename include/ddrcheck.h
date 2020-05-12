@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2018, Renesas Electronics Corporation
+ * Copyright (c) 2015-2019, Renesas Electronics Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,44 +29,5 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "common.h"
-#include "dgtable.h"
-#include "dgmodul1.h"
-#include "ddrcheck.h"
-#if SERIAL_FLASH == 1
-#include "dgmodul4.h"
-#endif /* SERIAL_FLASH == 1 */
-#if EMMC == 1
-#include "dgemmc.h"
-#endif /* EMMC == 1 */
-
-/********************************************************/
-/*        ROM TABLE                                     */
-/********************************************************/
-const com_menu MonCom[COMMAND_UNIT] = {
-/*--------------------- Basic command ------------------------------*/
-	"H"		, dgHelp			,  0	,
-#if SERIAL_FLASH == 1
-	"XCS"		, dgClearSpiflash0		,  0	,
-	"XLS"		, dgG2LoadSpiflash0		,  0	,
-	"XLS2"		, dgG2LoadSpiflash0_2		,  0	,
-	"XLS3"		, dgG2LoadSpiflash0_3		,  0	,
-	"XINFO_SA0"	, dgG2InfoSpiflash0_SA0		,  0	,
-	"XINFO_SA0_S"	, dgG2InfoSetSpiflash0_SA0	,  0	,
-	"XINFO"		, dgG2InfoSpiflash0		,  0	,
-	"XINFO_S"	, dgG2InfoSetSpiflash0		,  0	,
-#endif /* SERIAL_FLASH == 1 */
-#if EMMC == 1
-	"EM_DCID"	, &dg_emmc_disp_cid		,  0	,
-	"EM_DCSD"	, &dg_emmc_disp_csd		,  0	,
-	"EM_DECSD"	, &dg_emmc_disp_ext_csd		,  0	,
-	"EM_SECSD"	, &dg_emmc_set_ext_csd		,  0	,
-	"EM_W"		, &dg_emmc_write_mot		,  0	,
-	"EM_WB"		, &dg_emmc_write_bin		,  0	,
-	"EM_E"		, &dg_emmc_erase		,  0	,
-#endif /* EMMC == 1 */
-	"SUP"		, dgScifSpeedUp			,  0	,
-	"DDRCK"		, dgDdrTest			,  0	,
-	"RAMCK"		, dgRamTest			,  0	,
-	TBL_END		, 0				,  0
-};
+void dgDdrTest(void);
+void dgRamTest(void);
