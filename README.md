@@ -3,23 +3,23 @@
 <Div Align="right">
 Renesas Electronics Corporation
 
-Jan-09-2020
+May-11-2020
 </Div>
 
 The RZ/G2 flash writer is sample software for Renesas RZ/G2 Group MPUs.
-The RZ/G2 flash writer downloads the some of the raw images from Host PC via SCIF and writes the raw images to the Serial NOR Flash or eMMC.
+The RZ/G2 flash writer downloads binary images from Host PC via SCIF or USB and writes those binary images to Serial NOR Flash or eMMC.
 
 ## 1. Overview
 
-This document explains about RZ/G2 flash writer sample software for Renesas RZ/G2 Group MPUs.
+This document explains about the RZ/G2 flash writer sample software for Renesas RZ/G2 Group MPUs.
 
-The RZ/G2 flash writer is downloaded from the Host PC via SCIF by boot ROM.
+The RZ/G2 flash writer is downloaded from the Host PC via SCIF or USB by the boot ROM container within the RZ/G2 device.
 
-And the RZ/G2 flash writer downloads the some of the raw images from Host PC via SCIF, and writes the raw images to the Serial NOR Flash (hereafter referred to as &ldquo;Serial Flash&rdquo;) or eMMC.
+The RZ/G2 flash writer downloads binary images from Host PC via SCIF or USB, and writes those binary  images to Serial NOR Flash (hereafter referred to as &ldquo;Serial Flash&rdquo;) or eMMC.
 
-The RZ/G2 flash writer's Serial Flash writing support is on-board Serial NOR Flash(i.e. W25M512JW).
+The RZ/G2 flash writer's Serial Flash writing support is for on-board Serial NOR Flash devices (i.e. W25M512JW and others).
 
-The RZ/G2 flash writer eMMC writing support is High Speed SDR(i.e. 50MHz) and x8 bus width mode.
+The RZ/G2 flash writer eMMC writing support is for High Speed SDR (i.e. 50MHz) and x8 bus width mode.
 
 [Chapter 2](#2-operating-environment) describes the operating environment.
 
@@ -33,7 +33,7 @@ The RZ/G2 flash writer eMMC writing support is High Speed SDR(i.e. 50MHz) and x8
 
 [Chapter 7](#7-revision-history) explains revision history.
 
-*Note) This sample software does not support the file system. Therefore, can be write the raw image to the Serial NOR Flash or eMMC.*
+*Note) This sample software does not support file systems. Therefore, only raw binary images can be downloaded and programmed into Serial NOR Flash or eMMC.*
 
 ## 1.2. License
 
@@ -45,7 +45,7 @@ The RZ/G2 flash writer is distributed as a sample software from Renesas without 
 
 ## 1.4. Contributing
 
-To contribute to this layer, you should email patches to renesas-rz@renesas.com. Please send .patch files as email attachments, not embedded in the email body.
+To contribute to this software, you should email patches to renesas-rz@renesas.com. Please send .patch files as email attachments, not embedded in the email body.
 
 ## 1.5. References
 
@@ -64,13 +64,13 @@ The following table shows the document related to this function.
 
 ### 2.1. Hardware Environment
 
-The following table lists the hardware needed to use this function.
+The following table lists the hardware needed to use this utility.
 
 #### Hardware environment
 
 | Name                          | Note                                      |
 |-------------------------------|-------------------------------------------|
-| Target board                  | Hoperun HiHope RZ/G2[MN] platform         |
+| Target board                  | Hoperun HiHope RZ/G2[M,N,H] platform         |
 |                               | Silicon Linux RZ/G2E evaluation kit       |
 | Host PC                       | Ubuntu Desktop 14.04(64bit) or later      |
 
@@ -80,6 +80,7 @@ The following table shows Serial Flash and eMMC support for each MPU.
 
 | MPU    | Read/Write the Serial Flash | Boot from the Serial Flash | Read/Write the eMMC | Boot from the eMMC | MMC interface |
 |--------|-----------------------------|----------------------------|---------------------|--------------------|---------------|
+| RZ/G2H | Support                     | Support                    | Support             | Support            | MMC1          |
 | RZ/G2M | Support                     | Support                    | Support             | Support *1         | MMC1          |
 | RZ/G2N | Support                     | Support                    | Support             | Support            | MMC1          |
 | RZ/G2E | Support                     | Support                    | Support             | Support            | MMC1          |
@@ -97,7 +98,7 @@ The following table lists the software required to use this sample software.
 | Linaro Toolchain *1 | Linaro Binary Toolchain Release GCC 7.3-2018.05 for aarch64-elf. |
 | Yocto SDK *1 *2     | Yocto SDK built from Yocto environment for RZ/G2 Group           |
 
-\*1: One of the above environments is required.
+\*1: One of the above toolchains are required.
 
 \*2: Regarding how to get the Yocto SDK, refer to [Related Document](#related-document) No.2 or No.3.
 
@@ -105,17 +106,17 @@ The following table lists the software required to use this sample software.
 
 ### 3.1. Function
 
-This package has the following functions.
+This package has the following capabilities:
 
-- Write to the images to the Serial Flash.
+- Write binary images to the Serial Flash.
 - Erase the Serial Flash.
-- Display the CID/CSD/EXT_CSD registers of eMMC.
-- Modify the EXT_CSD registers of eMMC.
-- Write to the images to the boot partition of eMMC.
-- Write to the images to the user data area of eMMC.
-- Erase the boot partition of eMMC.
-- Erase the user data area of eMMC.
-- Change to the SCIF baud rate setting.
+- Display the CID/CSD/EXT_CSD registers of an eMMC.
+- Modify the EXT_CSD registers of an eMMC.
+- Write binary images to the boot partition of an eMMC.
+- Write binary images to the user data area of an eMMC.
+- Erase the boot partition of an eMMC.
+- Erase the user data area of an eMMC.
+- Change the SCIF baud rate setting.
 - Display the command help.
 
 ### 3.3. Option setting
@@ -159,6 +160,19 @@ If this option is not selected, the default value is ENABLE.
 | ENABLE  | eMMC writing function is available. (default) |
 | DISABLE | eMMC writing function is not available.       |
 
+#### 3.3.7 USB
+
+Select from the following table according to the USB download mode support.
+
+If this option is not selected, the default value is ENABLE.
+
+##### Association table for the USB communications values
+
+| USB     | USB Communications                                   |
+|---------|------------------------------------------------------|
+| ENABLE  | USB communication to Host PC is available. (default) |
+| DISABLE | USB communication to Host PC is not available.       |
+
 ### 3.4. Command specification
 
 The following table shows the command list.
@@ -194,21 +208,11 @@ This command writes the S-record format image to Serial Flash.
 | u-boot-elf-`<board_name>`.srec | H'50000000          | H'300000           | U-boot                 |
 
 The following shows the procedure of this command.
+The values must be entered as **hexadecimal**.
 
 *Note) The following procedure is an example on HiHope RZ/G2M board.*
 
-```text
->XLS2
-===== Qspi writing of RZ/G2 Board Command =============
-Load Program to Spiflash
-Writes to any of SPI address.
- Winbond : W25M512JW
-Program Top Address & Qspi Save Address
-===== Please Input Program Top Address ============
-  Please Input : H'
-```
-
-Please enter the program top address of the write image in hexadecimal.
+*Note) If Flash is already blank, you will not be asked to erase*
 
 ```text
 >XLS2
@@ -218,65 +222,11 @@ Writes to any of SPI address.
  Winbond : W25M512JW
 Program Top Address & Qspi Save Address
 ===== Please Input Program Top Address ============
-  Please Input : H'e6304000
+  Please Input : H'e6304000                                             <<<< Enter "e6304000" here
 
 ===== Please Input Qspi Save Address ===
-  Please Input : H'
-```
-
-Please enter the flash save address in hexadecimal.
-
-```text
->XLS2
-===== Qspi writing of RZ/G2 Board Command =============
-Load Program to Spiflash
-Writes to any of SPI address.
- Winbond : W25M512JW
-Program Top Address & Qspi Save Address
-===== Please Input Program Top Address ============
-  Please Input : H'e6304000
-
-===== Please Input Qspi Save Address ===
-  Please Input : H'40000
-Work RAM(H'50000000-H'53FFFFFF) Clear....
-please send ! ('.' & CR stop load)
-```
-
-Please download the write image in S-record format.
-
-```text
->XLS2
-===== Qspi writing of RZ/G2 Board Command =============
-Load Program to Spiflash
-Writes to any of SPI address.
- Winbond : W25M512JW
-Program Top Address & Qspi Save Address
-===== Please Input Program Top Address ============
-  Please Input : H'e6304000
-
-===== Please Input Qspi Save Address ===
-  Please Input : H'40000
-Work RAM(H'50000000-H'53FFFFFF) Clear....
-please send ! ('.' & CR stop load)
-SPI Data Clear(H'FF) Check :H'00040000-0005FFFF,Clear OK?(y/n)
-```
-
-Please enter the 'y' key when asked to clear.
-
-If Flash is erased, it will not be asked.
-
-```text
->XLS2
-===== Qspi writing of RZ/G2 Board Command =============
-Load Program to Spiflash
-Writes to any of SPI address.
- Winbond : W25M512JW
-Program Top Address & Qspi Save Address
-===== Please Input Program Top Address ============
-  Please Input : H'e6304000
-
-===== Please Input Qspi Save Address ===
-  Please Input : H'40000
+  Please Input : H'40000                                                <<<< Enter "40000" here
+SPI Data Clear(H'FF) Check :H'00040000-0005FFFF,Clear OK?(y/n)          <<<< Enter "y" here
 Work RAM(H'50000000-H'53FFFFFF) Clear....
 please send ! ('.' & CR stop load)
 SPI Data Clear(H'FF) Check :H'00040000-0005FFFF Erasing...Erase Completed
@@ -285,7 +235,6 @@ SAVE SPI-FLASH.......
  SpiFlashMemory Stat Address : H'00040000
  SpiFlashMemory End Address  : H'0005B0E3
 ===========================================================
-
 >
 ```
 
@@ -377,25 +326,11 @@ The following shows the procedure of this command.
 
 #### 3.4.7. Modify the EXT_CSD registers of eMMC command
 
-This command modifies the contents of the registers of EXT_CSD of the eMMC.
+This command modifies the contents of the EXT_CSD registers in the eMMC.
 
-The following shows the procedure of this command.
+The values must be entered as **hexadecimal**.
 
-```text
->EM_SECSD
-  Please Input EXT_CSD Index(H'00 - H'1FF) :
-```
-
-Enter the address of the EXT_CSD register in hexadecimal.
-
-```text
->EM_SECSD
-  Please Input EXT_CSD Index(H'00 - H'1FF) :b1
-  EXT_CSD[B1] = 0x00
-  Please Input Value(H'00 - H'FF) :
-```
-
-Enter the settings of EXT_CSD register in hexadecimal.
+Example:
 
 ```text
 >EM_SECSD
@@ -405,7 +340,12 @@ Enter the settings of EXT_CSD register in hexadecimal.
   EXT_CSD[B1] = 0x0A
 ```
 
-The EXT_CSD register has been modified.
+#### eMMC Boot Settings
+
+Please note that for eMMC booting, the following EXT_CSD registers need to be modified:
+ - EXT_CSD[**B1**] = **0x0A**
+ - EXT_CSD[**B3**] = **0x08**
+
 
 #### 3.4.8. Write to the S-record format images to the eMMC
 
@@ -422,83 +362,9 @@ This command writes the S-record format image to any partition of the eMMC.
 | u-boot-elf-`<board_name>`.srec | H'50000000          | boot partition2     | H'000000          | U-boot                 |
 
 The following shows the procedure of this command.
-
-```text
->EM_W
-EM_W Start --------------
----------------------------------------------------------
-Please select,eMMC Partition Area.
- 0:User Partition Area   : 30535680 KBytes
-  eMMC Sector Cnt : H'0 - H'03A3DFFF
- 1:Boot Partition 1      : 16384 KBytes
-  eMMC Sector Cnt : H'0 - H'00007FFF
- 2:Boot Partition 2      : 16384 KBytes
-  eMMC Sector Cnt : H'0 - H'00007FFF
----------------------------------------------------------
-  Select area(0-2)>
-```
-
-Please enter the partition number.
-
-```text
->EM_W
-EM_W Start --------------
----------------------------------------------------------
-Please select,eMMC Partition Area.
- 0:User Partition Area   : 30535680 KBytes
-  eMMC Sector Cnt : H'0 - H'03A3DFFF
- 1:Boot Partition 1      : 16384 KBytes
-  eMMC Sector Cnt : H'0 - H'00007FFF
- 2:Boot Partition 2      : 16384 KBytes
-  eMMC Sector Cnt : H'0 - H'00007FFF
----------------------------------------------------------
-  Select area(0-2)>1
--- Boot Partition 1 Program -----------------------------
-Please Input Start Address in sector :
-```
-
+The values must be entered as **hexadecimal**.
 Please enter the start sector number of the write image in hexadecimal. Sector size is 512 bytes.
-
-```text
->EM_W
-EM_W Start --------------
----------------------------------------------------------
-Please select,eMMC Partition Area.
- 0:User Partition Area   : 30535680 KBytes
-  eMMC Sector Cnt : H'0 - H'03A3DFFF
- 1:Boot Partition 1      : 16384 KBytes
-  eMMC Sector Cnt : H'0 - H'00007FFF
- 2:Boot Partition 2      : 16384 KBytes
-  eMMC Sector Cnt : H'0 - H'00007FFF
----------------------------------------------------------
-  Select area(0-2)>1
--- Boot Partition 1 Program -----------------------------
-Please Input Start Address in sector :0000
-Please Input Program Start Address :
-```
-
 Please enter the program top address of the write image in hexadecimal.
-
-```text
->EM_W
-EM_W Start --------------
----------------------------------------------------------
-Please select,eMMC Partition Area.
- 0:User Partition Area   : 30535680 KBytes
-  eMMC Sector Cnt : H'0 - H'03A3DFFF
- 1:Boot Partition 1      : 16384 KBytes
-  eMMC Sector Cnt : H'0 - H'00007FFF
- 2:Boot Partition 2      : 16384 KBytes
-  eMMC Sector Cnt : H'0 - H'00007FFF
----------------------------------------------------------
-  Select area(0-2)>1
--- Boot Partition 1 Program -----------------------------
-Please Input Start Address in sector :0000
-Please Input Program Start Address : E6320000
-Work RAM(H'50000000-H'50FFFFFF) Clear....
-please send ! ('.' & CR stop load)
-```
-
 Please download the write image in S-record format.
 
 ```text
@@ -513,10 +379,10 @@ Please select,eMMC Partition Area.
  2:Boot Partition 2      : 16384 KBytes
   eMMC Sector Cnt : H'0 - H'00007FFF
 ---------------------------------------------------------
-  Select area(0-2)>1
+  Select area(0-2)>1                                         <<<< Enter "1" here
 -- Boot Partition 1 Program -----------------------------
-Please Input Start Address in sector :0000
-Please Input Program Start Address : E6320000
+Please Input Start Address in sector :0000                   <<<< Enter "0000" here
+Please Input Program Start Address : E6320000                <<<< Enter "E6320000" here
 Work RAM(H'50000000-H'50FFFFFF) Clear....
 please send ! ('.' & CR stop load)
 SAVE -FLASH.......
@@ -533,22 +399,6 @@ The following shows the procedure of this command.
 
 ```text
 >EM_E
-Start --------------
----------------------------------------------------------
-Please select,eMMC Partition Area.
- 0:User Partition Area   : 30212096 KBytes
-  eMMC Sector Cnt : H'0 - H'0399FFFF
- 1:Boot Partition 1      : 4096 KBytes
-  eMMC Sector Cnt : H'0 - H'00001FFF
- 2:Boot Partition 2      : 4096 KBytes
-  eMMC Sector Cnt : H'0 - H'00001FFF
----------------------------------------------------------
-```
-
-Please enter the partition number.
-
-```text
->EM_E
 EM_E Start --------------
 ---------------------------------------------------------
 Please select,eMMC Partition Area.
@@ -559,7 +409,7 @@ Please select,eMMC Partition Area.
  2:Boot Partition 2      : 8192 KBytes
   eMMC Sector Cnt : H'0 - H'00003FFF
 ---------------------------------------------------------
-  Select area(0-2)>0
+  Select area(0-2)>0                                      <<<< Enter "0" here
 -- User Partition Area Program --------------------------
 EM_E Complete!
 ```
@@ -645,7 +495,7 @@ Get the source code of RZ/G2 flash writer.
 cd ~/
 git clone https://github.com/renesas-rz/rzg2_flash_writer.git
 cd rzg2_flash_writer
-git checkout -b v1.01 v1.01
+git checkout -b v1.02 v1.02
 ```
 
 ### 4.3. Build the RZ/G2 flash writer
@@ -771,3 +621,9 @@ Describe the revision history of RZ/G2 flash writer.
 - Support HiHope RZ/G2[MN] Rev.3/Rev.4 boards
 - Improve makefile to support the build by bitbake
 - Add new makefile for the linaro toolchain build
+
+### 7.3. v1.02
+
+- Support HiHope RZ/G2[H] Rev.4 boards
+- Support USB Download mode
+- List register configurations needed eMMC boot
