@@ -37,11 +37,11 @@
 
 void InitRPC_QspiFlashQuadExtMode(void);
 void InitRPC_QspiFlash4FastReadExtMode(void);
-void InitRPC_QspiFlash(void);
-void InitRPC_QspiFlashBoard(void);
+void InitRPC_QspiFlash(uint32_t rpcclk);
 void ReadConfigRegQspiFlash(uint32_t *cnfigReg);
 void WriteRegisterQspiFlash(uint32_t statusReg, uint32_t configReg);
 void WriteRegisterQspiFlash_Byte2(uint32_t statusReg, uint32_t configReg);
+void SectorEraseQspiFlash(uint32_t sector_addr);
 void SectorErase4QspiFlash(uint32_t sector_addr);
 void WriteData4ppWithBufferQspiFlash(uint32_t addr, uint32_t source_addr);
 void WriteData4ppQspiFlash(uint32_t addr, uint32_t writeData);
@@ -57,6 +57,7 @@ void WaitRpcTxEnd(void);
 void InitRPC_QspiFlashFastReadExtMode(void);
 void WriteDataPpWithBufferQspiFlash(uint32_t addr, uint32_t source_addr);
 
+void ParameterSectorErase3QspiFlash(uint32_t sector_addr);
 void ParameterSectorErase4QspiFlash(uint32_t sector_addr);
 void ResetRPC(void);
 //void SetResetRPC(void);

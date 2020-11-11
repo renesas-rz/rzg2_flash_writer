@@ -121,22 +121,11 @@ void InitRPC_QspiFlash4FastReadExtMode(void)
 		//bit0 DRDRE  = 0 : DATA SDR transfer
 }
 
-void InitRPC_QspiFlash(void)
+void InitRPC_QspiFlash(uint32_t rpcclk)
 {
 	PowerOnRPC();
 
-	SetRPC_ClockMode(RPC_CLK_80M);
-	ResetRPC();
-	SetRPC_SSL_Delay();
-
-	*((volatile uint32_t*)RPC_SEC_CONF) = 0x00000155;
-	*((volatile uint32_t*)RPC_OFFSET1)  = 0x31511144;
-}
-
-void InitRPC_QspiFlashBoard(void)
-{
-	PowerOnRPC();
-	SetRPC_ClockMode(RPC_CLK_40M);
+	SetRPC_ClockMode(rpcclk);
 	ResetRPC();
 	SetRPC_SSL_Delay();
 
@@ -1348,6 +1337,50 @@ void WriteDataWithBufferQspiFlash(uint32_t addr, uint32_t source_addr)	//for QSP
 	}
 	*((volatile uint32_t*)RPC_DRCR)       = 0x011F0301;
 		//bit9   RCF         =  1 : Read Cache Clear
+}
+
+// SE (4KB) 20h 3-byte address
+void ParameterSectorErase3QspiFlash(uint32_t sector_addr)
+{
+	uint32_t product;
+	uint32_t cut;
+
+	product = *((volatile uint32_t*)PRR) & PRR_PRODUCT_MASK;
+	cut = *((volatile uint32_t*)PRR) & PRR_CUT_MASK;
+
+	if ((product ==  PRR_PRODUCT_G2M) && (cut < PRR_CUT_30))
+	{
+		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
+	}
+	else
+	{
+		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80038260;
+		//bit31  CAL         =  1 : PHY calibration
+		//bit1-0 PHYMEM[1:0] = 00 : QSPI-SDR
+	}
+	*((volatile uint32_t*)RPC_CMNCR)      = 0x81FFF300;
+		//bit31  MD       =  1 : Manual mode
+		//bit1-0 BSZ[1:0] = 00 : QSPI Flash x 1
+	*((volatile uint32_t*)RPC_SMCMR)      = 0x00200000;
+		//bit23-16 CMD[7:0] = 0x20 : Sector Erase command (for Palladium QSPI model)
+	*((volatile uint32_t*)RPC_SMADR)      = sector_addr;
+	*((volatile uint32_t*)RPC_SMDRENR)    = 0x00000000;
+		//bit8 ADDRE  = 0 : Address SDR transfer
+		//bit0 SPIDRE = 0 : DATA SDR transfer
+	*((volatile uint32_t*)RPC_SMENR)      = 0x00004700;
+		//bit31-30 CDB[1:0]   =   00 : 1bit width command (QSPI0_MOSI)
+		//bit25-24 ADB[1:0]   =   00 : 1bit width address (QSPI0_MOSI)
+		//bit17-16 SPIDB[1:0] =   00 : 1bit width transfer data (QSPI0_MISO)
+		//bit15    DME        =    0 : No dummy cycle
+		//bit14    CDE        =    1 : Command enable
+		//bit11-8  ADE[3:0]   = 0111 : ADR[23:0] output (24 Bit Address)
+		//bit3-0   SPIDE[3:0] = 0000 : No transfer
+	*((volatile uint32_t*)RPC_SMCR)       = 0x00000001;
+		//bit2     SPIRE      = 0 : Data read disable
+		//bit1     SPIWE      = 0 : Data write disable
+		//bit0     SPIE       = 1 : SPI transfer start
+
+	WaitRpcTxEnd();
 }
 
 //SE D8h  3-byte address

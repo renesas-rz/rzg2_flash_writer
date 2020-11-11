@@ -3,7 +3,7 @@
 <Div Align="right">
 Renesas Electronics Corporation
 
-May-11-2020
+Nov-11-2020
 </Div>
 
 The RZ/G2 flash writer is sample software for Renesas RZ/G2 Group MPUs.
@@ -627,3 +627,7 @@ Describe the revision history of RZ/G2 flash writer.
 - Support HiHope RZ/G2[H] Rev.4 boards
 - Support USB Download mode
 - List register configurations needed eMMC boot
+
+### 7.4. v1.03
+
+- Support QSPI Flash devices smaller than 16MB

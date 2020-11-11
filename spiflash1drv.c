@@ -59,8 +59,24 @@ void Fast4RdQspiFlash(uint32_t sourceSpiAdd,uint32_t destinationAdd,uint32_t byt
 	mem_copy(destinationAdd, sourceAdd, byteCount);
 }
 
+//////////////////////////////////
+// Qspi:Fast Read  (FAST_READ 0Bh)
+//////////////////////////////////
+void FastRdQspiFlash(uint32_t sourceSpiAdd,uint32_t destinationAdd,uint32_t byteCount)
+{
+	uint32_t sourceAdd;
+
+#if (DEBUG_MSG)
+	PutStr("## FastRdQspiFlash", 1);
+#endif
+	InitRPC_QspiFlashFastReadExtMode();
+
+	sourceAdd = SPI_IOADDRESS_TOP + sourceSpiAdd;
+	mem_copy(destinationAdd, sourceAdd, byteCount);
+}
+
 //////////////////////////////////////////
-// Qspi:Sector Erase (64kB)	(4SE DCh)
+// Qspi:Sector Erase (64kB)	
 //////////////////////////////////////////
 static void SectorEraseQspiFlashInternal(uint32_t addr)
 {
@@ -70,8 +86,22 @@ static void SectorEraseQspiFlashInternal(uint32_t addr)
 	PutStr("## SectorEraseQspiFlashInternal", 1);
 #endif
 	WriteCommandQspiFlash(0x00060000);	//WRITE ENABLE
-	SectorErase4QspiFlash(addr);
-
+	if (gQspi_end_addess <= TOTAL_SIZE_16MB)
+	{
+#if (DEBUG_MSG)
+		PutStr("## SectorEraseQspiFlash", 1);
+#endif
+		// Sector Erase (D8h)
+		SectorEraseQspiFlash(addr);
+	}
+	else
+	{
+#if (DEBUG_MSG)
+		PutStr("## SectorErase4QspiFlash", 1);
+#endif
+		// Sector Erase with 4-Byte Address (DCh)
+		SectorErase4QspiFlash(addr);
+	}
 	while(1)
 	{
 		ReadStatusQspiFlash(&status);
@@ -107,12 +137,12 @@ int32_t BulkEraseQspiFlash(void)
 }
 
 //////////////////////////////////////////
-// Page Program with 4-Byte Address (12h)
+// Page Program
 //////////////////////////////////////////
 void PageProgramWithBuffeQspiFlash(uint32_t addr, uint32_t source_addr)
 {
 	uint32_t status;
-#if (DEBUG_MSG_WRITE)
+#if (DEBUG_MSG)
 	char	str[64];
 
 	PutStr("## PageProgramWithBuffeQspiFlash", 1);
@@ -125,7 +155,22 @@ void PageProgramWithBuffeQspiFlash(uint32_t addr, uint32_t source_addr)
 	PutStr(str, 1);
 #endif
 	WriteCommandQspiFlash(0x00060000);	//WRITE ENABLE
-	WriteData4ppWithBufferQspiFlash(addr, source_addr);	//4PP
+	if (gQspi_end_addess <= TOTAL_SIZE_16MB)
+	{
+#if (DEBUG_MSG)
+		PutStr("## WriteDataPpWithBuffer", 1);
+#endif
+		//Page Program (PP:02h)  3-byte address
+		WriteDataPpWithBufferQspiFlash(addr, source_addr);
+	}
+	else
+	{
+#if (DEBUG_MSG)
+		PutStr("## WriteData4ppWithBufferQspiFlash", 1);
+#endif
+		// Page Program with 4-Byte Address (12h)
+		WriteData4ppWithBufferQspiFlash(addr, source_addr);
+	}
 	while(1)
 	{
 		ReadStatusQspiFlash(&status);
@@ -138,7 +183,6 @@ void PageProgramWithBuffeQspiFlash(uint32_t addr, uint32_t source_addr)
 
 ///////////////////////////////////////////////
 // Qspi:Parameter 4-kB Sector Erase
-// 4KB Sector Erase with 4-Byte Address (21h)
 ///////////////////////////////////////////////
 void ParameterSectorErase4kbQspiFlash(uint32_t addr)
 {
@@ -152,8 +196,16 @@ void ParameterSectorErase4kbQspiFlash(uint32_t addr)
 	PutStr(str, 1);
 #endif
 	WriteCommandQspiFlash(0x00060000);	//WRITE ENABLE
-	ParameterSectorErase4QspiFlash(addr);
-
+	if (gQspi_end_addess <= TOTAL_SIZE_16MB)
+	{
+		// 4KB Sector Erase (20h)
+		ParameterSectorErase3QspiFlash(addr);
+	}
+	else
+	{
+		// 4KB Sector Erase with 4-Byte Address (21h)
+		ParameterSectorErase4QspiFlash(addr);
+	}
 	while(1)
 	{
 		ReadStatusQspiFlash(&status);
@@ -229,13 +281,13 @@ static void SetSectorErase64kbQspiFlashCypress(void)
 //////////////////////////////////////////
 void SaveDataWithBuffeQspiFlash(uint32_t srcAdd, uint32_t svFlashAdd, uint32_t svSize)
 {
-#if (DEBUG_MSG_WRITE)
+#if (DEBUG_MSG)
 	char		str[64];
 #endif
 	uint32_t	flashAdd;
 	uint32_t	writeDataAdd;
 
-#if (DEBUG_MSG_WRITE)
+#if (DEBUG_MSG)
 	PutStr("## SaveDataWithBuffeQspiFlash", 1);
 
 	PutStr("srcAdd : 0x", 0);
@@ -362,6 +414,12 @@ void SectorRdQspiFlash(uint32_t spiStatAdd, uint32_t distRamAdd)
 	Data2HexAscii(readSize, str, 4);
 	PutStr(str, 1);
 #endif
-
-	Fast4RdQspiFlash(SectorStatTopAdd, distRamAdd, readSize);
+	if (gQspi_end_addess <= TOTAL_SIZE_16MB)
+	{
+		FastRdQspiFlash(SectorStatTopAdd, distRamAdd, readSize);
+	}
+	else
+	{
+		Fast4RdQspiFlash(SectorStatTopAdd, distRamAdd, readSize);
+	}
 }

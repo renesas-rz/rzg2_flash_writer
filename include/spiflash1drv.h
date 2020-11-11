@@ -32,6 +32,7 @@
 #define SPIREG_CR3V 0x00800004			//Volatile Status and Configuration Registers (CR3V)
 
 void Fast4RdQspiFlash(uint32_t sourceSpiAdd,uint32_t destinationAdd,uint32_t byteCount);
+void FastRdQspiFlash(uint32_t sourceSpiAdd,uint32_t destinationAdd,uint32_t byteCount);
 int32_t BulkEraseQspiFlash(void);
 void PageProgramWithBuffeQspiFlash(uint32_t addr, uint32_t source_addr);
 void ParameterSectorErase4kbQspiFlash(uint32_t addr);

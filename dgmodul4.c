@@ -269,7 +269,14 @@ void dgG2LoadSpiflash0(void)
 
 	if ((gSpiFlashSvArea == 1) || (gSpiFlashSvArea == 2))
 	{
-		Fast4RdQspiFlash(InfoPrgStatAdd, rdBufstatAdd, OnBoardSpiSysSize);
+		if (gQspi_end_addess <= TOTAL_SIZE_16MB)
+		{
+			FastRdQspiFlash(InfoPrgStatAdd, rdBufstatAdd, OnBoardSpiSysSize);
+		}
+		else
+		{
+			Fast4RdQspiFlash(InfoPrgStatAdd, rdBufstatAdd, OnBoardSpiSysSize);
+		}
 		PutStr("SPI Data Clear(H'FF):H'000000-03FFFF Erasing.", 0);
 		ParameterSectorEraseQspiFlash(InfoPrgStatAdd, ((OnBoardSpiSysSize) - 1));
 	}
@@ -309,7 +316,8 @@ void dgG2LoadSpiflash0(void)
 
 void InitRPC_Mode(void)
 {
-	InitRPC_QspiFlash();
+	InitRPC_QspiFlash(RPC_CLK_40M);
+//	InitRPC_QspiFlash(RPC_CLK_80M);
 }
 
 uint32_t CheckQspiFlashId(void)
@@ -351,6 +359,27 @@ uint32_t CheckQspiFlashId(void)
 			PutStr(" Winbond : ", 0);
 			switch(deviceId)
 			{
+				case DEVICE_ID_W25Q64JV:
+						PutStr("W25Q64JV", 1);
+						gQspi_sa_size    = SA_64KB;
+						gQspi_end_addess = TOTAL_SIZE_8MB - 0x8000 - 1;
+				break;
+				case DEVICE_ID_W25Q64JW:
+						PutStr("W25Q64JW", 1);
+						gQspi_sa_size    = SA_64KB;
+						gQspi_end_addess = TOTAL_SIZE_8MB - 0x8000 - 1;
+				break;
+				case DEVICE_ID_W25Q128JV:
+						PutStr("W25Q128JV", 1);
+						gQspi_sa_size    = SA_64KB;
+						gQspi_end_addess = TOTAL_SIZE_16MB - 0x8000 - 1;
+				break;
+
+				case DEVICE_ID_W25Q128JW:
+						PutStr("W25Q128JW", 1);
+						gQspi_sa_size    = SA_64KB;
+						gQspi_end_addess = TOTAL_SIZE_16MB - 0x8000 - 1;
+				break;
 				case DEVICE_ID_W25Q256:
 						PutStr("W25Q256", 1);
 						gQspi_sa_size    = SA_64KB;
@@ -364,6 +393,7 @@ uint32_t CheckQspiFlashId(void)
 				case DEVICE_ID_W25M512JW:
 						PutStr("W25M512JW", 1);
 						gQspi_sa_size    = SA_64KB;
+
 						gQspi_end_addess = TOTAL_SIZE_32MB - 0x8000 - 1;
 				break;
 				case DEVICE_ID_W25Q512JV:
@@ -494,7 +524,14 @@ int32_t CkQspiFlash1ClearSectorSize(uint32_t rdBufAdd,uint32_t spiFlashStatAdd,u
 	char		str[64];
 
 	PutStr("SPI Data Clear(H'FF) Check :",0);
-	Fast4RdQspiFlash(spiFlashStatAdd, rdBufAdd,checkSize);
+	if (gQspi_end_addess <= TOTAL_SIZE_16MB)
+	{
+		FastRdQspiFlash(spiFlashStatAdd, rdBufAdd,checkSize);
+	}
+	else
+	{
+		Fast4RdQspiFlash(spiFlashStatAdd, rdBufAdd,checkSize);
+	}
 
 	flashEraseFlg = 0;
 
@@ -1002,7 +1039,14 @@ void dgG2InfoSetSpiflash0_SA0(void)
 
 	OnBoardSpiSysSize    = 0x2000;
 
-	Fast4RdQspiFlash(spiFlashStatAdd, rdBufstatAdd, OnBoardSpiSysSize);
+	if (gQspi_end_addess <= TOTAL_SIZE_16MB)
+	{
+		FastRdQspiFlash(spiFlashStatAdd, rdBufstatAdd, OnBoardSpiSysSize);
+	}
+	else
+	{
+		Fast4RdQspiFlash(spiFlashStatAdd, rdBufstatAdd, OnBoardSpiSysSize);
+	}
 	//Boot ROM Parameter
 	readAdd  = workTopAdd + SPIBOOT_BTROM_PARA;
 	PutStr(" Boot ROM Parameters                        : H'", 0);
