@@ -203,10 +203,16 @@ static void InitIOCTRL_G2E(void)
 
 static void InitPUD_G2E(void)
 {
+#if EMMC == 1
+	PFC_WR(PFC_PUD3, 0x001FF79FU);
+#endif
 }
 
 static void InitPUEN_G2E(void)
 {
+#if EMMC == 1
+	PFC_WR(PFC_PUEN3, 0x001FF800U);
+#endif
 }
 #endif /* RZG2_EK874*/
 

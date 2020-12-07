@@ -45,8 +45,8 @@
 #include "usb_lib.h"
 #endif /* USB_ENABLE == 1 */
 
-#define WRITER_VERSION	" V1.03"		/* Software Version	*/
-#define WRITER_DATE	" Sep.28,2020"		/* Release date		*/
+#define WRITER_VERSION	" V1.04"		/* Software Version	*/
+#define WRITER_DATE	" Dec.02,2020"		/* Release date		*/
 
 /* This definition sets the delay time in 10 milliseconds unit from */
 /* USB enumeration completion until the message is displayed.       */

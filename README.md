@@ -3,7 +3,7 @@
 <Div Align="right">
 Renesas Electronics Corporation
 
-Nov-11-2020
+Dec-02-2020
 </Div>
 
 The RZ/G2 flash writer is sample software for Renesas RZ/G2 Group MPUs.
@@ -68,11 +68,11 @@ The following table lists the hardware needed to use this utility.
 
 #### Hardware environment
 
-| Name                          | Note                                      |
-|-------------------------------|-------------------------------------------|
-| Target board                  | Hoperun HiHope RZ/G2[M,N,H] platform         |
-|                               | Silicon Linux RZ/G2E evaluation kit       |
-| Host PC                       | Ubuntu Desktop 14.04(64bit) or later      |
+| Name         | Note                                        |
+|--------------|---------------------------------------------|
+| Target board | Hoperun HiHope RZ/G2[M,N,H] platform        |
+|              | Silicon Linux RZ/G2E evaluation kit (EK874) |
+| Host PC      | Ubuntu Desktop 14.04(64bit) or later        |
 
 The following table shows Serial Flash and eMMC support for each MPU.
 
@@ -83,9 +83,12 @@ The following table shows Serial Flash and eMMC support for each MPU.
 | RZ/G2H | Support                     | Support                    | Support             | Support            | MMC1          |
 | RZ/G2M | Support                     | Support                    | Support             | Support *1         | MMC1          |
 | RZ/G2N | Support                     | Support                    | Support             | Support            | MMC1          |
-| RZ/G2E | Support                     | Support                    | Support             | Support            | MMC1          |
+| RZ/G2E | Support                     | Support                    | Support *2          | Support *2         | MMC1          |
 
 \*1: Some early samples are not support booting from the eMMC. Please contact to Renesas sales for further details.
+
+\*2: eMMC is not implemented on the Silicon Linux RZ/G2E evaluation kit Rev.A - C boards.
+Rev.D or later boards can use eMMC, but note that the support is disabled in default settings.
 
 ## 2.2. Software Environment
 
@@ -155,10 +158,10 @@ If this option is not selected, the default value is ENABLE.
 
 ##### Association table for the eMMC value and valid eMMC writing function settings
 
-| EMMC    | Serial Flash writing setting                  |
-|---------|-----------------------------------------------|
-| ENABLE  | eMMC writing function is available. (default) |
-| DISABLE | eMMC writing function is not available.       |
+| EMMC    | Serial Flash writing setting                                |
+|---------|-------------------------------------------------------------|
+| ENABLE  | eMMC writing function is available. (default for HIHOPE)    |
+| DISABLE | eMMC writing function is not available. (default for EK874) |
 
 #### 3.3.7 USB
 
@@ -168,10 +171,10 @@ If this option is not selected, the default value is ENABLE.
 
 ##### Association table for the USB communications values
 
-| USB     | USB Communications                                   |
-|---------|------------------------------------------------------|
-| ENABLE  | USB communication to Host PC is available. (default) |
-| DISABLE | USB communication to Host PC is not available.       |
+| USB     | USB Communications                                                 |
+|---------|--------------------------------------------------------------------|
+| ENABLE  | USB communication to Host PC is available. (default for HIHOPE)    |
+| DISABLE | USB communication to Host PC is not available. (default for EK874) |
 
 ### 3.4. Command specification
 
@@ -631,3 +634,7 @@ Describe the revision history of RZ/G2 flash writer.
 ### 7.4. v1.03
 
 - Support QSPI Flash devices smaller than 16MB
+
+### 7.5. v1.04
+
+- Support SiLinux EK874 Rev.D/Rev.E boards
