@@ -498,7 +498,7 @@ Get the source code of RZ/G2 flash writer.
 cd ~/
 git clone https://github.com/renesas-rz/rzg2_flash_writer.git
 cd rzg2_flash_writer
-git checkout -b v1.02 v1.02
+git checkout -b v1.04 v1.04
 ```
 
 ### 4.3. Build the RZ/G2 flash writer
