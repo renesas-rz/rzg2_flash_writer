@@ -53,11 +53,11 @@ uint32_t	gDeviceId;
 uint32_t	gQspi_sa_size;
 uint32_t	gQspi_end_addess;
 
-uintptr_t	gErrDdrAdd;
-uint32_t	gErrDdrData,gTrueDdrData;
-uintptr_t	gSubErrAdd;
-uintptr_t	gSubErrData;
-uintptr_t	gSubTrueData;
+extern uintptr_t	gErrDdrAdd;
+extern uint32_t		gErrDdrData,gTrueDdrData;
+extern uintptr_t	gSubErrAdd;
+extern uintptr_t	gSubErrData;
+extern uintptr_t	gSubTrueData;
 
 extern char gKeyBuf[64];
 
