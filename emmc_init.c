@@ -1,32 +1,7 @@
 /*
- * Copyright (c) 2015-2019, Renesas Electronics Corporation
- * All rights reserved.
+ * Copyright (c) 2015-2018, Renesas Electronics Corporation. All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *   - Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *
- *   - Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *
- *   - Neither the name of Renesas nor the names of its contributors may be
- *     used to endorse or promote products derived from this software without
- *     specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 /** 
@@ -41,9 +16,9 @@
 #include "emmc_std.h"
 #include "emmc_registers.h"
 #include "emmc_def.h"
-#include "reg_rzg2.h"
 #include "common.h"
 #include "bit.h"
+#include "cpg_regs.h"
 
 /* ***************** MACROS, CONSTANTS, COMPILATION FLAGS ****************** */
 
@@ -254,34 +229,24 @@ static EMMC_ERROR_CODE emmc_dev_init(void)
 	uint32_t tmp_val;
 	volatile uint32_t* adr_cpg_sdxckcr;
 
-	switch(mmc_ch) {
-		case 0x0 :
-			tmp_val	= BIT12;
-			adr_cpg_sdxckcr	= (volatile uint32_t*)CPG_SD2CKCR;
-			break;
-		case 0x1 :
-			tmp_val	= BIT11;
-			adr_cpg_sdxckcr	= (volatile uint32_t*)CPG_SD3CKCR;
-			break;
-	}
-
-	/* Power on eMMC */
-	dataL = *((volatile uint32_t*)CPG_SMSTPCR3);
-	if ((dataL) & (tmp_val)) {
-		dataL &= ~(tmp_val);
-		*((volatile uint32_t*)CPG_CPGWPR)   = ~dataL;
-		*((volatile uint32_t*)CPG_SMSTPCR3) = dataL;
-	}
-
-	dataL = *((volatile uint32_t*)CPG_MSTPSR3);
-	while ( (dataL & (tmp_val)) != 0x0 ) {// wait tmp_val=0
-		dataL = *((volatile uint32_t*)CPG_MSTPSR3);
-	}
-	
 	/* Set SD clock */
-	*((volatile uint32_t*)CPG_CPGWPR) = ~(BIT9|BIT0);	//SD phy 200MHz
-	/* Stop SDnH clock & SDn=200MHz */
-	*adr_cpg_sdxckcr = (BIT9|BIT0); 
+	dataL = *((volatile uint32_t*)CPG_PL2SDHI_DSEL);
+	dataL |= 0x00010001U;
+	*((volatile uint32_t*)CPG_PL2SDHI_DSEL) = dataL;
+
+	dataL = *((volatile uint32_t*)CPG_CLKON_SDHI);
+	dataL |= 0x0001000FU;
+	*((volatile uint32_t*)CPG_CLKON_SDHI) = dataL;
+	do {
+		dataL = *((volatile uint32_t*)CPG_CLKMON_SDHI);
+	} while ((dataL & BIT0) == 0U);	/* wait until bit0=1 */
+
+	dataL = *((volatile uint32_t*)CPG_RST_SDHI);
+	dataL |= 0x00010001U;
+	*((volatile uint32_t*)CPG_RST_SDHI) = dataL;
+	do {
+		dataL = *((volatile uint32_t*)CPG_RSTMON_SDHI);
+	} while ((dataL & BIT0) == 1U);	/* wait until bit0=1 */
 
 #ifdef EMMC_VOLTAGE_1_8
 	InitMmcPinFunction();
@@ -296,8 +261,8 @@ static EMMC_ERROR_CODE emmc_dev_init(void)
 	SETR_32(SD_INFO2_MASK, SD_INFO2_CLEAR );	/* all interrupt disable */
 
 	SETR_32(HOST_MODE, 0x00000000U);			/* SD_BUF access width = 64-bit */
-	SETR_32(SD_OPTION, 0x0000C0EEU);  		/* Bus width = 1bit, timeout=MAX */
-	SETR_32(SD_CLK_CTRL, 0x00000000U);		/* Automatic Control=Disable, Clock Output=Disable */
+	SETR_32(SD_OPTION, 0x0000C0EEU);  		/* Bus width = 8bit, timeout=MAX */
+	SETR_32(SD_CLK_CTRL, 0x000000000U);		/* Automatic Control=Disable, Clock Output=Disable */
 
     return EMMC_SUCCESS;
 }
@@ -338,23 +303,6 @@ static EMMC_ERROR_CODE emmc_dev_finalize(void)
 	SETR_32(SD_INFO1_MASK, 0x00000000U);	/* all interrupt disable */
 	SETR_32(SD_INFO2_MASK, SD_INFO2_CLEAR );	/* all interrupt disable */
 	SETR_32(SD_CLK_CTRL, 0x00000000U);		/* MMC clock stop */
-
-	switch (mmc_ch) {
-		case 0x0 :
-			tmp_val	= BIT12;
-			break;
-		case 0x1 :
-			tmp_val	= BIT11;
-			break;
-	}
-
-	
-	dataL = *((volatile uint32_t*)CPG_SMSTPCR3);
-	if ((dataL & tmp_val) == 0U) {
-		dataL |= (tmp_val);
-		*((volatile uint32_t*)CPG_CPGWPR)   = ~dataL;
-		*((volatile uint32_t*)CPG_SMSTPCR3) = dataL;
-	}
 
     return result;
 }
@@ -429,94 +377,16 @@ static void emmc_memset(
 // voltage=1: 3.3V
 static void SetMmcPfcVoltage(uint32_t voltage)
 {
-#ifdef EMMC_VOLTAGE_1_8
-	uint32_t dataL;
-#ifdef EMMC_DEBUG
-	char str[16];
-	int32_t chCnt;
-
-	PutStr("PFC_IOCTRL6 Before  = 0x", 0);
-	Hex2Ascii(GETR_32(PFC_IOCTRL6), str, &chCnt);
-    PutStr(str, 1);
-#endif /* EMMC_DEBUG */
-
-	dataL = *((volatile uint32_t*)PFC_IOCTRL6);
-	if(voltage)	dataL |=  (BIT2);	// Case 3.3V
-	else		dataL &= ~(BIT2);	// Case 1.8V
-	*((volatile uint32_t*)PFC_PMMR)    = ~dataL;
-	*((volatile uint32_t*)PFC_IOCTRL6) =  dataL;
-	if(voltage)	while( !(BIT2 & *((volatile uint32_t*)PFC_IOCTRL6)) );	// wait 1
-	else		while(  (BIT2 & *((volatile uint32_t*)PFC_IOCTRL6)) );	// wait 0
-
-#ifdef EMMC_DEBUG
-    PutStr("PFC_IOCTRL6 After   = 0x", 0);
-	Hex2Ascii(GETR_32(PFC_IOCTRL6), str, &chCnt);
-    PutStr(str, 1);
-#endif /* EMMC_DEBUG */
-#endif /* EMMC_VOLTAGE_1_8 */
 }
 
 // voltage=0: 1.8V
 // voltage=1: 3.3V
 static void SetMmcVoltage(uint32_t voltage)
 {
-#ifdef EMMC_VOLTAGE_1_8
-#ifdef EMMC_DEBUG
-	char str[16];
-	int32_t chCnt;
-
-	PutStr("GPIO_OUTDT5 Before  = 0x", 0);
-	Hex2Ascii(GETR_32(GPIO_OUTDT5), str, &chCnt);
-    PutStr(str, 1);
-#endif /* EMMC_DEBUG */
-
-	if(voltage){
-		// IO=3.3V : 1.8V->3.3V before change IOsel voltage
-		SetMmcPfcVoltage(1);											// set voltage 3.3V
-		*((volatile uint32_t*)GPIO_OUTDT5) |=  BIT25;				// VCCQ_MMC : 3.3V
-		while( !(BIT25 & *((volatile uint32_t*)GPIO_OUTDT5)) );	// wait 1
-		StartTMU2(1);													// wait 10ms  (DVC: (3.3V-1.8V) / (10mV/4us) = 0.6ms)
-	}else{
-		// IO=1.8V : 3.3V->1.8V after change IOsel voltage
-		*((volatile uint32_t*)GPIO_OUTDT5) &= ~BIT25;				// VCCQ_MMC : 1.8V
-		while(  (BIT25 & *((volatile uint32_t*)GPIO_OUTDT5)) );	// wait 0
-		StartTMU2(1);													// wait 10ms  (DVC: (3.3V-1.8V) / (10mV/4us) = 0.6ms)
-		SetMmcPfcVoltage(0);											// set voltage 1.8V
-	}
-
-#ifdef EMMC_DEBUG
-    PutStr("GPIO_OUTDT5 After   = 0x", 0);
-	Hex2Ascii(GETR_32(GPIO_OUTDT5), str, &chCnt);
-    PutStr(str, 1);
-#endif /* EMMC_DEBUG */
-#endif /* EMMC_VOLTAGE_1_8 */
 }
 
 static void InitMmcPinFunction(void)
 {
-#ifdef EMMC_VOLTAGE_1_8
-	uint32_t dataL;
-#ifdef EMMC_DEBUG
-	char str[16];
-	int32_t chCnt;
-#endif /* EMMC_DEBUG */
-
-#ifdef EMMC_DEBUG
-    PutStr("GPIO_INOUTSEL5 Before  = 0x", 0);
-	Hex2Ascii(GETR_32(GPIO_INOUTSEL5), str, &chCnt);
-    PutStr(str, 1);
-#endif /* EMMC_DEBUG */
-	// GPSR5[25]    --> GPIO-Output (3.3V/1.8V select)
-	// GP5[25] OUT-PORT-----
-	dataL = *((volatile uint32_t*)GPIO_INOUTSEL5);
-	dataL |= (BIT25);
-	*((volatile uint32_t*)GPIO_INOUTSEL5) = dataL;
-#ifdef EMMC_DEBUG
-    PutStr("GPIO_INOUTSEL5 After   = 0x", 0);
-	Hex2Ascii(GETR_32(GPIO_INOUTSEL5), str, &chCnt);
-    PutStr(str, 1);
-#endif /* EMMC_DEBUG */
-#endif /* EMMC_VOLTAGE_1_8 */
 }
 #endif /* EMMC_VOLTAGE_1_8 */
 

@@ -1,64 +1,63 @@
 #
-# Copyright (c) 2015-2019, Renesas Electronics Corporation. All rights reserved.
+# Copyright (c) 2021, Renesas Electronics Corporation. All rights reserved.
 #
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions are met:
-#
-# Redistributions of source code must retain the above copyright notice, this
-# list of conditions and the following disclaimer.
-#
-# Redistributions in binary form must reproduce the above copyright notice,
-# this list of conditions and the following disclaimer in the documentation
-# and/or other materials provided with the distribution.
-#
-# Neither the name of ARM nor the names of its contributors may be used
-# to endorse or promote products derived from this software without specific
-# prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-# POSSIBILITY OF SUCH DAMAGE.
+# SPDX-License-Identifier: BSD-3-Clause
 #
 
-#/* Select BOARD("HIHOPE"or"EK874" )**************
 ifeq ("$(BOARD)", "")
-BOARD = HIHOPE
+BOARD = RZG2L_SMARC
 endif
 
-#/* Select USB("ENABLE"or"DISABLE" )********************************************
-ifeq ("$(USB)", "")
-ifeq ("$(BOARD)", "EK874")
-USB = DISABLE
-else
-USB = ENABLE
-endif
+ifeq ("$(BOARD)", "RZG2L_SMARC")
+#--------------------------------------
+# RZ/G2L Smarc board
+FILENAME_ADD = _RZG2L_SMARC
+DEVICE   = RZG2L
+DDR_TYPE = DDR4
+DDR_SIZE = 2GB
+SWIZZLE  = T1C
+#--------------------------------------
+else ifeq ("$(BOARD)", "RZG2L_15MMSQ_DEV")
+# RZ/G2L 15MMSQ Dev board
+FILENAME_ADD = _RZG2L_15MMSQ_DEV
+DEVICE   = RZG2L
+DDR_TYPE = DDR4
+DDR_SIZE = 4GB
+SWIZZLE  = T1C
+#--------------------------------------
+else ifeq ("$(BOARD)", "RZG2L_21MMSQ_DEV")
+# RZ/G2L 21MMSQ Dev board
+FILENAME_ADD = _RZG2L_21MMSQ_DEV
+DEVICE   = RZG2L
+DDR_TYPE = DDR4
+DDR_SIZE = 4GB
+SWIZZLE  = T2C
+#--------------------------------------
+else ifeq ("$(BOARD)", "RZG2LC_DEV")
+# RZ/G2LC Dev board
+FILENAME_ADD = _RZG2LC_DEV
+DEVICE   = RZG2LC
+DDR_TYPE = DDR3L
+DDR_SIZE = 1GB
+SWIZZLE  = T3CL
 endif
 
-#/* Select BOOT("WRITER"or"WRITER_WITH_CERT" )*************************
-ifeq ("$(BOOT)", "")
-BOOT = WRITER_WITH_CERT
-endif
-
-#/* Select SERIAL_FLASH("ENABLE"or"DISABLE" )***********************************
+# Select SERIAL_FLASH("ENABLE"or"DISABLE" )
 ifeq ("$(SERIAL_FLASH)", "")
 SERIAL_FLASH = ENABLE
 endif
 
-#/* Select EMMC("ENABLE"or"DISABLE" )*******************************************
+# Select EMMC("ENABLE"or"DISABLE" )
 ifeq ("$(EMMC)", "")
-ifeq ("$(BOARD)", "EK874")
 EMMC = DISABLE
-else
-EMMC = ENABLE
 endif
+
+ifeq ("$(INTERNAL_MEMORY_ONLY)", "")
+INTERNAL_MEMORY_ONLY = DISABLE
+endif
+
+ifeq ("$(INTERNAL_MEMORY_ONLY)", "ENABLE")
+DDR_TYPE = INTERNAL
 endif
 
 #CPU
@@ -74,63 +73,77 @@ OUTPUT_DIR  = AArch64_output
 OBJECT_DIR  = AArch64_obj
 CROSS_COMPILE ?= aarch64-elf-
 
-ifeq ("$(BOARD)", "EK874")
-	BOARD_NAME   =  EK874
-	FILENAME_ADD = _ek874
-	CFLAGS += -DRZG2_EK874=1
-else
-	BOARD_NAME   =  HIHOPE
-	FILENAME_ADD = _hihope
-	CFLAGS += -DRZG2_HIHOPE=1
+CFLAGS += -O0  
+BOOT_DEF    = Writer
+FILE_NAME   = $(OUTPUT_DIR)/Flash_Writer_SCIF$(FILENAME_ADD)_$(DDR_TYPE)_$(DDR_SIZE)
+
+ifeq ("$(DEVICE)", "RZG2L")
+	CFLAGS += -DRZG2L=1
 endif
 
-ifeq ("$(BOOT)", "WRITER")
-	BOOT_DEF    = Writer
-	FILE_NAME   = $(OUTPUT_DIR)/AArch$(AArch)_Flash_writer_SCIF_E6304000$(FILENAME_ADD)
-ifeq ("$(BOARD)", "EK874")
-	MEMORY_DEF = memory_writer_small.def
-else
-	MEMORY_DEF = memory_writer.def
-endif
+ifeq ("$(DEVICE)", "RZG2LC")
+	CFLAGS += -DRZG2LC=1
 endif
 
-ifeq ("$(BOOT)", "WRITER_WITH_CERT")
-	BOOT_DEF    = Writer
-	FILE_NAME   = $(OUTPUT_DIR)/AArch$(AArch)_Flash_writer_SCIF_DUMMY_CERT_E6300400$(FILENAME_ADD)
-ifeq ("$(BOARD)", "EK874")
-	MEMORY_DEF  = memory_writer_small_with_cert.def
-else
-	MEMORY_DEF  = memory_writer_with_cert.def
+ifeq ("$(DDR_TYPE)", "DDR4")
+	CFLAGS += -DDDR4=1
 endif
+ifeq ("$(DDR_TYPE)", "DDR3L")
+	CFLAGS += -DDDR3L=1
 endif
 
-ifeq ("$(USB)", "ENABLE")
-        CFLAGS += -DUSB_ENABLE=1
+ifeq ("$(DDR_SIZE)", "4GB")
+	CFLAGS += -DDDR_SIZE_4GB=1
+endif
+ifeq ("$(DDR_SIZE)", "2GB")
+	CFLAGS += -DDDR_SIZE_2GB=1
+endif
+ifeq ("$(DDR_SIZE)", "1GB")
+	CFLAGS += -DDDR_SIZE_1GB=1
 endif
 
-ifeq ("$(USB)", "DISABLE")
-        CFLAGS += -DUSB_ENABLE=0
+ifeq ("$(SWIZZLE)", "T1C")
+	CFLAGS += -DSWIZZLE_T1C=1
+endif
+
+ifeq ("$(SWIZZLE)", "T2C")
+	CFLAGS += -DSWIZZLE_T2C=1
+endif
+
+ifeq ("$(SWIZZLE)", "T3CL")
+	CFLAGS += -DSWIZZLE_T3CL=1
 endif
 
 ifeq ("$(SERIAL_FLASH)", "ENABLE")
 	CFLAGS += -DSERIAL_FLASH=1
-else
+endif
+
+ifeq ("$(SERIAL_FLASH)", "DISABLE")
 	CFLAGS += -DSERIAL_FLASH=0
 endif
 
 ifeq ("$(EMMC)", "ENABLE")
 	CFLAGS += -DEMMC=1
-else
+endif
+
+ifeq ("$(EMMC)", "DISABLE")
 	CFLAGS += -DEMMC=0
+endif
+
+ifeq ("$(INTERNAL_MEMORY_ONLY)", "DISABLE")
+	CFLAGS += -DINTERNAL_MEMORY_ONLY=0
+	MEMORY_DEF = memory_writer.def
+endif
+
+ifeq ("$(INTERNAL_MEMORY_ONLY)", "ENABLE")
+	CFLAGS += -DINTERNAL_MEMORY_ONLY=1
+	MEMORY_DEF = memory_writer_internal.def
 endif
 
 DDR_DEF = ddr_qos_init_setting
 
 LIBS        = -L$(subst libc.a, ,$(shell $(CC) -print-file-name=libc.a 2> /dev/null)) -lc
 LIBS        += -L$(subst libgcc.a, ,$(shell $(CC) -print-libgcc-file-name 2> /dev/null)) -lgcc
-ifeq ("$(USB)", "ENABLE")
-LIBS        += -L./AArch64_lib/ -lusb
-endif
 
 INCLUDE_DIR = include
 DDR_DIR = ddr
@@ -140,56 +153,51 @@ OUTPUT_FILE = $(FILE_NAME).axf
 
 #Object file
 OBJ_FILE_BOOT =					\
-	$(OBJECT_DIR)/boot_mon.o		\
+	$(OBJECT_DIR)/boot_mon.o	\
 	$(OBJECT_DIR)/stack.o
 
-SRC_FILE :=					\
-	main.c					\
-	init_scif.c				\
-	scifdrv.c				\
-	devdrv.c				\
-	common.c				\
-	dgtable.c				\
-	dgmodul1.c				\
-	Message.c				\
-	dmaspi.c				\
-	ramckmdl.c				\
-	cpudrv.c				\
-	boardid.c				\
-	boot_init_lbsc.c			\
-	boot_init_port.c			\
-	boot_init_gpio.c			\
-	micro_wait.c				\
-	ddrcheck.c
+SRC_FILE :=						\
+	main.c						\
+	init_scif.c					\
+	scifdrv.c					\
+	devdrv.c					\
+	common.c					\
+	dgtable.c					\
+	dgmodul1.c					\
+	memory_cmd.c				\
+	Message.c					\
+	ramckmdl.c					\
+	cpudrv.c					\
+	bootparam.c					\
+	sys/syc.c					\
+	sys/cpg.c					\
+	sys/pfc.c					\
+	sys/tzc_400.c
+
+ifeq ("$(INTERNAL_MEMORY_ONLY)", "DISABLE")
+SRC_FILE +=						\
+	ddrcheck.c					\
+	ddr/ddr.c
+endif
 
 ifeq ("$(SERIAL_FLASH)", "ENABLE")
-SRC_FILE +=					\
-	dgmodul4.c				\
+SRC_FILE +=						\
+	dgmodul4.c					\
 	rpcqspidrv.c				\
 	spiflash1drv.c
 endif
 
 ifeq ("$(EMMC)", "ENABLE")
-SRC_FILE +=					\
-	dg_emmc_config.c			\
-	dg_emmc_access.c			\
-	emmc_cmd.c				\
-	emmc_init.c				\
-	emmc_interrupt.c			\
-	emmc_mount.c				\
-	emmc_write.c				\
-	emmc_erase.c				\
+SRC_FILE +=						\
+	dg_emmc_config.c				\
+	dg_emmc_access.c				\
+	emmc_cmd.c					\
+	emmc_init.c					\
+	emmc_interrupt.c				\
+	emmc_mount.c					\
+	emmc_write.c					\
+	emmc_erase.c					\
 	emmc_utility.c
-endif
-
-ifeq ("$(BOOT)", "WRITER_WITH_CERT")
-	SRC_FILE += cert_param.c
-endif
-
-ifeq ("$(BOARD)", "EK874")
-include ddr/ddr3l/ddr.mk
-else
-include ddr/lpddr4/ddr.mk
 endif
 
 OBJ_FILE := $(addprefix $(OBJECT_DIR)/,$(patsubst %.c,%.o,$(SRC_FILE)))

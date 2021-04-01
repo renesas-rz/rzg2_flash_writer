@@ -1,32 +1,7 @@
 /*
- * Copyright (c) 2015-2019, Renesas Electronics Corporation
- * All rights reserved.
+ * Copyright (c) 2015-2016, Renesas Electronics Corporation. All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *   - Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *
- *   - Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *
- *   - Neither the name of Renesas nor the names of its contributors may be
- *     used to endorse or promote products derived from this software without
- *     specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 /** 
@@ -45,12 +20,14 @@
 #define MMC_CH0		(0U)		/* SDHI2/MMC0 */
 #define MMC_CH1		(1U)		/* SDHI3/MMC1 */
 
-#define USE_MMC_CH	(MMC_CH1)	/* RZ/G2E, RZ/G2M, RZ/G2N	*/
+#define USE_MMC_CH	(MMC_CH0)
+
 
 /** @brief eMMC registers
  */
-#define	MMC0_SD_BASE		(0xEE140000U)
-#define MMC1_SD_BASE		(0xEE160000U)
+#define	MMC0_SD_BASE		(0x11C00000U)
+#define MMC1_SD_BASE		(0x11C10000U)
+
 
 #if USE_MMC_CH == MMC_CH0
 #define	MMC_SD_BASE		(MMC0_SD_BASE)
@@ -104,30 +81,30 @@
  */
 #define SD_INFO1_HPIRES				0x00010000UL		/* Response Reception Completion	*/
 #define SD_INFO1_INFO10				0x00000400UL		/* Indicates the SDDAT3 state		*/
-#define SD_INFO1_INFO9				0x00000200UL		/* SDDAT3 Card Insertion		*/
-#define SD_INFO1_INFO8				0x00000100UL		/* SDDAT3 Card Removal			*/
-#define SD_INFO1_INFO7				0x00000080UL		/* Write Protect			*/
+#define SD_INFO1_INFO9				0x00000200UL		/* SDDAT3 Card Insertion			*/
+#define SD_INFO1_INFO8				0x00000100UL		/* SDDAT3 Card Removal				*/
+#define SD_INFO1_INFO7				0x00000080UL		/* Write Protect					*/
 #define SD_INFO1_INFO5				0x00000020UL		/* Indicates the ISDCD state		*/
-#define SD_INFO1_INFO4				0x00000010UL		/* ISDCD Card Insertion			*/
-#define SD_INFO1_INFO3				0x00000008UL		/* ISDCD Card Removal			*/
-#define SD_INFO1_INFO2				0x00000004UL		/* Access end				*/
-#define SD_INFO1_INFO0				0x00000001UL		/* Response end				*/
+#define SD_INFO1_INFO4				0x00000010UL		/* ISDCD Card Insertion				*/
+#define SD_INFO1_INFO3				0x00000008UL		/* ISDCD Card Removal				*/
+#define SD_INFO1_INFO2				0x00000004UL		/* Access end						*/
+#define SD_INFO1_INFO0				0x00000001UL		/* Response end						*/
 
 /** @brief SD_INFO2 Registers
  */
 #define SD_INFO2_ILA				0x00008000UL		/* Illegal Access Error			*/
-#define SD_INFO2_CBSY				0x00004000UL		/* Command Type Register Busy		*/
+#define SD_INFO2_CBSY				0x00004000UL		/* Command Type Register Busy	*/
 #define SD_INFO2_SCLKDIVEN			0x00002000UL
 #define SD_INFO2_BWE				0x00000200UL		/* SD_BUF Write Enable			*/
 #define SD_INFO2_BRE				0x00000100UL		/* SD_BUF Read Enable			*/
-#define SD_INFO2_DAT0				0x00000080UL		/* SDDAT0				*/
-#define SD_INFO2_ERR6				0x00000040UL		/* Response Timeout			*/
-#define SD_INFO2_ERR5				0x00000020UL		/* SD_BUF Illegal Read Access		*/
-#define SD_INFO2_ERR4				0x00000010UL		/* SD_BUF Illegal Write Access		*/
-#define SD_INFO2_ERR3				0x00000008UL		/* Data Timeout				*/
-#define SD_INFO2_ERR2				0x00000004UL		/* END Error				*/
-#define SD_INFO2_ERR1				0x00000002UL		/* CRC Error				*/
-#define SD_INFO2_ERR0				0x00000001UL		/* CMD Error				*/
+#define SD_INFO2_DAT0				0x00000080UL		/* SDDAT0						*/
+#define SD_INFO2_ERR6				0x00000040UL		/* Response Timeout				*/
+#define SD_INFO2_ERR5				0x00000020UL		/* SD_BUF Illegal Read Access	*/
+#define SD_INFO2_ERR4				0x00000010UL		/* SD_BUF Illegal Write Access	*/
+#define SD_INFO2_ERR3				0x00000008UL		/* Data Timeout					*/
+#define SD_INFO2_ERR2				0x00000004UL		/* END Error					*/
+#define SD_INFO2_ERR1				0x00000002UL		/* CRC Error					*/
+#define SD_INFO2_ERR0				0x00000001UL		/* CMD Error					*/
 #define SD_INFO2_ALL_ERR			0x0000807FUL
 #define SD_INFO2_CLEAR				0x00000800UL		/* BIT11 The write value should always be 1. HWM_0003 */
 
@@ -151,15 +128,20 @@
 
 
 /** @brief MMC Clock Frequency
- * 200MHz * 1/x = output clock
+ * 133MHz * 1/x = output clock
  */
 #define MMC_CLK_OFF			0UL			/* Clock output is disabled				*/
-#define MMC_400KHZ			512UL			/* 200MHz * 1/512 = 390 KHz 				*/
-#define MMC_20MHZ			16UL			/* 200MHz * 1/16   = 12.5 MHz Normal speed mode		*/
-#define MMC_26MHZ			8UL			/* 200MHz * 1/8   = 25 MHz High speed mode 26Mhz	*/
-#define MMC_52MHZ			4UL			/* 200MHz * 1/4   = 50 MHz High speed mode 52Mhz	*/
-#define MMC_100MHZ			2UL			/* 200MHz * 1/2   = 100 MHz				*/
-#define MMC_200MHZ			1UL			/* 200MHz * 1/1   = 200 MHz				*/
+#define MMC_260KHZ			512UL			/* 133MHz * 1/512 = 260 KHz 				*/
+#define MMC_1MHZ			128UL			/* 133MHz * 1/128 = 1.0390 MHz Normal speed mode	*/
+#define MMC_2MHZ			64UL			/* 133MHz * 1/64  = 2.0781 MHz Normal speed mode	*/
+#define MMC_4MHZ			32UL			/* 133MHz * 1/32  = 4.1563 MHz Normal speed mode	*/
+#define MMC_8MHZ			16UL			/* 133MHz * 1/16  = 8.3125 MHz Normal speed mode	*/
+#define MMC_16MHZ			8UL			/* 133MHz * 1/8   = 16.625 MHz High speed mode 26MHz	*/
+#define MMC_32MHZ			4UL			/* 133MHz * 1/4   = 33.25  MHz High speed mode 52MHz	*/
+#define MMC_400KHZ			MMC_260KHZ		/* Alternative setting 400kHz */
+#define MMC_20MHZ			MMC_16MHZ		/* Alternative setting 20MHz  */
+#define MMC_26MHZ			MMC_16MHZ		/* Alternative setting 26MHz  */
+#define MMC_52MHZ			MMC_32MHZ		/* Alternative setting 52MHz  */
 
 
 #define MMC_FREQ_52MHZ		52000000UL
@@ -169,7 +151,7 @@
 
 /** @brief MMC Clock DIV
  */
-#define MMC_SD_CLK_START	0x00000100UL	/* CLOCK On	*/
+#define MMC_SD_CLK_START	0x00000100UL	/* CLOCK On		*/
 #define MMC_SD_CLK_STOP		(~0x00000100UL)	/* CLOCK stop   */
 #define MMC_SD_CLK_DIV1		0x000000FFUL	/* 1/1          */
 #define MMC_SD_CLK_DIV2		0x00000000UL	/* 1/2          */

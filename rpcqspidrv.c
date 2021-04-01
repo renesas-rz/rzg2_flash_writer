@@ -1,58 +1,21 @@
 /*
- * Copyright (c) 2015-2019, Renesas Electronics Corporation
- * All rights reserved.
+ * Copyright (c) 2015-2019, Renesas Electronics Corporation. All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *   - Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *
- *   - Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *
- *   - Neither the name of Renesas nor the names of its contributors may be
- *     used to endorse or promote products derived from this software without
- *     specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #include "common.h"
 #include "rpcqspidrv.h"
-#include "reg_rzg2.h"
+#include "rzg2l_def.h"
+#include "cpg_regs.h"
+#include "rpc_regs.h"
 #include "bit.h"
 #include "cpudrv.h"
 
 void InitRPC_QspiFlashQuadExtMode(void)
 {
-	uint32_t product;
-	uint32_t cut;
-
-	product = *((volatile uint32_t*)PRR) & PRR_PRODUCT_MASK;
-	cut = *((volatile uint32_t*)PRR) & PRR_CUT_MASK;
-
-	if ((product ==  PRR_PRODUCT_G2M) && (cut < PRR_CUT_30))
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x00030260;
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
-	}
-	else
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x00038260;
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80038260;
-	}
+	*((volatile uint32_t*)RPC_PHYCNT)     = 0x00030260;
+	*((volatile uint32_t*)RPC_PHYCNT)     = 0x80030260;
 	*((volatile uint32_t*)RPC_CMNCR)      = 0x01FFF300;
 	*((volatile uint32_t*)RPC_DRCR)       = 0x001F0100;
 		//bit20-16 RBURST[4:0] = 11111 : 32 continuous data unit
@@ -80,22 +43,8 @@ void InitRPC_QspiFlashQuadExtMode(void)
 
 void InitRPC_QspiFlash4FastReadExtMode(void)
 {
-	uint32_t product;
-	uint32_t cut;
-
-	product = *((volatile uint32_t*)PRR) & PRR_PRODUCT_MASK;
-	cut = *((volatile uint32_t*)PRR) & PRR_CUT_MASK;
-
-	if ((product ==  PRR_PRODUCT_G2M) && (cut < PRR_CUT_30))
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x00030260;
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
-	}
-	else
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x00038260;
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80038260;
-	}
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x00030260;
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
 	*((volatile uint32_t*)RPC_CMNCR)      = 0x01FFF300;
 	*((volatile uint32_t*)RPC_DRCR)       = 0x001F0100;
 		//bit20-16 RBURST[4:0] = 11111 : 32 continuous data unit
@@ -125,35 +74,21 @@ void InitRPC_QspiFlash(uint32_t rpcclk)
 {
 	PowerOnRPC();
 
-	SetRPC_ClockMode(rpcclk);
+	SetRPC_ClockMode(RPC_CLK_80M);
 	ResetRPC();
 	SetRPC_SSL_Delay();
 
-	*((volatile uint32_t*)RPC_SEC_CONF) = 0x00000155;
-	*((volatile uint32_t*)RPC_OFFSET1)  = 0x31511144;
+	*((volatile uint32_t*)RPC_OFFSET1)= 0x31511144;		/* DDRTMG[1:0](Bit[29:28]) == B'11 */
 }
 
 void ReadConfigRegQspiFlash(uint32_t *cnfigReg)
 {
 	uint8_t readData;
-	uint32_t product;
-	uint32_t cut;
-
-	product = *((volatile uint32_t*)PRR) & PRR_PRODUCT_MASK;
-	cut = *((volatile uint32_t*)PRR) & PRR_CUT_MASK;
 
 //  Manual mode / No dummy / On Command / No Address /  Data:8bit transfer
 
-	if ((product ==  PRR_PRODUCT_G2M) && (cut < PRR_CUT_30))
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x00030260;
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
-	}
-	else
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x00038260;
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80038260;
-	}
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x00030260;
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
 	*((volatile uint32_t*)RPC_CMNCR)      = 0x81FFF300;
 	*((volatile uint32_t*)RPC_SMCMR)      = 0x00350000;
 		//bit23-16 CMD[7:0] = 0x35 : Read Configuration Register (CFG)
@@ -180,23 +115,11 @@ void ReadConfigRegQspiFlash(uint32_t *cnfigReg)
 void WriteRegisterQspiFlash(uint32_t statusReg, uint32_t configReg)
 {
 	uint16_t writeData;
-	uint32_t product;
-	uint32_t cut;
 
 	writeData  = ( (configReg<<8) & 0x0000FF00 );
 	writeData |= (  statusReg     & 0x000000FF );
 
-	product = *((volatile uint32_t*)PRR) & PRR_PRODUCT_MASK;
-	cut = *((volatile uint32_t*)PRR) & PRR_CUT_MASK;
-
-	if ((product ==  PRR_PRODUCT_G2M) && (cut < PRR_CUT_30))
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
-	}
-	else
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80038260;
-	}
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
 		//bit31  CAL         =  1 : PHY calibration
 		//bit1-0 PHYMEM[1:0] = 00 : QSPI-SDR
 	*((volatile uint32_t*)RPC_CMNCR)      = 0x81FFF300;
@@ -223,14 +146,7 @@ void WriteRegisterQspiFlash(uint32_t statusReg, uint32_t configReg)
 
 	WaitRpcTxEnd();
 
-	if ((product ==  PRR_PRODUCT_G2M) && (cut < PRR_CUT_30))
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x00030270;
-	}
-	else
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x00038270;
-	}
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x00030270;
 		//bit31  CAL         =  0 : No PHY calibration
 		//bit2   WBUF        =  0 : Write Buffer Disable
 		//bit1-0 PHYMEM[1:0] = 11 : HyperFlash
@@ -242,23 +158,11 @@ void WriteRegisterQspiFlash_Byte2(uint32_t statusReg, uint32_t configReg)
 {
 	uint32_t loopf,dataL;
 	unsigned char writeStatusData,writeConfigData;
-	uint32_t product;
-	uint32_t cut;
 
 	writeStatusData  = (volatile unsigned char)statusReg;
 	writeConfigData  = (volatile unsigned char)configReg;
 
-	product = *((volatile uint32_t*)PRR) & PRR_PRODUCT_MASK;
-	cut = *((volatile uint32_t*)PRR) & PRR_CUT_MASK;
-
-	if ((product ==  PRR_PRODUCT_G2M) && (cut < PRR_CUT_30))
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
-	}
-	else
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80038260;
-	}
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
 		//bit31  CAL         =  1 : PHY calibration
 		//bit1-0 PHYMEM[1:0] = 00 : QSPI-SDR
 	*((volatile uint32_t*)RPC_CMNCR)      = 0x81FFF300;
@@ -304,17 +208,7 @@ void WriteRegisterQspiFlash_Byte2(uint32_t statusReg, uint32_t configReg)
 		if( !(dataL & BIT1) )	loopf=0;
 	}
 
-	if ((product ==  PRR_PRODUCT_G2M) && (cut < PRR_CUT_30))
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x00030270;
-	}
-	else
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x00038270;
-		//bit31  CAL         =  0 : No PHY calibration
-		//bit2   WBUF        =  0 : Write Buffer Disable
-		//bit1-0 PHYMEM[1:0] = 11 : HyperFlash
-	}
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x00030270;
 	*((volatile uint32_t*)RPC_DRCR)       = 0x011F0301;
 		//bit9   RCF         =  1 : Read Cache Clear
 }
@@ -323,22 +217,8 @@ void WriteRegisterQspiFlash_Byte2(uint32_t statusReg, uint32_t configReg)
 void SectorErase4QspiFlash(uint32_t sector_addr)
 {
 	char str[64];
-	uint32_t product;
-	uint32_t cut;
 
-	product = *((volatile uint32_t*)PRR) & PRR_PRODUCT_MASK;
-	cut = *((volatile uint32_t*)PRR) & PRR_CUT_MASK;
-
-	if ((product ==  PRR_PRODUCT_G2M) && (cut < PRR_CUT_30))
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
-	}
-	else
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80038260;
-		//bit31  CAL         =  1 : PHY calibration
-		//bit1-0 PHYMEM[1:0] = 00 : QSPI-SDR
-	}
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
 	*((volatile uint32_t*)RPC_CMNCR)      = 0x81FFF300;
 		//bit31  MD       =  1 : Manual mode
 		//bit1-0 BSZ[1:0] = 00 : QSPI Flash x 1
@@ -367,22 +247,7 @@ void SectorErase4QspiFlash(uint32_t sector_addr)
 //4P4E 21h 4-byte address
 void ParameterSectorErase4QspiFlash(uint32_t sector_addr)
 {
-	uint32_t product;
-	uint32_t cut;
-
-	product = *((volatile uint32_t*)PRR) & PRR_PRODUCT_MASK;
-	cut = *((volatile uint32_t*)PRR) & PRR_CUT_MASK;
-
-	if ((product ==  PRR_PRODUCT_G2M) && (cut < PRR_CUT_30))
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
-	}
-	else
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80038260;
-		//bit31  CAL         =  1 : PHY calibration
-		//bit1-0 PHYMEM[1:0] = 00 : QSPI-SDR
-	}
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
 	*((volatile uint32_t*)RPC_CMNCR)      = 0x81FFF300;
 		//bit31  MD       =  1 : Manual mode
 		//bit1-0 BSZ[1:0] = 00 : QSPI Flash x 1
@@ -412,30 +277,14 @@ void ParameterSectorErase4QspiFlash(uint32_t sector_addr)
 void WriteData4ppWithBufferQspiFlash(uint32_t addr, uint32_t source_addr)
 {
 	uintptr_t i=0;
-	uint32_t product;
-	uint32_t cut;
-
 	*((volatile uint32_t*)RPC_DRCR)       = 0x011F0301;
 		//bit9   RCF         =  1 : Read Cache Clear
 
-	product = *((volatile uint32_t*)PRR) & PRR_PRODUCT_MASK;
-	cut = *((volatile uint32_t*)PRR) & PRR_CUT_MASK;
-
-	if ((product ==  PRR_PRODUCT_G2M) && (cut < PRR_CUT_30))
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030274;
-	}
-	else
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80038274;
-		//bit31  CAL         =  1 : PHY calibration
-		//bit2   WBUF        =  1 : Write Buffer Enable
-		//bit1-0 PHYMEM[1:0] = 00 : QSPI-SDR
-	}
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030274;
 
 	for(i = 0; i < 256; i = i+0x4)
 	{
-		(*(volatile uint32_t*)(0xEE208000+i)) = (*(volatile uint32_t*)(source_addr+i));
+		(*(volatile uint32_t*)(RPC_WRBUF+i)) = (*(volatile uint32_t*)(source_addr+i));
 	}
 
 		//bit31  CAL         =  1 : PHY calibration
@@ -465,17 +314,7 @@ void WriteData4ppWithBufferQspiFlash(uint32_t addr, uint32_t source_addr)
 
 	WaitRpcTxEnd();
 
-	if ((product ==  PRR_PRODUCT_G2M) && (cut < PRR_CUT_30))
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x00030273;
-	}
-	else
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x00038273;
-		//bit31  CAL         =  0 : No PHY calibration
-		//bit2   WBUF        =  0 : Write Buffer Disable
-		//bit1-0 PHYMEM[1:0] = 11 : HyperFlash
-	}
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x00030273;
 	*((volatile uint32_t*)RPC_DRCR)       = 0x011F0301;
 		//bit9   RCF         =  1 : Read Cache Clear
 }
@@ -486,30 +325,15 @@ void WriteDataPpWithBufferQspiFlash(uint32_t addr, uint32_t source_addr)
 {
 	//uint32_t i=0;
 	uintptr_t i=0;
-	uint32_t product;
-	uint32_t cut;
 
 	*((volatile uint32_t*)RPC_DRCR)       = 0x011F0301;
 		//bit9   RCF         =  1 : Read Cache Clear
 
-	product = *((volatile uint32_t*)PRR) & PRR_PRODUCT_MASK;
-	cut = *((volatile uint32_t*)PRR) & PRR_CUT_MASK;
-
-	if ((product ==  PRR_PRODUCT_G2M) && (cut < PRR_CUT_30))
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030274;
-	}
-	else
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80038274;
-		//bit31  CAL         =  1 : PHY calibration
-		//bit2   WBUF        =  1 : Write Buffer Enable
-		//bit1-0 PHYMEM[1:0] = 00 : QSPI-SDR
-	}
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030274;
 
 	for(i = 0; i < 256; i = i+0x4)
 	{
-		(*(volatile uint32_t*)(0xEE208000+i)) = (*(volatile uint32_t*)(source_addr+i));
+		(*(volatile uint32_t*)(RPC_WRBUF+i)) = (*(volatile uint32_t*)(source_addr+i));
 	}
 		//bit31  CAL         =  1 : PHY calibration
 		//bit2   WBUF        =  1 : Write Buffer Enable
@@ -538,17 +362,7 @@ void WriteDataPpWithBufferQspiFlash(uint32_t addr, uint32_t source_addr)
 
 	WaitRpcTxEnd();
 
-	if ((product ==  PRR_PRODUCT_G2M) && (cut < PRR_CUT_30))
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x00030273;
-	}
-	else
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x00038273;
-		//bit31  CAL         =  0 : No PHY calibration
-		//bit2   WBUF        =  0 : Write Buffer Disable
-		//bit1-0 PHYMEM[1:0] = 11 : HyperFlash
-	}
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x00030273;
 	*((volatile uint32_t*)RPC_DRCR)       = 0x011F0301;
 		//bit9   RCF         =  1 : Read Cache Clear
 }
@@ -557,22 +371,7 @@ void WriteDataPpWithBufferQspiFlash(uint32_t addr, uint32_t source_addr)
 //Page Program (4PP:12h)  4-byte address
 void WriteData4ppQspiFlash(uint32_t addr, uint32_t writeData)
 {
-	uint32_t product;
-	uint32_t cut;
-
-	product = *((volatile uint32_t*)PRR) & PRR_PRODUCT_MASK;
-	cut = *((volatile uint32_t*)PRR) & PRR_CUT_MASK;
-
-	if ((product ==  PRR_PRODUCT_G2M) && (cut < PRR_CUT_30))
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
-	}
-	else
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80038260;
-		//bit31  CAL         =  1 : PHY calibration
-		//bit1-0 PHYMEM[1:0] = 00 : QSPI-SDR
-	}
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
 	*((volatile uint32_t*)RPC_CMNCR)      = 0x81FFF300;
 		//bit31  MD       =  1 : Manual mode
 		//bit1-0 BSZ[1:0] = 00 : QSPI Flash x 1
@@ -598,17 +397,7 @@ void WriteData4ppQspiFlash(uint32_t addr, uint32_t writeData)
 
 	WaitRpcTxEnd();
 
-	if ((product ==  PRR_PRODUCT_G2M) && (cut < PRR_CUT_30))
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x00030273;
-	}
-	else
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x00038273;
-		//bit31  CAL         =  0 : No PHY calibration
-		//bit2   WBUF        =  0 : Write Buffer Disable
-		//bit1-0 PHYMEM[1:0] = 11 : HyperFlash
-	}
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x00030273;
 	*((volatile uint32_t*)RPC_DRCR)       = 0x011F0301;
 		//bit9   RCF         =  1 : Read Cache Clear
 
@@ -617,22 +406,8 @@ void WriteData4ppQspiFlash(uint32_t addr, uint32_t writeData)
 void WriteData4ppQspiFlash_CsCont(uint32_t addr, uint32_t *writeData,uint32_t cnt)
 {
 	uint32_t i,loopf,dataL;
-	uint32_t product;
-	uint32_t cut;
 
-	product = *((volatile uint32_t*)PRR) & PRR_PRODUCT_MASK;
-	cut = *((volatile uint32_t*)PRR) & PRR_CUT_MASK;
-
-	if ((product ==  PRR_PRODUCT_G2M) && (cut < PRR_CUT_30))
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
-	}
-	else
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80038260;
-		//bit31  CAL         =  1 : PHY calibration
-		//bit1-0 PHYMEM[1:0] = 00 : QSPI-SDR
-	}
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
 	*((volatile uint32_t*)RPC_CMNCR)      = 0x81FFF300;
 		//bit31  MD       =  1 : Manual mode
 		//bit1-0 BSZ[1:0] = 00 : QSPI Flash x 1
@@ -698,17 +473,7 @@ void WriteData4ppQspiFlash_CsCont(uint32_t addr, uint32_t *writeData,uint32_t cn
 		}
 	}
 
-	if ((product ==  PRR_PRODUCT_G2M) && (cut < PRR_CUT_30))
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x00030273;
-	}
-	else
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x00038273;
-		//bit31  CAL         =  0 : No PHY calibration
-		//bit2   WBUF        =  0 : Write Buffer Disable
-		//bit1-0 PHYMEM[1:0] = 11 : HyperFlash
-	}
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x00030273;
 	*((volatile uint32_t*)RPC_DRCR)       = 0x011F0301;
 		//bit9   RCF         =  1 : Read Cache Clear
 }
@@ -716,22 +481,7 @@ void WriteData4ppQspiFlash_CsCont(uint32_t addr, uint32_t *writeData,uint32_t cn
 //Quad Page Program (4QPP:34h)  4-byte address
 void WriteData4qppQspiFlash(uint32_t addr, uint32_t writeData)
 {
-	uint32_t product;
-	uint32_t cut;
-
-	product = *((volatile uint32_t*)PRR) & PRR_PRODUCT_MASK;
-	cut = *((volatile uint32_t*)PRR) & PRR_CUT_MASK;
-
-	if ((product ==  PRR_PRODUCT_G2M) && (cut < PRR_CUT_30))
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
-	}
-	else
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80038260;
-		//bit31  CAL         =  1 : PHY calibration
-		//bit1-0 PHYMEM[1:0] = 00 : QSPI-SDR
-	}
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
 	*((volatile uint32_t*)RPC_CMNCR)      = 0x81FFF300;
 		//bit31  MD       =  1 : Manual mode
 		//bit1-0 BSZ[1:0] = 00 : QSPI Flash x 1
@@ -757,17 +507,7 @@ void WriteData4qppQspiFlash(uint32_t addr, uint32_t writeData)
 
 	WaitRpcTxEnd();
 
-	if ((product ==  PRR_PRODUCT_G2M) && (cut < PRR_CUT_30))
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x00030273;
-	}
-	else
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x00038273;
-		//bit31  CAL         =  0 : No PHY calibration
-		//bit2   WBUF        =  0 : Write Buffer Disable
-		//bit1-0 PHYMEM[1:0] = 11 : HyperFlash
-	}
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x00030273;
 	*((volatile uint32_t*)RPC_DRCR)       = 0x011F0301;
 		//bit9   RCF         =  1 : Read Cache Clear
 
@@ -775,24 +515,8 @@ void WriteData4qppQspiFlash(uint32_t addr, uint32_t writeData)
 
 uint32_t SingleFastReadQspiFlashData4Byte(uint32_t addr, uint32_t *readData)	//for QSPIx1ch
 {
-	uint32_t product;
-	uint32_t cut;
-
-	product = *((volatile uint32_t*)PRR) & PRR_PRODUCT_MASK;
-	cut = *((volatile uint32_t*)PRR) & PRR_CUT_MASK;
-
-	if ((product ==  PRR_PRODUCT_G2M) && (cut < PRR_CUT_30))
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x00030260;
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
-	}
-	else
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x00038260;
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80038260;
-		//bit31  CAL         =  1 : PHY calibration
-		//bit1-0 PHYMEM[1:0] = 00 : QSPI-SDR
-	}
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x00030260;
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
 	*((volatile uint32_t*)RPC_CMNCR)      = 0x81FFF300;
 		//bit31  MD       =  1 : Manual mode
 		//bit1-0 BSZ[1:0] = 00 : QSPI Flash x 1
@@ -826,24 +550,8 @@ uint32_t SingleFastReadQspiFlashData4Byte(uint32_t addr, uint32_t *readData)	//f
 
 uint32_t SingleFastReadQspiFlashData1Byte(uint32_t addr, uint32_t *readData)	//for QSPIx1ch
 {
-	uint32_t product;
-	uint32_t cut;
-
-	product = *((volatile uint32_t*)PRR) & PRR_PRODUCT_MASK;
-	cut = *((volatile uint32_t*)PRR) & PRR_CUT_MASK;
-
-	if ((product ==  PRR_PRODUCT_G2M) && (cut < PRR_CUT_30))
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x00030260;
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
-	}
-	else
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x00038260;
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80038260;
-		//bit31  CAL         =  1 : PHY calibration
-		//bit1-0 PHYMEM[1:0] = 00 : QSPI-SDR
-	}
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x00030260;
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
 	*((volatile uint32_t*)RPC_CMNCR)      = 0x81FFF300;
 		//bit31  MD       =  1 : Manual mode
 		//bit1-0 BSZ[1:0] = 00 : QSPI Flash x 1
@@ -880,24 +588,8 @@ uint32_t SingleFastReadQspiFlashData1Byte(uint32_t addr, uint32_t *readData)	//f
 //65h Read Any Register command (RADR 65h)
 uint32_t ReadAnyRegisterQspiFlash(uint32_t addr, unsigned char *readData)		// Add24bit,Data8bit
 {
-	uint32_t product;
-	uint32_t cut;
-
-	product = *((volatile uint32_t*)PRR) & PRR_PRODUCT_MASK;
-	cut = *((volatile uint32_t*)PRR) & PRR_CUT_MASK;
-
-	if ((product ==  PRR_PRODUCT_G2M) && (cut < PRR_CUT_30))
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x00030260;
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
-	}
-	else
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x00038260;
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80038260;
-		//bit31  CAL         =  1 : PHY calibration
-		//bit1-0 PHYMEM[1:0] = 00 : QSPI-SDR
-	}
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x00030260;
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
 	*((volatile uint32_t*)RPC_CMNCR)      = 0x81FFF300;
 		//bit31  MD       =  1 : Manual mode
 		//bit1-0 BSZ[1:0] = 00 : QSPI Flash x 1
@@ -933,22 +625,7 @@ uint32_t ReadAnyRegisterQspiFlash(uint32_t addr, unsigned char *readData)		// Ad
 //71h Write Any Register command (WRAR 71h)
 void WriteAnyRegisterQspiFlash(uint32_t addr, unsigned char writeData)			// Add24bit,Data8bit
 {
-	uint32_t product;
-	uint32_t cut;
-
-	product = *((volatile uint32_t*)PRR) & PRR_PRODUCT_MASK;
-	cut = *((volatile uint32_t*)PRR) & PRR_CUT_MASK;
-
-	if ((product ==  PRR_PRODUCT_G2M) && (cut < PRR_CUT_30))
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
-	}
-	else
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80038260;
-		//bit31  CAL         =  1 : PHY calibration
-		//bit1-0 PHYMEM[1:0] = 00 : QSPI-SDR
-	}
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
 	*((volatile uint32_t*)RPC_CMNCR)      = 0x81FFF300;
 		//bit31  MD       =  1 : Manual mode
 		//bit1-0 BSZ[1:0] = 00 : QSPI Flash x 1
@@ -974,17 +651,7 @@ void WriteAnyRegisterQspiFlash(uint32_t addr, unsigned char writeData)			// Add2
 
 	WaitRpcTxEnd();
 
-	if ((product ==  PRR_PRODUCT_G2M) && (cut < PRR_CUT_30))
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x00030273;
-	}
-	else
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x00038273;
-		//bit31  CAL         =  0 : No PHY calibration
-		//bit2   WBUF        =  0 : Write Buffer Disable
-		//bit1-0 PHYMEM[1:0] = 11 : HyperFlash
-	}
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x00030273;
 	*((volatile uint32_t*)RPC_DRCR)       = 0x011F0301;
 		//bit9   RCF         =  1 : Read Cache Clear
 }
@@ -992,22 +659,8 @@ void WriteAnyRegisterQspiFlash(uint32_t addr, unsigned char writeData)			// Add2
 //FAST_READ 0Bh (CR2V[7]=0) is followed by a 3-byte address
 void InitRPC_QspiFlashFastReadExtMode(void)
 {
-	uint32_t product;
-	uint32_t cut;
-
-	product = *((volatile uint32_t*)PRR) & PRR_PRODUCT_MASK;
-	cut = *((volatile uint32_t*)PRR) & PRR_CUT_MASK;
-
-	if ((product ==  PRR_PRODUCT_G2M) && (cut < PRR_CUT_30))
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x00030260;
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
-	}
-	else
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x00038260;
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80038260;
-	}
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x00030260;
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
 	*((volatile uint32_t*)RPC_CMNCR)      = 0x01FFF300;
 	*((volatile uint32_t*)RPC_DRCR)       = 0x001F0100;
 		//bit20-16 RBURST[4:0] = 11111 : 32 continuous data unit
@@ -1042,37 +695,13 @@ void SetRPC_ClockMode(uint32_t mode)
 {
 	uint32_t dataL=0;
 
-#ifdef RZG2_HIHOPE
-	if (mode == RPC_CLK_160M)
-	{
-		dataL = 0x00000011;	/* RPC clock 160MHz */
-	}
-	else if (mode == RPC_CLK_80M)
-	{
-		dataL = 0x00000013;	/* RPC clock 80MHz */
-	}
-	else
-	{
-		dataL = 0x00000017;	/* RPC clock 40MHz */
-	}
-#endif /* RZG2_HIHOPE */
-#ifdef RZG2_EK874
-	if (mode == RPC_CLK_160M)
-	{
-		dataL = 0x00000011;	/* RPC clock 160MHz */
-	}
-	else if (mode == RPC_CLK_80M)
-	{
-		dataL = 0x00000001;	/* RPC clock 80MHz */
-	}
-	else
-	{
-		dataL = 0x00000003;	/* RPC clock 40MHz */
-	}
-#endif /* RZG2_EK874 */
+	/* --- Set 16.6MHz on PLL3 for SPI Multi --- */
+	dataL = *((volatile uint32_t*)CPG_PL3A_DDIV);
+	dataL &= (~0x00000700U);
+	dataL |=  0x01000300U;	/* DIV_PLL3_C = 1/8 */
+	*((volatile uint32_t*)CPG_PL3A_DDIV) = dataL;
 
-	*((volatile uint32_t*)CPG_CPGWPR)   = ~dataL;
-	*((volatile uint32_t*)CPG_RPCCKCR)  =  dataL;
+	*((volatile uint32_t*)CPG_PL3_SSEL) = 0x01110011U;
 
 	SoftDelay(50000);
 }
@@ -1094,60 +723,60 @@ void WaitRpcTxEnd(void)
 
 void ResetRPC(void)
 {
-	*((volatile uint32_t*)CPG_CPGWPR) = ~BIT17;
-	*((volatile uint32_t*)CPG_SRCR9)  =  BIT17;
-	//wait: tRLRH Reset# low pulse width 10us
-	StartTMU0usec(2);							// wait 20us
-
-	*((volatile uint32_t*)CPG_CPGWPR)   = ~BIT17;
-	*((volatile uint32_t*)CPG_SRSTCLR9) =  BIT17;
-	//wait: tREADY1(35us) - tRHSL(10us) = 25us
-	StartTMU0usec(4);							// wait 40us
 }
 
 void SetRPC_SSL_Delay(void)
 {
+	uint32_t dataL=0;
+
+	*((volatile uint32_t*)RPC_PHYADJ2) = 0xA5390000;
+	*((volatile uint32_t*)RPC_PHYADJ1) = 0x80000000;
+	*((volatile uint32_t*)RPC_PHYADJ2) = 0x00008080;
+	*((volatile uint32_t*)RPC_PHYADJ1) = 0x80000022;
+	*((volatile uint32_t*)RPC_PHYADJ2) = 0x00008080;
+	*((volatile uint32_t*)RPC_PHYADJ1) = 0x80000024;
+
+	dataL = *((volatile uint32_t*)RPC_PHYCNT);
+	*((volatile uint32_t*)RPC_PHYCNT)  = (dataL | 0x00030000);
+	*((volatile uint32_t*)RPC_PHYADJ2) = 0x00000030;
+	*((volatile uint32_t*)RPC_PHYADJ1) = 0x80000032;
+
+
 	*((volatile uint32_t*)RPC_SSLDR) = 0x00000400;
-		//bit10-8  SLNDL[2:0] =  100 : 5.5 cycles of QSPIn_SPCLK 
+		//bit10-8  SLNDL[2:0] =  100 : 5.5 cycles from QSPIn_SPCLK edge
 }
 
 void PowerOnRPC(void)
 {
 	uint32_t dataL=0;
 
-	dataL = *((volatile uint32_t*)CPG_MSTPSR9);
-	if (dataL & BIT17)
-	{
-		// case RPC(QSPI) Standby
-		dataL &= ~BIT17;
-		*((volatile uint32_t*)CPG_CPGWPR)    = ~dataL;
-		*((volatile uint32_t*)CPG_SMSTPCR9)  =  dataL;
-		while(BIT17 & *((volatile uint32_t*)CPG_MSTPSR9));  // wait bit=0
-	}
+	dataL = *((volatile uint32_t*)CPG_CLKON_SPI_MULTI);
+	dataL |= 0x00030003U;									/* Set WEN[0](bit[8) w/B'1 */
+	*((volatile uint32_t*)CPG_CLKON_SPI_MULTI) = dataL;
+	do {
+		dataL = *((volatile uint32_t*)CPG_CLKMON_SPI_MULTI);
+	} while ((dataL & (BIT1 | BIT0)) == 0U);	/* wait until bit1/0=1 */
+
+	dataL = *((volatile uint32_t*)CPG_RST_SPI);
+	dataL |= 0x00010001U;
+	*((volatile uint32_t*)CPG_RST_SPI) = dataL;
+	do {
+		dataL = *((volatile uint32_t*)CPG_RSTMON_SPI);
+	} while ((dataL & BIT0) == 1U);	/* wait until bit0=1 */
 }
 
 
 uint32_t ReadQspiFlashID(uint32_t *readData)	//for QSPIx1ch
 {
 	char str[64];
-	uint32_t product;
-	uint32_t cut;
 
-	product = *((volatile uint32_t*)PRR) & PRR_PRODUCT_MASK;
-	cut = *((volatile uint32_t*)PRR) & PRR_CUT_MASK;
-
-	if ((product ==  PRR_PRODUCT_G2M) && (cut < PRR_CUT_30))
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x00030260;
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
-	}
-	else
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x00038260;
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80038260;
-		//bit31  CAL         =  1 : PHY calibration
-		//bit1-0 PHYMEM[1:0] = 00 : QSPI-SDR
-	}
+#if 1	/* 2020/12/21 S.Hirai	*/
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x00030060;
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030060;
+#else	/* 1 */
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x00030260;
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
+#endif	/* 1 */
 	*((volatile uint32_t*)RPC_CMNCR)      = 0x81FFF300;
 		//bit31  MD       =  1 : Manual mode
 		//bit1-0 BSZ[1:0] = 00 : QSPI Flash x 1
@@ -1177,24 +806,8 @@ uint32_t ReadQspiFlashID(uint32_t *readData)	//for QSPIx1ch
 
 uint32_t ReadStatusQspiFlash(uint32_t *readData)	//for QSPIx1ch
 {
-	uint32_t product;
-	uint32_t cut;
-
-	product = *((volatile uint32_t*)PRR) & PRR_PRODUCT_MASK;
-	cut = *((volatile uint32_t*)PRR) & PRR_CUT_MASK;
-
-	if ((product ==  PRR_PRODUCT_G2M) && (cut < PRR_CUT_30))
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x00030260;
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
-	}
-	else
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x00038260;
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80038260;
-		//bit31  CAL         =  1 : PHY calibration
-		//bit1-0 PHYMEM[1:0] = 00 : QSPI-SDR
-	}
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x00030260;
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
 	*((volatile uint32_t*)RPC_CMNCR)      = 0x81FFF300;
 		//bit31  MD       =  1 : Manual mode
 		//bit1-0 BSZ[1:0] = 00 : QSPI Flash x 1
@@ -1227,22 +840,7 @@ uint32_t ReadStatusQspiFlash(uint32_t *readData)	//for QSPIx1ch
 
 void WriteCommandQspiFlash(uint32_t command)	//for QSPIx1ch
 {
-	uint32_t product;
-	uint32_t cut;
-
-	product = *((volatile uint32_t*)PRR) & PRR_PRODUCT_MASK;
-	cut = *((volatile uint32_t*)PRR) & PRR_CUT_MASK;
-
-	if ((product ==  PRR_PRODUCT_G2M) && (cut < PRR_CUT_30))
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
-	}
-	else
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80038260;
-		//bit31  CAL         =  1 : PHY calibration
-		//bit1-0 PHYMEM[1:0] = 00 : QSPI-SDR
-	}
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
 	*((volatile uint32_t*)RPC_CMNCR)      = 0x81FFF300;
 		//bit31  MD       =  1 : Manual mode
 		//bit1-0 BSZ[1:0] = 00 : QSPI Flash x 1
@@ -1271,30 +869,14 @@ void WriteCommandQspiFlash(uint32_t command)	//for QSPIx1ch
 void WriteDataWithBufferQspiFlash(uint32_t addr, uint32_t source_addr)	//for QSPIx1ch
 {
 	uintptr_t i=0;
-	uint32_t product;
-	uint32_t cut;
-
 	*((volatile uint32_t*)RPC_DRCR)       = 0x011F0301;
 		//bit9   RCF         =  1 : Read Cache Clear
 
-	product = *((volatile uint32_t*)PRR) & PRR_PRODUCT_MASK;
-	cut = *((volatile uint32_t*)PRR) & PRR_CUT_MASK;
-
-	if ((product ==  PRR_PRODUCT_G2M) && (cut < PRR_CUT_30))
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030274;
-	}
-	else
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80038274;
-		//bit31  CAL         =  1 : PHY calibration
-		//bit2   WBUF        =  1 : Write Buffer Enable
-		//bit1-0 PHYMEM[1:0] = 00 : QSPI-SDR
-	}
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030274;
 
 	for(i = 0; i < 256;i = i+0x4)
 	{
-		(*(volatile uint32_t*)(0xEE208000+i)) = (*(volatile uint32_t*)(source_addr+i));
+		(*(volatile uint32_t*)(RPC_WRBUF+i)) = (*(volatile uint32_t*)(source_addr+i));
 	}
 
 		//bit31  CAL         =  1 : PHY calibration
@@ -1324,17 +906,7 @@ void WriteDataWithBufferQspiFlash(uint32_t addr, uint32_t source_addr)	//for QSP
 
 	WaitRpcTxEnd();
 
-	if ((product ==  PRR_PRODUCT_G2M) && (cut < PRR_CUT_30))
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x00030273;
-	}
-	else
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x00038273;
-		//bit31  CAL         =  0 : No PHY calibration
-		//bit2   WBUF        =  0 : Write Buffer Disable
-		//bit1-0 PHYMEM[1:0] = 11 : HyperFlash
-	}
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x00030273;
 	*((volatile uint32_t*)RPC_DRCR)       = 0x011F0301;
 		//bit9   RCF         =  1 : Read Cache Clear
 }
@@ -1342,22 +914,7 @@ void WriteDataWithBufferQspiFlash(uint32_t addr, uint32_t source_addr)	//for QSP
 // SE (4KB) 20h 3-byte address
 void ParameterSectorErase3QspiFlash(uint32_t sector_addr)
 {
-	uint32_t product;
-	uint32_t cut;
-
-	product = *((volatile uint32_t*)PRR) & PRR_PRODUCT_MASK;
-	cut = *((volatile uint32_t*)PRR) & PRR_CUT_MASK;
-
-	if ((product ==  PRR_PRODUCT_G2M) && (cut < PRR_CUT_30))
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
-	}
-	else
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80038260;
-		//bit31  CAL         =  1 : PHY calibration
-		//bit1-0 PHYMEM[1:0] = 00 : QSPI-SDR
-	}
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
 	*((volatile uint32_t*)RPC_CMNCR)      = 0x81FFF300;
 		//bit31  MD       =  1 : Manual mode
 		//bit1-0 BSZ[1:0] = 00 : QSPI Flash x 1
@@ -1386,22 +943,7 @@ void ParameterSectorErase3QspiFlash(uint32_t sector_addr)
 //SE D8h  3-byte address
 void SectorEraseQspiFlash(uint32_t sector_addr)	//for QSPIx1ch
 {
-	uint32_t product;
-	uint32_t cut;
-
-	product = *((volatile uint32_t*)PRR) & PRR_PRODUCT_MASK;
-	cut = *((volatile uint32_t*)PRR) & PRR_CUT_MASK;
-
-	if ((product ==  PRR_PRODUCT_G2M) && (cut < PRR_CUT_30))
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
-	}
-	else
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80038260;
-		//bit31  CAL         =  1 : PHY calibration
-		//bit1-0 PHYMEM[1:0] = 00 : QSPI-SDR
-	}
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
 	*((volatile uint32_t*)RPC_CMNCR)      = 0x81FFF300;
 		//bit31  MD       =  1 : Manual mode
 		//bit1-0 BSZ[1:0] = 00 : QSPI Flash x 1
@@ -1429,24 +971,8 @@ void SectorEraseQspiFlash(uint32_t sector_addr)	//for QSPIx1ch
 
 void InitRPC_ExtMode_QuadIORead(void)	//for QSPIx1ch
 {
-	uint32_t product;
-	uint32_t cut;
-
-	product = *((volatile uint32_t*)PRR) & PRR_PRODUCT_MASK;
-	cut = *((volatile uint32_t*)PRR) & PRR_CUT_MASK;
-
-	if ((product ==  PRR_PRODUCT_G2M) && (cut < PRR_CUT_30))
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x00030260;
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
-	}
-	else
-	{
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x00038260;
-		*((volatile uint32_t*)RPC_PHYCNT)    = 0x80038260;
-		//bit31  CAL         =  1 : PHY calibration
-		//bit1-0 PHYMEM[1:0] = 00 : QSPI-SDR
-	}
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x00030260;
+	*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
 	*((volatile uint32_t*)RPC_CMNCR)      = 0x01FFF300;
 		//bit31  MD       =  0 : External address space read mode
 		//bit1-0 BSZ[1:0] = 00 : QSPI Flash x 1

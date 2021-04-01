@@ -1,32 +1,7 @@
 /*
- * Copyright (c) 2015-2016, Renesas Electronics Corporation
- * All rights reserved.
+ * Copyright (c) 2015-2016, Renesas Electronics Corporation. All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *   - Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *
- *   - Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *
- *   - Neither the name of Renesas nor the names of its contributors may be
- *     used to endorse or promote products derived from this software without
- *     specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #define __EMMC_GLOBAL_DEFINE__
@@ -44,23 +19,21 @@
 
 #define SIZE_TEST
 
-#define	EMMC_PRR	0xFF000044U	/* Product Register */
-
-#define	EXT_CSD_INDEX_MAX		(511U)
-#define	EXT_CSD_VALUE_MAX		(0xFF)
+#define EXT_CSD_INDEX_MAX		(511U)
+#define EXT_CSD_VALUE_MAX		(0xFF)
 
 #ifdef EXTCSD_PROTECT
-#define	EXT_CSD_WRITE_INDEX_NUM		(37U)
-#define	EXT_CSD_PROTECT_INDEX_NUM	(5U)
+#define EXT_CSD_WRITE_INDEX_NUM		(37U)
+#define EXT_CSD_PROTECT_INDEX_NUM	(5U)
 #else /* EXTCSD_PROTECT */
-#define	EXT_CSD_WRITE_INDEX_NUM		(32U)
+#define EXT_CSD_WRITE_INDEX_NUM		(32U)
 #endif /* EXTCSD_PROTECT */
 
 typedef enum{
 	EMMC_EXT_CSD_INPUT_END = 0,
 	EMMC_EXT_CSD_INPUT_VALUE,
 	EMMC_EXT_CSD_INPUT_INDEX
-} EMMC_EXT_CSD_INPUT;
+}EMMC_EXT_CSD_INPUT;
 
 typedef enum
 {
@@ -73,7 +46,7 @@ typedef enum
 	CID_FIELD_MDT,
 	CID_FIELD_CRC,
 	CID_FIELD_MAX
-} CID_FIELD;
+}CID_FIELD;
 
 typedef enum
 {
@@ -111,7 +84,7 @@ typedef enum
 	CSD_FIELD_ECC,
 	CSD_FIELD_CRC,
 	CSD_FIELD_MAX
-} CSD_FIELD;
+}CSD_FIELD;
 
 typedef enum
 {
@@ -217,14 +190,16 @@ typedef enum
 	EXT_CSD_FIELD_ENH_START_ADDR,
 	EXT_CSD_FIELD_SEC_BAD_BLK_MGMNT,
 	EXT_CSD_FIELD_MAX
-} EXT_CSD_FIELD;
+}EXT_CSD_FIELD;
+
+
 
 typedef struct
 {
 	uint32_t top;
 	uint32_t end;
 	uint8_t name[48];
-} EMMC_DISP_REGISTER_DATA;
+}EMMC_DISP_REGISTER_DATA;
 
 const EMMC_DISP_REGISTER_DATA dg_cid_data[CID_FIELD_MAX] = {
 	{	127,	120,	"MID  "},
@@ -409,6 +384,7 @@ static void warningChgProtectIndex(void);
 static void dispField( uint32_t start, uint32_t end );
 static void dispOffset( int8_t cnt );
 
+
 /****************************************************************
 	MODULE			: dg_emmc_disp_cid 		*
 	FUNCTION		: Display CID			*
@@ -422,7 +398,7 @@ void	dg_emmc_disp_cid(void)
 	result = dg_emmc_check_init();
 	if (EMMC_SUCCESS != result)
 	{
-		PutStr("eMMC Init ERROR!",1);
+		PutStr("eMMC Init ERROR!", 1);
 		return;
 	}
 	disp_cid();
@@ -443,7 +419,7 @@ void	dg_emmc_disp_csd(void)
 	result = dg_emmc_check_init();
 	if (EMMC_SUCCESS != result)
 	{
-		PutStr("eMMC Init ERROR!",1);
+		PutStr("eMMC Init ERROR!", 1);
 		return;
 	}
 	disp_csd();
@@ -465,7 +441,7 @@ void	dg_emmc_disp_ext_csd(void)
 	result = dg_emmc_check_init();
 	if (EMMC_SUCCESS != result)
 	{
-		PutStr("eMMC Init ERROR!",1);
+		PutStr("eMMC Init ERROR!", 1);
 		return;
 	}
 
@@ -474,7 +450,7 @@ void	dg_emmc_disp_ext_csd(void)
 	result = emmc_exec_cmd(EMMC_R1_ERROR_MASK, mmc_drv_obj.response);
 	if (result != EMMC_SUCCESS)
 	{
-		PutStr("CMD8 error",1);
+		PutStr("CMD8 error", 1);
 		return;
 	}
 
@@ -506,7 +482,7 @@ void	dg_emmc_set_ext_csd(void)
 	result = dg_emmc_check_init();
 	if (EMMC_SUCCESS != result)
 	{
-		PutStr("eMMC Init ERROR!",1);
+		PutStr("eMMC Init ERROR!", 1);
 		return;
 	}
 
@@ -515,7 +491,7 @@ void	dg_emmc_set_ext_csd(void)
 	result = emmc_set_ext_csd(arg);
 	if (EMMC_SUCCESS != result)
 	{
-		PutStr(" EM_SECSD ERASE_GROUP_DEF CHG ERR!", 1 );
+		PutStr(" EM_SECSD ERASE_GROUP_DEF CHG ERR!", 1);
 		return;
 	}
 
@@ -524,7 +500,7 @@ void	dg_emmc_set_ext_csd(void)
 	result = emmc_exec_cmd(EMMC_R1_ERROR_MASK, mmc_drv_obj.response);
 	if (result != EMMC_SUCCESS)
 	{
-		PutStr("EM_SECSD CMD8 ERR!",1);
+		PutStr("EM_SECSD CMD8 ERR!", 1);
 		return;
 	}
 
@@ -533,12 +509,12 @@ void	dg_emmc_set_ext_csd(void)
 
 	chkInput = InputExtCsdParam(&index, &value);
 #ifdef EMMC_DEBUG
-	PutStr("Index = ",0);
+	PutStr("Index = ", 0);
 	Hex2DecAscii((int32_t)index,buf,&chCnt);
-	PutStr(buf,1);
-	PutStr("Value = 0x",0);
+	PutStr(buf, 1);
+	PutStr("Value = 0x", 0);
 	Hex2Ascii((int32_t)value,buf,&chCnt);
-	PutStr(buf,1);
+	PutStr(buf, 1);
 #endif /* EMMC_DEBUG */
 	if (1 != chkInput)
 	{
@@ -554,7 +530,7 @@ void	dg_emmc_set_ext_csd(void)
 		if (WaitKeyIn_YorN())
 		{
 			DelStr(34);
-			PutStr(" EM_SECSD CANCEL!", 1 );
+			PutStr(" EM_SECSD CANCEL!", 1);
 			return;
 		}
 		DelStr(34);
@@ -562,7 +538,7 @@ void	dg_emmc_set_ext_csd(void)
 		if (WaitKeyIn_YorN())
 		{
 			DelStr(34);
-			PutStr(" EM_SECSD CANCEL!", 1 );
+			PutStr(" EM_SECSD CANCEL!", 1);
 			return;
 		}
 		DelStr(34);
@@ -574,7 +550,7 @@ void	dg_emmc_set_ext_csd(void)
 	result = emmc_set_ext_csd(arg);
 	if (EMMC_SUCCESS != result)
 	{
-		PutStr(" EM_SECSD ERR!", 1 );
+		PutStr(" EM_SECSD ERR!", 1);
 		return;
 	}
 
@@ -583,24 +559,24 @@ void	dg_emmc_set_ext_csd(void)
 	result = emmc_exec_cmd(EMMC_R1_ERROR_MASK, mmc_drv_obj.response);
 	if (result != EMMC_SUCCESS)
 	{
-		PutStr("EM_SECSD CMD8 ERR!",1);
+		PutStr("EM_SECSD CMD8 ERR!", 1);
 		return;
 	}
 
 	// Disp Change After Values
-	PutStr("  EXT_CSD[",0);
+	PutStr("  EXT_CSD[", 0);
 	Hex2Ascii(index,buf,&chCnt);
-	PutStr(&buf[6],0);
-	PutStr("] = 0x",0);
+	PutStr(&buf[6], 0);
+	PutStr("] = 0x", 0);
 	Hex2Ascii((int32_t)mmc_drv_obj.ext_csd_data[index],buf,&chCnt);
-	PutStr(&buf[6],1);
+	PutStr(&buf[6], 1);
 
 	return;
 }
 
 
 /****************************************************************
-	MODULE			: disp_cid			*
+	MODULE			: disp_cid		 	*
 	FUNCTION		: Display CID			*
 	COMMAND			: 				*
 	INPUT PARAMETER		: 				*
@@ -620,26 +596,26 @@ static void disp_cid(void)
 	uint32_t i;
 	// CSD=128bit
 	/* dump disp */
-	PutStr("",1);
-	PutStr("[CID Raw Data]",1);
-	PutStr("<--BIT127                               BIT0-->",1);
-	for(i = 0; i <EMMC_MAX_CID_LENGTH; i++)
+	PutStr("", 1);
+	PutStr("[CID Raw Data]", 1);
+	PutStr("<--BIT127                               BIT0-->", 1);
+	for (i = 0; i<EMMC_MAX_CID_LENGTH; i++)
 	{
 		Data2HexAscii(mmc_drv_obj.cid_data[i],buf,1);
-		PutStr(buf,0);
-		PutStr(" ",0);
+		PutStr(buf, 0);
+		PutStr(" ", 0);
 	}
-	PutStr("",1);
+	PutStr("", 1);
 #endif /* EMMC_TOOL_DUMP */
 
 	/* field disp */
-	PutStr("",1);
-	PutStr("[CID Field Data]",1);
-	for(loop = 0; loop < CID_FIELD_MAX; loop++)
+	PutStr("", 1);
+	PutStr("[CID Field Data]", 1);
+	for (loop = 0; loop < CID_FIELD_MAX; loop++)
 	{
 		dispField((int32_t)dg_cid_data[loop].top,(int32_t)dg_cid_data[loop].end);
-		PutStr(dg_cid_data[loop].name,0);
-		PutStr("0x",0);
+		PutStr(dg_cid_data[loop].name, 0);
+		PutStr("0x", 0);
 
 		bitCnt = (dg_cid_data[loop].top - dg_cid_data[loop].end) + 1;
 		dispCnt = ( bitCnt >> 3 );
@@ -649,7 +625,7 @@ static void disp_cid(void)
 		}
 
 		value = 0;
-		for(cnt = dispCnt; cnt > 0; cnt--)
+		for (cnt = dispCnt; cnt > 0; cnt--)
 		{
 			end = dg_cid_data[loop].end + ((cnt-1) * 8);
 			top = end + 7;
@@ -659,15 +635,15 @@ static void disp_cid(void)
 			}
 			value = EMMC_GET_CID(top,end);
 			Data2HexAscii((uint32_t)value,buf,1);
-			PutStr(buf,0);
+			PutStr(buf, 0);
 		}
-		PutStr("",1);
+		PutStr("", 1);
 	}
-	PutStr("",1);
+	PutStr("", 1);
 }
 
 /****************************************************************
-	MODULE			: disp_csd			*
+	MODULE			: disp_csd		 	*
 	FUNCTION		: Display CSD			*
 	COMMAND			: 				*
 	INPUT PARAMETER		: 				*
@@ -687,26 +663,26 @@ static void disp_csd(void)
 	uint32_t i;
 	// CSD=128bit
 	/* dump disp */
-	PutStr("",1);
-	PutStr("[CSD Raw Data]",1);
-	PutStr("<--BIT127                               BIT0-->",1);
-	for(i = 0; i < EMMC_MAX_CSD_LENGTH; i++)
+	PutStr("", 1);
+	PutStr("[CSD Raw Data]", 1);
+	PutStr("<--BIT127                               BIT0-->", 1);
+	for ( i = 0; i < EMMC_MAX_CSD_LENGTH; i++)
 	{
 		Data2HexAscii(mmc_drv_obj.csd_data[i],buf,1);
-		PutStr(buf,0);
-		PutStr(" ",0);
+		PutStr(buf, 0);
+		PutStr(" ", 0);
 	}
-	PutStr("",1);
+	PutStr("", 1);
 #endif /* EMMC_TOOL_DUMP */
 
 	/* field disp */
-	PutStr("",1);
+	PutStr("", 1);
 	PutStr("[CSD Field Data]",1);
-	for(loop = 0; loop < CSD_FIELD_MAX; loop++)
+	for (loop = 0; loop < CSD_FIELD_MAX; loop++)
 	{
 		dispField((int32_t)dg_csd_data[loop].top,(int32_t)dg_csd_data[loop].end);
-		PutStr(dg_csd_data[loop].name,0);
-		PutStr("0x",0);
+		PutStr(dg_csd_data[loop].name, 0);
+		PutStr("0x", 0);
 
 		bitCnt = (dg_csd_data[loop].top - dg_csd_data[loop].end) + 1;
 		dispCnt = ( bitCnt >> 3 );
@@ -716,7 +692,7 @@ static void disp_csd(void)
 		}
 
 		value = 0;
-		for(cnt = dispCnt; cnt > 0; cnt--)
+		for (cnt = dispCnt; cnt > 0; cnt--)
 		{
 			end = dg_csd_data[loop].end + ((cnt-1) * 8);
 			top = end + 7;
@@ -727,15 +703,15 @@ static void disp_csd(void)
 
 			value = EMMC_GET_CSD(top,end);
 			Data2HexAscii((uint32_t)value,buf,1);
-			PutStr(buf,0);
+			PutStr(buf, 0);
 		}
-		PutStr("",1);
+		PutStr("", 1);
 	}
-	PutStr("",1);
+	PutStr("", 1);
 }
 
 /****************************************************************
-	MODULE			: disp_ext_csd			*
+	MODULE			: disp_ext_csd	 		*
 	FUNCTION		: Display EXT_CSD		*
 	COMMAND			: 				*
 	INPUT PARAMETER		: 				*
@@ -753,67 +729,67 @@ static void disp_ext_csd(void)
 #ifdef EMMC_TOOL_DUMP
 	uint32_t i,j;
 	// EXT_CSD=512Byte
-	PutStr("",1);
-	PutStr("[EXT_CSD Raw Data]",1);
-	PutStr("addr 00 01 02 03 04 05 06 07 08 09 | 10 11 12 13 14 15 16 17 18 19",1);
-	PutStr("-----------------------------------|------------------------------",1);
-	for(i = 0; i < EMMC_MAX_EXT_CSD_LENGTH; i+=20)
+	PutStr("", 1);
+	PutStr("[EXT_CSD Raw Data]", 1);
+	PutStr("addr 00 01 02 03 04 05 06 07 08 09 | 10 11 12 13 14 15 16 17 18 19", 1);
+	PutStr("-----------------------------------|------------------------------", 1);
+	for (i = 0; i < EMMC_MAX_EXT_CSD_LENGTH; i+= 20)
 	{
 		if (i < 10)
 		{
-			PutStr("0",0);
+			PutStr("0", 0);
 		}
 		if (i < 100)
 		{
-			PutStr("0",0);
+			PutStr("0", 0);
 		}
-		Hex2DecAscii(i,buf,&chCnt);
-		PutStr(buf,0);
-		PutStr("  ",0);
-		for(j = i; j<(i+20); j++)
+		Hex2DecAscii(i, buf, &chCnt);
+		PutStr(buf, 0);
+		PutStr("  ", 0);
+		for (j = i; j < (i+20); j++)
 		{
-			if (j == (i+10))
+			if (j == (i+10)) 
 			{
-				PutStr("| ",0);
+				PutStr("| ", 0);
 			}
 			if (j < EMMC_MAX_EXT_CSD_LENGTH)
 			{
 				Data2HexAscii(mmc_drv_obj.ext_csd_data[j],buf,1);
-				PutStr(buf,0);
-				PutStr(" ",0);
+				PutStr(buf, 0);
+				PutStr(" ", 0);
 			}
 		}
-		PutStr("",1);
+		PutStr("", 1);
 	}
 #endif /* EMMC_TOOL_DUMP */
 
 	/* field disp */
-	PutStr("",1);
-	PutStr("[EXT_CSD Field Data]",1);
-	for(loop = 0; loop < EXT_CSD_FIELD_MAX; loop++)
+	PutStr("", 1);
+	PutStr("[EXT_CSD Field Data]", 1);
+	for (loop = 0; loop < EXT_CSD_FIELD_MAX; loop++)
 	{
-		dispField((int32_t)dg_ext_csd_data[loop].top,(int32_t)dg_ext_csd_data[loop].end);
-		PutStr(dg_ext_csd_data[loop].name,0);
-		PutStr("0x",0);
+		dispField((int32_t)dg_ext_csd_data[loop].top, (int32_t)dg_ext_csd_data[loop].end);
+		PutStr(dg_ext_csd_data[loop].name, 0);
+		PutStr("0x", 0);
 
 		byteCnt = (dg_ext_csd_data[loop].top - dg_ext_csd_data[loop].end) + 1;
-		for(cnt = 0; cnt < byteCnt; cnt++)
+		for (cnt = 0; cnt < byteCnt; cnt++)
 		{
 			index = dg_ext_csd_data[loop].top - cnt;
 
 			if ((cnt != 0) && (cnt % 8) == 0)
 			{
-				PutStr("",1);
-				PutStr("                                                        ",0);
+				PutStr("", 1);
+				PutStr("                                                        ", 0);
 			}
 
 			value = mmc_drv_obj.ext_csd_data[index];
 			Hex2Ascii((uint32_t)value,buf,&chCnt);
 			PutStr(&buf[6],0);
 		}
-		PutStr("",1);
+		PutStr("", 1);
 	}
-	PutStr("",1);
+	PutStr("", 1);
 }
 
 /****************************************************************
@@ -838,31 +814,32 @@ static uint32_t InputExtCsdParam( uint32_t *index, uint32_t *value )
 	{
 		if (EMMC_EXT_CSD_INPUT_INDEX == loop)
 		{
-			PutStr("  Please Input EXT_CSD Index(H'00 - H'1FF) :",0);
+			PutStr("  Please Input EXT_CSD Index(H'00 - H'1FF) :", 0);
 		}
 		else
 		{
-			PutStr("  Please Input Value(H'00 - H'FF) :",0);
+			PutStr("  Please Input Value(H'00 - H'FF) :", 0);
 		}
 
 		GetStr(key,&chCnt);
 		chPtr = 0;
-		if (!GetStrBlk(key,buf,&chPtr,0))
+		if (!GetStrBlk(key, buf, &chPtr, 0))
 		{
 			if (chPtr == 1)
-			{						/* Case Return */
+			{
+				/* Case Return */
 				return(0);
 			}
-			else if (chPtr > (int8_t)((SIZE_32BIT<<1)+1))	/* Case Data Size Over */
+			else if (chPtr > (int8_t)((SIZE_32BIT<<1)+1)) /* Case Data Size Over */
 			{
-				PutStr("Syntax Error",1);
+				PutStr("Syntax Error", 1);
 			}
 			else
 			{
 				wrData = 0xFFFFFFFFU;
-				if (HexAscii2Data((uint8_t*)buf,&wrData))
+				if (HexAscii2Data((uint8_t*)buf, &wrData))
 				{
-					PutStr("Syntax Error",1);
+					PutStr("Syntax Error", 1);
 				}
 				else
 				{
@@ -871,33 +848,33 @@ static uint32_t InputExtCsdParam( uint32_t *index, uint32_t *value )
 					{
 						if (EXT_CSD_INDEX_MAX < wrData)		/* Param Error */
 						{
-							PutStr("Param Error",1);
+							PutStr("Param Error", 1);
 						}
 						else
 						{
 							result = emmcChkExtCsdWriteIndex( wrData );
 							if (1 != result)
 							{
-								PutStr("Unwritable Index",1);
+								PutStr("Unwritable Index", 1);
 							}
 							else
 							{
 								*index = wrData;
 								loop--;
-								PutStr("  EXT_CSD[",0);
-								Hex2Ascii(wrData,buf,&lchCnt);
-								PutStr(&buf[6],0);
-								PutStr("] = 0x",0);
-								Hex2Ascii((int32_t)mmc_drv_obj.ext_csd_data[wrData],buf,&lchCnt);
-								PutStr(&buf[6],1);
+								PutStr("  EXT_CSD[", 0);
+								Hex2Ascii(wrData, buf, &lchCnt);
+								PutStr(&buf[6] ,0);
+								PutStr("] = 0x", 0);
+								Hex2Ascii((int32_t)mmc_drv_obj.ext_csd_data[wrData], buf, &lchCnt);
+								PutStr(&buf[6], 1);
 							}
 						}
 					}
-					else						/* case value */
+					else	/* case value */
 					{
 						if (EXT_CSD_VALUE_MAX < wrData)		/* Size Over */
 						{
-							PutStr("Param Error",1);
+							PutStr("Param Error", 1);
 						}
 						else
 						{
@@ -923,7 +900,7 @@ static uint32_t emmcChkExtCsdWriteIndex(uint32_t index)
 {
 	uint32_t cnt;
 
-	for(cnt = 0; cnt < EXT_CSD_WRITE_INDEX_NUM; cnt++)
+	for (cnt = 0; cnt < EXT_CSD_WRITE_INDEX_NUM; cnt++)
 	{
 		if (extCsdWriteIndex[cnt] == index)
 		{
@@ -946,7 +923,7 @@ static uint32_t emmcChkExtCsdProtectIndex(uint32_t index)
 
 	for (cnt = 0; cnt < EXT_CSD_PROTECT_INDEX_NUM; cnt++)
 	{
-		if (extCsdProtectIndex[cnt] == index)
+		if( extCsdProtectIndex[cnt] == index )
 		{
 			return(1);
 		}
@@ -962,8 +939,8 @@ static uint32_t emmcChkExtCsdProtectIndex(uint32_t index)
 *************************************************************************/
 static void warningChgProtectIndex(void)
 {
-	PutStr("!! Warning !! This field contains the item of protection.",1);
-	PutStr("              Change OK?(y/n)",0);
+	PutStr("!! Warning !! This field contains the item of protection.", 1);
+	PutStr("              Change OK?(y/n)", 0);
 }
 
 #endif /* EXTCSD_PROTECT */
@@ -979,16 +956,16 @@ static void dispField( uint32_t start, uint32_t end )
 	int8_t buf[16];
 	int32_t chCnt;
 
-	PutStr("[",0);
-	Hex2DecAscii((int32_t)start,buf,&chCnt);
+	PutStr("[", 0);
+	Hex2DecAscii((int32_t)start, buf, &chCnt);
 	dispOffset(chCnt);
-	PutStr(buf,0);
-	PutStr(":",0);
-	Hex2DecAscii((int32_t)end,buf,&chCnt);
+	PutStr(buf, 0);
+	PutStr(":", 0);
+	Hex2DecAscii((int32_t)end, buf, &chCnt);
 	dispOffset(chCnt);
-	PutStr(buf,0);
-	PutStr("]",0);
-	PutStr("  ",0);
+	PutStr(buf, 0);
+	PutStr("]", 0);
+	PutStr("  ", 0);
 }
 
 /****************************************************************

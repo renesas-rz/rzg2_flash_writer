@@ -1,32 +1,7 @@
 /*
- * Copyright (c) 2015-2019, Renesas Electronics Corporation
- * All rights reserved.
+ * Copyright (c) 2015-2021, Renesas Electronics Corporation. All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *   - Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *
- *   - Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *
- *   - Neither the name of Renesas nor the names of its contributors may be
- *     used to endorse or promote products derived from this software without
- *     specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #include "emmc_config.h"
@@ -39,14 +14,9 @@
 #include "common.h"
 #include "types.h"
 
-#include "reg_rzg2.h"
 #include "ramckmdl.h"
 #include "dgmodul1.h"
 #include "devdrv.h"
-#include "boardid.h"
-#if USB_ENABLE == 1
-#include "usb_lib.h"
-#endif /* USB_ENABLE == 1 */
 
 #define	SIZE2SECTOR(x)			( (x) >> 9 )	/* 512Byte		*/
 
@@ -323,19 +293,7 @@ void	dg_emmc_write(EMMC_WRITE_COMMAND wc)
 		}
 		PutStr("please send binary file!",1);
 
-#if USB_ENABLE == 1
-		if (gTerminal == USB_TERMINAL)
-		{
-			totalDownloadSize = ((fileSize + (DMA_TRANSFER_SIZE - 1)) & DMA_ROUNDUP_VALUE);
-			USB_ReadDataWithDMA((unsigned long)Load_workStartAdd, totalDownloadSize);
-		}
-		else
-		{
-			dg_emmc_write_bin_serial(Load_workStartAdd, fileSize);
-		}
-#else  /* USB_ENABLE == 1 */
 		dg_emmc_write_bin_serial(Load_workStartAdd, fileSize);
-#endif /* USB_ENABLE == 1 */
 
 		workAdd_Min = (uintptr_t)Load_workStartAdd;
 		workAdd_Max = workAdd_Min + fileSize - 1;
@@ -532,54 +490,28 @@ void	dg_emmc_erase(void)
 	COMMAND			: 				*
 	INPUT PARAMETER		: 				*
 *****************************************************************/
-static int8_t dg_emmc_mot_load(uint32_t *maxADD ,uint32_t *minADD, uint32_t gUserPrgStartAdd )
+static int8_t dg_emmc_mot_load(uint32_t *maxADD ,uint32_t *minADD, uint32_t prgStartAdd)
 {
-//MIN,MAX address calc
-	int8_t 	str[12];			//max getByteCount=4 ->  4 * 2 +1 (NULL) = 9
-	uint32_t data,getByteCount,byteCount;
-	uint32_t loadGetCount,adByteCount,loadGetData,loadGetSum,loadGetCR;
-	uintptr_t loadGetAddress;
-	uint32_t loop,loop_S0,s0flag,errFlg,endFlg;
-//**** Add dgLS_Load2 ********************************************************************
-	uint32_t workAdd_Min,workAdd_Max;
-//****************************************************************************************
-//LAGER Add------------------------------------------------------------------------
-	uint32_t WorkStartAdd,Calculation;
-	uint32_t loadOffset;
+	char		str[12];
+	uint32_t	data;
+	uint32_t	getByteCount, byteCount;
+	uint32_t	loadGetCount,adByteCount,loadGetData,loadGetSum,loadGetCR;
+	uint32_t	loadGetAddress, prevLoadAddress;
+	uint32_t	loop, loop_S0, s0flag,errFlg, checkData,endFlg;
+	uint32_t	workAdd_Min,workAdd_Max;
 
-	workAdd_Min = 0xFFFFFFFFU;
-	workAdd_Max = 0x00000000U;
+	unsigned char *ptr;
 
-	WorkStartAdd = LS_WORK_DRAM_SADD;	//H'50000000
+	prevLoadAddress = prgStartAdd;
 
-	if ((0x40000000U <= gUserPrgStartAdd) && (gUserPrgStartAdd < WorkStartAdd))
-	{
-		//H'40000000 =< gUserPrgStartAdd < H'50000000
-		loadOffset = WorkStartAdd - gUserPrgStartAdd ;
-		Calculation = ADDITION;
-	}
-	else if ((WorkStartAdd <= gUserPrgStartAdd) && (gUserPrgStartAdd < 0xC0000000U))
-	{
-		//H'50000000 =< gUserPrgStartAdd < H'C0000000
-		loadOffset = gUserPrgStartAdd - WorkStartAdd ;
-		Calculation = SUBTRACTION;
-	}
-	else if ((EMMC_SECURERAM_SADD <= gUserPrgStartAdd) && (gUserPrgStartAdd <= EMMC_SECURERAM_EADD))
-	{
-		//H'E6300000 =< gUserPrgStartAdd < H'E631FFFF  1st cut
-		loadOffset = gUserPrgStartAdd - WorkStartAdd ;
-		Calculation = SUBTRACTION;
-	}
-	else
-	{
-		PutStr("ERROR Load file.   <Download  file  DRAM(H'40000000-H'BFFFFFFF) , SecureRAM(H'E6300000-H'E631FFFF) ONLY > ",1);
-		return(1);
-	}
-
+	ptr = (unsigned char *)EMMC_WORK_DRAM_SADD;
+	workAdd_Min = EMMC_WORK_DRAM_SADD;
+	workAdd_Max = EMMC_WORK_DRAM_SADD;
 	loop	= 1;
 	loop_S0	= 1;
 	errFlg	= 0;
 	endFlg	= 0;
+	checkData = 0xFF;
 
 	PutStr("please send ! ('.' & CR stop load)",1);
 	while(loop)
@@ -589,7 +521,7 @@ static int8_t dg_emmc_mot_load(uint32_t *maxADD ,uint32_t *minADD, uint32_t gUse
 		while(1)
 		{
 			GetChar(str);
-			if (*str == '.' || *str == 's' || *str =='S')
+			if (*str == '.' || *str == 's' || *str == 'S')
 			{
 				break;
 			}
@@ -601,7 +533,7 @@ static int8_t dg_emmc_mot_load(uint32_t *maxADD ,uint32_t *minADD, uint32_t gUse
 				GetChar(str);
 				if (*str == CR_CODE)
 				{
-					return(1);
+				 	return(1);
 				}
 			}
 		}
@@ -610,11 +542,10 @@ static int8_t dg_emmc_mot_load(uint32_t *maxADD ,uint32_t *minADD, uint32_t gUse
 			GetChar(str);
 			switch(*str)
 			{
-				case '0':	// S0:Title
+				case '0':
 					s0flag = 1;
 					while(loop_S0)
 					{
-						// loop CRorLR code
 						GetChar(str);
 						if ((*str == CR_CODE) || (*str == LF_CODE))
 						{
@@ -622,16 +553,19 @@ static int8_t dg_emmc_mot_load(uint32_t *maxADD ,uint32_t *minADD, uint32_t gUse
 						}
 					}
 				break;
-				case '1':	// S1:2Byte Address
+				case '1':
+					// S1:2Byte Address
 					adByteCount = 2;
 				break;
-				case '2':	// S2:3Byte Address
+				case '2':
+					// S2:3Byte Address
 					adByteCount = 3;
 				break;
-				case '3':	// S3:4Byte Address
+				case '3':
+					// S3:4Byte Address
 					adByteCount = 4;
 				break;
-				case '7':	// S7,S8,S9:end code
+				case '7':
 				case '8':
 				case '9':
 					endFlg = 1;
@@ -643,18 +577,13 @@ static int8_t dg_emmc_mot_load(uint32_t *maxADD ,uint32_t *minADD, uint32_t gUse
 		}
 		if (endFlg == 1 || errFlg == 1)
 		{
-			// end code etc.
 			while(1)
 			{
-				// loop CRorLR code ,CRorLR Return
 				GetChar(str);
 				if ((*str == CR_CODE) || (*str == LF_CODE))
 				{
-
-//**** Add dgLS_Load2 ********************************************************************
-					*maxADD = workAdd_Max;
+					*maxADD = workAdd_Max - 1;
 					*minADD = workAdd_Min;
-//****************************************************************************************
 					return(0);
 				}
 			}
@@ -662,62 +591,41 @@ static int8_t dg_emmc_mot_load(uint32_t *maxADD ,uint32_t *minADD, uint32_t gUse
 		if (s0flag == 0)
 		{
 			//Get Byte count (addressByteCount + dataByteCount + sumCheckByteCount(=1) )
-			getByteCount =1;
+			getByteCount = 1;
 			GetStr_ByteCount(str,getByteCount);
-			HexAscii2Data((uint8_t*)str,&data);
+			HexAscii2Data((unsigned char*)str,&data);
 			loadGetCount = data;
+
 			//Get Address
-			getByteCount =adByteCount;
-			GetStr_ByteCount(str,getByteCount);
-			HexAscii2Data((uint8_t*)str,&data);
+			getByteCount   = adByteCount;
+			GetStr_ByteCount(str, getByteCount);
+			HexAscii2Data((unsigned char*)str,&data);
 			loadGetAddress = data;
-
-//LAGER Add------------------------------------------------------------------------
-			if (Calculation == SUBTRACTION)
+			if (prevLoadAddress != loadGetAddress)
 			{
-				loadGetAddress = loadGetAddress - loadOffset;
-   			}
-			else
-			{
-				loadGetAddress = loadGetAddress + loadOffset;
+				ptr         += (loadGetAddress - prevLoadAddress);
+				workAdd_Max += (loadGetAddress - prevLoadAddress);
 			}
-//---------------------------------------------------------------------------------
-
 			loadGetCount = loadGetCount - getByteCount;  // Get Address byte count -
-
-
-//**** Add dgLS_Load2 ********************************************************************
-			//Min Address Check
-			if (loadGetAddress < workAdd_Min)
-			{
-				workAdd_Min = loadGetAddress;
-			}
-//****************************************************************************************
-
 			//Get Data & Data write
 			getByteCount = 1;
-			for(byteCount = loadGetCount; loadGetCount > 1; loadGetCount = loadGetCount - 1)
+			for (byteCount = loadGetCount; loadGetCount > 1; loadGetCount = loadGetCount - 1)
 			{
-				GetStr_ByteCount(str,getByteCount);
-				HexAscii2Data((uint8_t*)str,&data);
-				loadGetData = data;
-				*((uint8_t *)loadGetAddress) = loadGetData;
-				loadGetAddress = loadGetAddress +1;
+				GetStr_ByteCount(str, getByteCount);
+				HexAscii2Data((unsigned char*)str, &data);
+				loadGetAddress++;
+				*ptr = (unsigned char)data;
+				ptr++;
+				workAdd_Max++;
 			}
-//**** Add dgLS_Load2 ********************************************************************
-			//Max Address Check
-			if ((loadGetAddress - 1) > workAdd_Max)
-			{
-				workAdd_Max = (loadGetAddress-1);
-			}
-//****************************************************************************************
+			prevLoadAddress = loadGetAddress;
 			//Get sum
-			getByteCount =1;
-			GetStr_ByteCount(str,getByteCount);
-			HexAscii2Data((uint8_t*)str,&data);
-			loadGetSum = data;
+			getByteCount = 1;
+			GetStr_ByteCount(str, getByteCount);
+			HexAscii2Data((unsigned char*)str,&data);
+			loadGetSum   = data;
 			//Get CR code
-			GetChar(str);	//  char input
+			GetChar(str);
 			loadGetCR = *str;
 			if ((loadGetCR == CR_CODE) || (loadGetCR == LF_CODE))
 			{

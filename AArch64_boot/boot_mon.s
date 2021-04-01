@@ -1,45 +1,27 @@
-;/*
-; * Copyright (c) 2015-2018, Renesas Electronics Corporation
-; * All rights reserved.
-; *
-; * Redistribution and use in source and binary forms, with or without
-; * modification, are permitted provided that the following conditions are met:
-; *
-; *   - Redistributions of source code must retain the above copyright notice,
-; *     this list of conditions and the following disclaimer.
-; *
-; *   - Redistributions in binary form must reproduce the above copyright
-; *     notice, this list of conditions and the following disclaimer in the
-; *     documentation and/or other materials provided with the distribution.
-; *
-; *   - Neither the name of Renesas nor the names of its contributors may be
-; *     used to endorse or promote products derived from this software without
-; *     specific prior written permission.
-; *
-; * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-; * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-; * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-; * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-; * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-; * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-; * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-; * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-; * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-; * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-; * POSSIBILITY OF SUCH DAMAGE.
-; */
+/*
+ * Copyright (c) 2015-2021, Renesas Electronics Corporation. All rights reserved.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
 
-;# W0-W30 : 32bit Register (W30=Link Register)
-;# X0-X30 : 64bit Register (X30=Link Register)
-;# WZR    : 32bit Zero Register
-;# XZR    : 64bit Zero Register
-;# WSP    : 32bit Stack Pointer
-;# SP     : 64bit Stack Pointer
+/*
+  W0-W30 : 32bit Register (W30=Link Register)
+  X0-X30 : 64bit Register (X30=Link Register)
+  WZR    : 32bit Zero Register
+  XZR    : 64bit Zero Register
+  WSP    : 32bit Stack Pointer
+  SP     : 64bit Stack Pointer
+*/
 
-	.INCLUDE		"boot_mon.h"
-	.ALIGN	4
+    .section BOOT_MON, "ax"
+	.include		"boot_mon.h"
+	.align	4
 
-;# Initialize registers
+	.global Register_init
+
+	.extern InitScif
+
+// Initialize registers
 Register_init:
 	LDR		X0, =0
 	LDR		X1, =0
@@ -74,11 +56,58 @@ Register_init:
 	LDR		X30, =0
 
 Set_EnableRAM:
-	LDR		X0, =0xE67F0018
-	LDR		W1, =0x00000001			;#Enable  DRAM/SECRAM/PUBRAM
-	STR		W1, [X0]
+	LDR	W0, =0x11040000		// TZC-400(ACPU)
 
-;# Loader
+	LDR	W1, [X0, #0x0110]	// REGION_ATTRIBUTES_0
+//	AND	W1, W1, #0xFFFFFFFF
+	MOV	W2, #0x3FFFFFFF
+	AND	W1, W1, W2
+	STR	W1, [X0, #0x0110]
+	LDR	W1, [X0, #0x0114]	// REGION_ID_ACCESS_0
+	ORR	W1, W1, #0x000F000F
+	STR	W1, [X0, #0x0114]
+	LDR	W1, [X0, #0x0008]	// GATE_KEEPER
+	ORR	W1, W1, #0x0000000F
+	STR	W1, [X0, #0x0008]
+	LDR	W1, [X0, #0x000C]	// SPECULATION_CTRL
+	ORR	W1, W1, #0x00000003
+	STR	W1, [X0, #0x000C]
+
+	LDR	W0, =0x11050000		// TZC-400(MCPU)
+
+	LDR	W1, [X0, #0x0110]	// REGION_ATTRIBUTES_0
+//	AND	W1, W1, #0xFFFFFFFF
+	MOV	W2, #0x3FFFFFFF
+	AND	W1, W1, W2
+	STR	W1, [X0, #0x0110]
+	LDR	W1, [X0, #0x0114]	// REGION_ID_ACCESS_0
+	ORR	W1, W1, #0x000F000F
+	STR	W1, [X0, #0x0114]
+	LDR	W1, [X0, #0x0008]	// GATE_KEEPER
+	ORR	W1, W1, #0x0000000F
+	STR	W1, [X0, #0x0008]
+	LDR	W1, [X0, #0x000C]	// SPECULATION_CTRL
+	ORR	W1, W1, #0x00000003
+	STR	W1, [X0, #0x000C]
+
+	LDR	W0, =0x011060000	// TZC-400(SPI Multi)
+
+	LDR	W1, [X0, #0x0110]	// REGION_ATTRIBUTES_0
+//	AND	W1, W1, #0xFFFFFFFF
+	MOV	W2, #0x3FFFFFFF
+	AND	W1, W1, W2
+	STR	W1, [X0, #0x0110]
+	LDR	W1, [X0, #0x0114]	// REGION_ID_ACCESS_0
+	ORR	W1, W1, #0x000F000F
+	STR	W1, [X0, #0x0114]
+	LDR	W1, [X0, #0x0008]	// GATE_KEEPER
+	ORR	W1, W1, #0x0000000F
+	STR	W1, [X0, #0x0008]
+	LDR	W1, [X0, #0x000C]	// SPECULATION_CTRL
+	ORR	W1, W1, #0x00000003
+	STR	W1, [X0, #0x000C]
+
+// Loader
     LDR x0, =__STACKS_END__
     MSR SP_EL0,x0
     MSR SP_EL1,x0
@@ -92,83 +121,73 @@ Set_EnableRAM:
     MSR SPSR_EL3,x0
 
 
-;# Board Initialize
-.ifdef Area0Boot
-
+// Board Initialize
 Init_set_WDT:
-	LDR		W0, =RWDT_RWTCSRA
-	LDR		W1, =0xA5A5A500				;#Timer disabled
+	LDR		X0, =WDT_WDTCNT_PON
+	MOV		W1, #0x00000001
 	STR		W1, [X0]
 
-Init_set_SYSWDT:
-	LDR		W0, =SYSWDT_WTCSRA
-	LDR		W1, =0xA5A5A500				;#Timer  disabled (Enable -> disabled)
-	STR		W1, [X0]
 
-.endif
-
-
-
-;# Enable cache
-;#	mov x1, #(SCTLR_I_BIT | SCTLR_A_BIT | SCTLR_SA_BIT)
-	mrs x0, sctlr_el3
-	orr x0, x0, #(0x1 << 12)
-	orr x0, x0, #(0x1 <<  1)
-	orr x0, x0, #(0x1 <<  3)
-	msr sctlr_el3, x0
+// Enable cache
+//	mov     x1, #(SCTLR_I_BIT | SCTLR_A_BIT | SCTLR_SA_BIT)
+	mrs     x0, sctlr_el3
+	orr     x0, x0, #(0x1 << 12)
+	orr     x0, x0, #(0x1 <<  1)
+	orr     x0, x0, #(0x1 <<  3)
+	msr     sctlr_el3, x0
 	isb
 
 
 	/* clear bss section */
-	mov	X0, #0x0
+	mov	    W0, #0x0
 	ldr	X1, =__BSS_START__
 	ldr	X2, =__BSS_SIZE__
 bss_loop:
 	subs	X2, X2, #4
-	bcc	bss_end
-	str	W0, [X1, X2]
-	b	bss_loop
+	bcc	    bss_end
+	str	    W0, [X1, X2]
+	b	    bss_loop
 bss_end:
 
-.ifdef Area0Boot
-	/* copy data section */
-	ldr	X0, =__DATA_COPY_START__
-	ldr	X1, =__DATA_START__
-	ldr	X2, =__DATA_SIZE__
-data_loop:
-	subs	X2, X2, #4
-	bcc	data_end
-	ldr	W3, [X0, X2]
-	str	W3, [X1, X2]
-	b	data_loop
-.endif
+//.ifdef Area0Boot
+//	/* copy data section */
+//	ldr	X0, =__DATA_COPY_START__
+//	ldr	X1, =__DATA_START__
+//	ldr	X2, =__DATA_SIZE__
+//data_loop:
+//	subs	X2, X2, #4
+//	bcc	    data_end
+//	ldr	    W3, [X0, X2]
+//	str	    W3, [X1, X2]
+//	b	    data_loop
+//.endif
 
 data_end:
 
-	BL InitPORT
-	BL InitGPIO
-	BL InitLBSC
+//	BL InitPORT
+//	BL InitGPIO
+//	BL InitLBSC
 	BL InitScif
-	BL InitDram
-
-	cmp	x0, #0
-	beq	2f	/* InitDram success */
-	mov	x19, x0
-
-	ldr	x0, =dram_err_msg
-	mov	x1, #0
-	bl	PutStr
-
-	mov	x0, x19	/* return value of InitDram */
-	ldr	x1, =str_buf
-	ldr	x2, =cnt
-	bl	Hex2Ascii
-	mov	x0, x1
-	mov	x1, #1
-	bl	PutStr
-1:
-	wfi		/* InitDram fail */
-	b	1b
+//	BL InitDram
+//
+//	cmp	x0, #0
+//	beq	2f	/* InitDram success */
+//	mov	x19, x0
+//
+//	ldr	x0, =dram_err_msg
+//	mov	x1, #0
+//	bl	PutStr
+//
+//	mov	x0, x19	/* return value of InitDram */
+//	ldr	x1, =str_buf
+//	ldr	x2, =cnt
+//	bl	Hex2Ascii
+//	mov	x0, x1
+//	mov	x1, #1
+//	bl	PutStr
+//1:
+//	wfi		/* InitDram fail */
+//	b	1b
 
 2:
 	BL		Main
@@ -185,5 +204,5 @@ cnt:
 str_buf:
 	.space	16
 
-	.END
+	.end
 

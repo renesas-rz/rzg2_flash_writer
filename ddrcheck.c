@@ -1,39 +1,14 @@
 /*
- * Copyright (c) 2015-2019, Renesas Electronics Corporation
- * All rights reserved.
+ * Copyright (c) 2015-2021, Renesas Electronics Corporation. All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *   - Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *
- *   - Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *
- *   - Neither the name of Renesas nor the names of its contributors may be
- *     used to endorse or promote products derived from this software without
- *     specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: BSD-3-Clause
  */
+
+#pragma GCC optimize ("Og")
 
 #include "common.h"
 #include "dgtable.h"
-#include "reg_rzg2.h"
 #include "ramckmdl.h"
-#include "dmaspi.h"
 #include "devdrv.h"
 #include "ddrcheck.h"
 
@@ -387,94 +362,61 @@ void dgDdrTest(void)
 {
 	uint32_t readData;
 
-	uint32_t product;
-
-	product = *((volatile uint32_t*)PRR) & PRR_PRODUCT_MASK;
-
 	PutStr("=== DDR R/W CHECK ====",1);
-	switch (product)
+#if (RZG2L == 1)
+	PutStr("=== RZ/G2L (Memory controller is only channel 1) ===",1);
+#elif (RZG2LC == 1)
+	PutStr("=== RZ/G2LC (Memory controller is only channel 1) ===",1);
+#endif
+	readData = *((volatile uint32_t*)0x000000041000000);	//Access Check
+	PutStr("Check:0x00_41000000 ... ",0);
+	if (CkExtendDdrRamCheck((void*)0x000000041000000))
 	{
-		case PRR_PRODUCT_G2E:
-		case PRR_PRODUCT_G2N:
-			if (product == PRR_PRODUCT_G2E)
-			{
-				PutStr("=== RZ/G2E (Memory controller is only channel 1) ===",1);
-			}
-			else
-			{
-				PutStr("=== RZ/G2N (Memory controller is only channel 1) ===",1);
-			}
-			readData = *((volatile uint32_t*)0x0000000410000000);	//Access Check
-			PutStr("Check:0x04_10000000 ... ",0);
-			if (CkExtendDdrRamCheck((void*)0x0000000410000000))
-			{
-				PutStr(" Fail!",1);
-				PutDdrErrInfo();
-				return;
-			}
-			else
-			{
-				PutStr(" Pass!",1);
-			}
-			PutStr("Check:0x04_40000000 ... ",0);
-			if (CkExtendDdrRamCheck((void*)0x0000000440000000))
-			{
-				PutStr(" Fail!",1);
-				PutDdrErrInfo();
-				return;
-			}
-			else
-			{
-				PutStr(" Pass!",1);
-			}
-		break;
-		case PRR_PRODUCT_G2H:
-		case PRR_PRODUCT_G2M:
-			if (product == PRR_PRODUCT_G2H)
-			{
-				PutStr("=== Memory map RZ/G2H ====",1);
-
-			}
-			else
-			{
-				PutStr("=== Memory map RZ/G2M ====",1);
-			}
-			//CH0 Check
-			readData = *((volatile uint32_t*)0x0000000410000000);	//Access Check
-			PutStr("Check:0x04_10000000 ... ",0);
-			if (CkExtendDdrRamCheck((void*)0x0000000410000000))
-			{
-				PutStr(" Fail!",1);
-				PutDdrErrInfo();
-				PutStr("Next channel Test OK?(y/n)",0);
-				if (WaitKeyIn_YorN())
-				{
-					// Return1=N
-			    		DelStr(26);
-			    		return;
-				}
-				DelStr(26);
-			}
-			else
-			{
-				PutStr(" Pass!",1);
-			}
-			//CH2 Check
-			PutStr("Check:0x06_00000100 ... ",0);
-			if (CkExtendDdrRamCheck((void*)0x0000000600000100))
-			{
-				PutStr(" Fail!",1);
-				PutDdrErrInfo();
-				return;
-			}
-			else
-			{
-				PutStr(" Pass!",1);
-			}
-		break;
-		default:
-		break;
+		PutStr(" Fail!",1);
+		PutDdrErrInfo();
+		return;
 	}
+	else
+	{
+		PutStr(" Pass!",1);
+	}
+#if (DDR_SIZE_1GB == 0)
+	PutStr("Check:0x00_80000000 ... ",0);
+	if (CkExtendDdrRamCheck((void*)0x000000080000000))
+	{
+		PutStr(" Fail!",1);
+		PutDdrErrInfo();
+		return;
+	}
+	else
+	{
+		PutStr(" Pass!",1);
+	}
+#if (DDR_SIZE_4GB == 1)
+	PutStr("Check:0x00_c0000000 ... ",0);
+	if (CkExtendDdrRamCheck((void*)0x0000000c0000000))
+	{
+		PutStr(" Fail!",1);
+		PutDdrErrInfo();
+		return;
+	}
+	else
+	{
+		PutStr(" Pass!",1);
+	}
+	PutStr("Check:0x01_00000000 ... ",0);
+	if (CkExtendDdrRamCheck((void*)0x000000100000000))
+	{
+		PutStr(" Fail!",1);
+		PutDdrErrInfo();
+		return;
+	}
+	else
+	{
+		PutStr(" Pass!",1);
+	}
+#endif
+#endif
 }
 
 void dgRamTest(void)
