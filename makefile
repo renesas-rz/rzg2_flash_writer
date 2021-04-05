@@ -61,7 +61,7 @@ DDR_TYPE = INTERNAL
 endif
 
 #CPU
-CPU     = -march=armv8-a
+CPU     = 
 AArch   = 64
 THUMB   = 
 AS_NEON = 
@@ -73,7 +73,7 @@ OUTPUT_DIR  = AArch64_output
 OBJECT_DIR  = AArch64_obj
 CROSS_COMPILE ?= aarch64-elf-
 
-CFLAGS += -O0  
+CFLAGS += -O0 -fno-stack-protector -fno-exceptions -fno-unwind-tables -fno-asynchronous-unwind-tables
 BOOT_DEF    = Writer
 FILE_NAME   = $(OUTPUT_DIR)/Flash_Writer_SCIF$(FILENAME_ADD)_$(DDR_TYPE)_$(DDR_SIZE)
 
