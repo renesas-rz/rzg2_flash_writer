@@ -170,6 +170,7 @@ SRC_FILE :=						\
 	cpudrv.c					\
 	bootparam.c					\
 	sys/syc.c					\
+	sys/sysc.c					\
 	sys/cpg.c					\
 	sys/pfc.c					\
 	sys/tzc_400.c

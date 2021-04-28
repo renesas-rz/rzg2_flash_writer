@@ -11,6 +11,7 @@
 #include "ddr_mc_regs.h"
 #include "ddr_phy_regs.h"
 #include "cpg.h"
+#include "sysc.h"
 
 #define CEIL(a, div)	(((a) + ((div) - 1)) / (div))
 #define _MIN(a, b)		((a) < (b) ? (a) : (b))
@@ -55,6 +56,8 @@
 #define	INFO(...)
 #define ARRAY_SIZE(X) (sizeof(X)/(sizeof(X[0])))
 
+static unsigned int soc_rev;
+
 void panic(void)
 {
 	while(1);
@@ -88,6 +91,20 @@ static inline void write_phy_reg(uint32_t offset, uint32_t val)
 static inline void rmw_phy_reg(uint32_t offset, uint32_t mask, uint32_t val)
 {
 	write_phy_reg(offset, (read_phy_reg(offset) & mask) | val);
+}
+
+void ddr_ctrl_reten_en_n(uint8_t val)
+{
+	if (soc_rev > 1)
+	{
+		val &= 1;
+		write_phy_reg(DDRPHY_R79, (val << 1));
+	}
+	else
+	{
+		val &= 1;
+		rmw_phy_reg(DDRPHY_R78, 0xFFFEFFFF, (val << 16));
+	}
 }
 
 static void disable_phy_clk(void)
@@ -898,6 +915,8 @@ void ddr_setup(void)
 	uint8_t lp_auto_entry_en = 0;
 	int i;
 
+	soc_rev = sysc_get_device_revision();
+
 	// Step2 - Step11
 	cpg_active_ddr(disable_phy_clk);
 
@@ -919,7 +938,7 @@ void ddr_setup(void)
 		;
 
 	// Step16
-	rmw_phy_reg(DDRPHY_R78, 0xFFFEFFFF,0x00000000);
+	ddr_ctrl_reten_en_n(0);
 	rmw_mc_reg(DENALI_CTL_64, 0xFFFFFEFF, 0x00000000);
 	rmw_mc_reg(DENALI_CTL_11, 0xFEFFFFFF, 0x01000000);
 	rmw_mc_reg(DENALI_CTL_00, 0xFFFFFFFE, 0x00000001);
@@ -934,7 +953,7 @@ void ddr_setup(void)
 
 	// Step17
 	cpg_reset_ddr_mc();
-	rmw_phy_reg(DDRPHY_R78, 0xFFFEFFFF, 0x00010000);
+	ddr_ctrl_reten_en_n(1);
 
 	// Step18-19
 	program_mc1(&lp_auto_entry_en);

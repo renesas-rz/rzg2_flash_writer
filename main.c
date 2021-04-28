@@ -23,6 +23,7 @@
 #include "pfc.h"
 #include "syc.h"
 #include "ddr.h"
+#include "sysc.h"
 
 extern const char *const StartMessMonitor[START_MESS_MON_LINE];
 extern const com_menu MonCom[COMMAND_UNIT];
@@ -84,8 +85,33 @@ void InitMain(void)
 
 void StartMess( void )
 {
+	unsigned int rev;
+	char	str[4];
+
 	PutStr("  ",1);
 	PutMess(StartMessMonitor);
+	PutStr(" Product Code : ", 0);
+#if (RZG2L == 1)
+	PutStr("RZ/G2L" ,0);
+#endif
+#if (RZG2LC == 1)
+	PutStr("RZ/G2CL" ,0);
+#endif
+	PutStr(" rev ", 0);
+	rev = sysc_get_device_revision();
+	if (rev > 9)
+	{
+		str[0] = '1';
+		str[1] = '0' + (rev - 10);
+		str[2] = 0;
+	}
+	else
+	{
+		str[0] = '0' + rev;
+		str[1] = 0;
+	}
+	PutStr(str, 0);
+	PutStr(".0", 1);
 	PutStr(">", 0);
 }
 

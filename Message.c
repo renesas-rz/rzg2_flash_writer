@@ -8,17 +8,11 @@
 /**********************
 *  TITLE              *
 ***********************/
-#define WRITER_VERSION	"V0.87"		/* Software Version */
-#define WRITER_DATE	"Apr.01,2021"	/* Release date */
-
-#if (RZG2L == 1)
-#define SOC_NAME	"RZ/G2L"	/* RZ/G2L */
-#elif (RZG2LC == 1)
-#define SOC_NAME	"RZ/G2LC"	/* RZ/G2LC */
-#endif
+#define WRITER_VERSION	"V0.88"		/* Software Version */
+#define WRITER_DATE	"Apr.28,2021"	/* Release date */
 
 const char *const StartMessMonitor[START_MESS_MON_LINE] = {
-				"Flash writer for " SOC_NAME " Series "
+				"Flash writer for RZ/G2 Series "
 				WRITER_VERSION " " WRITER_DATE,
 				MESSAGE_END,
 };
