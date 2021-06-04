@@ -56,7 +56,7 @@
 #define	INFO(...)
 #define ARRAY_SIZE(X) (sizeof(X)/(sizeof(X[0])))
 
-static unsigned int soc_rev;
+static unsigned int soc_info;
 
 void panic(void)
 {
@@ -95,7 +95,7 @@ static inline void rmw_phy_reg(uint32_t offset, uint32_t mask, uint32_t val)
 
 void ddr_ctrl_reten_en_n(uint8_t val)
 {
-	if (soc_rev > 1)
+	if (soc_info > 1)
 	{
 		val &= 1;
 		write_phy_reg(DDRPHY_R79, (val << 1));
@@ -915,7 +915,7 @@ void ddr_setup(void)
 	uint8_t lp_auto_entry_en = 0;
 	int i;
 
-	soc_rev = sysc_get_device_revision();
+	soc_info = sysc_get_device_info();
 
 	// Step2 - Step11
 	cpg_active_ddr(disable_phy_clk);

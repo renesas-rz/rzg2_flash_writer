@@ -8,6 +8,6 @@
 #define __SYSC_H__
 
 unsigned int sysc_get_device_id(void);
-unsigned int sysc_get_device_revision(void);
+unsigned int sysc_get_device_info(void);
 
 #endif	/* __SYSC_H__ */
