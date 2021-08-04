@@ -1,39 +1,25 @@
-/*
- * Copyright (c) 2015-2016, Renesas Electronics Corporation
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *   - Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *
- *   - Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *
- *   - Neither the name of Renesas nor the names of its contributors may be
- *     used to endorse or promote products derived from this software without
- *     specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- */
-
-/**
- * @file  emmc_std.h
- * @brief eMMC boot is expecting this header file
- *
- */
+/*******************************************************************************
+* DISCLAIMER
+* This software is supplied by Renesas Electronics Corporation and is only
+* intended for use with Renesas products. No other uses are authorized. This
+* software is owned by Renesas Electronics Corporation and is protected under
+* all applicable laws, including copyright laws.
+* THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+* THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT
+* LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+* AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED.
+* TO THE MAXIMUM EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS
+* ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES SHALL BE LIABLE
+* FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR
+* ANY REASON RELATED TO THIS SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE
+* BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+* Renesas reserves the right, without notice, to make changes to this software
+* and to discontinue the availability of this software. By using this software,
+* you agree to the additional terms and conditions found by accessing the
+* following link:
+* http://www.renesas.com/disclaimer
+* Copyright (C) 2021 Renesas Electronics Corporation. All rights reserved.
+*******************************************************************************/ 
 
 #ifndef __EMMC_STD_H__
 #define __EMMC_STD_H__
@@ -42,103 +28,36 @@
 
 /* ***************** MACROS, CONSTANTS, COMPILATION FLAGS ****************** */
 
-/** @brief 64bit registers
- **/
 #define SETR_64(r, v)                   (*(volatile uint64_t *)(r) = (v))
 #define GETR_64(r)                      (*(volatile uint64_t *)(r))
 
-/** @brief 32bit registers
- **/
 #define SETR_32(r, v)                   (*(volatile uint32_t *)(r) = (v))
 #define GETR_32(r)                      (*(volatile uint32_t *)(r))
 
-/** @brief 16bit registers
- */
 #define SETR_16(r, v)                   (*(volatile uint16_t *)(r) = (v))
 #define GETR_16(r)                      (*(volatile uint16_t *)(r))
 
-/** @brief 8bit registers
- */
 #define SETR_8(r, v)                    (*(volatile uint8_t *)(r) = (v))
 #define GETR_8(r)                       (*(volatile uint8_t *)(r))
 
-/** @brief CSD register Macros
- */
 #define EMMC_GET_CID(x,y)               (emmc_bit_field(mmc_drv_obj.cid_data, (x), (y)))
 
-#if 0
-#define EMMC_CID_MID()					(EMMC_GET_CID(127,120))
-#define EMMC_CID_CBX()					(EMMC_GET_CID(113,112))
-#define EMMC_CID_OID()					(EMMC_GET_CID(111,104))
-#define EMMC_CID_PNM1()					(EMMC_GET_CID(103,88))
-#define EMMC_CID_PNM2()					(EMMC_GET_CID(87,56))
-#define EMMC_CID_PRV()					(EMMC_GET_CID(55,48))
-#define EMMC_CID_PSN()					(EMMC_GET_CID(47,16))
-#define EMMC_CID_MDT()					(EMMC_GET_CID(15,8))
-#define EMMC_CID_CRC()					(EMMC_GET_CID(7,1))
-#endif
-
-
-/** @brief CSD register Macros
- */
 #define EMMC_GET_CSD(x,y)               (emmc_bit_field(mmc_drv_obj.csd_data, (x), (y)))
 #define EMMC_CSD_SPEC_VARS()            (EMMC_GET_CSD(125,122))
 #define EMMC_CSD_TRAN_SPEED()           (EMMC_GET_CSD(103,96))
 
-#if 0
-#define EMMC_CSD_CSD_STRUCTURE()        (EMMC_GET_CSD(127,126))
-#define EMMC_CSD_SPEC_VARS()            (EMMC_GET_CSD(125,122))
-#define EMMC_CSD_TAAC()                 (EMMC_GET_CSD(119,112))
-#define EMMC_CSD_NSAC()                 (EMMC_GET_CSD(111,104))
-#define EMMC_CSD_TRAN_SPEED()           (EMMC_GET_CSD(103,96))
-#define EMMC_CSD_CCC()                  (EMMC_GET_CSD(95,84))
-#define EMMC_CSD_READ_BL_LEN()          (EMMC_GET_CSD(83,80))
-#define EMMC_CSD_READ_BL_PARTIAL()      (EMMC_GET_CSD(79,79))
-#define EMMC_CSD_WRITE_BLK_MISALIGN()   (EMMC_GET_CSD(78,78))
-#define EMMC_CSD_READ_BLK_MISALIGN()    (EMMC_GET_CSD(77,77))
-#define EMMC_CSD_DSR_IMP()              (EMMC_GET_CSD(76,76))
-#define EMMC_CSD_C_SIZE()               (EMMC_GET_CSD(73,62))
-#define EMMC_CSD_VDD_R_CURR_MIN()       (EMMC_GET_CSD(61,59))
-#define EMMC_CSD_VDD_R_CURR_MAX()       (EMMC_GET_CSD(58,56))
-#define EMMC_CSD_VDD_W_CURR_MIN()       (EMMC_GET_CSD(55,53))
-#define EMMC_CSD_VDD_W_CURR_MAX()       (EMMC_GET_CSD(52,50))
-#define EMMC_CSD_C_SIZE_MULT()          (EMMC_GET_CSD(49,47))
-#define EMMC_CSD_ERASE_GRP_SIZE()       (EMMC_GET_CSD(46,42))
-#define EMMC_CSD_ERASE_GRP_MULT()       (EMMC_GET_CSD(41,37))
-#define EMMC_CSD_WP_GRP_SIZE()          (EMMC_GET_CSD(36,32))
-#define EMMC_CSD_WP_GRP_ENABLE()        (EMMC_GET_CSD(31,31))
-#define EMMC_CSD_DEFALT_ECC()           (EMMC_GET_CSD(30,29))
-#define EMMC_CSD_R2W_FACTOR()           (EMMC_GET_CSD(28,26))
-#define EMMC_CSD_WRITE_BL_LEN()         (EMMC_GET_CSD(25,22))
-#define EMMC_CSD_WRITE_BL_PARTIAL()     (EMMC_GET_CSD(21,21))
-#define EMMC_CSD_CONTENT_PROT_APP()     (EMMC_GET_CSD(16,16))
-#define EMMC_CSD_FILE_FORMAT_GRP()      (EMMC_GET_CSD(15,15))
-#define EMMC_CSD_COPY()                 (EMMC_GET_CSD(14,14))
-#define EMMC_CSD_PERM_WRITE_PROTECT()   (EMMC_GET_CSD(13,13))
-#define EMMC_CSD_TMP_WRITE_PROTECT()    (EMMC_GET_CSD(12,12))
-#define EMMC_CSD_FILE_FORMAT()          (EMMC_GET_CSD(11,10))
-#define EMMC_CSD_ECC()                  (EMMC_GET_CSD(9,8))
-#define EMMC_CSD_CRC()                  (EMMC_GET_CSD(7,1))
-#endif
-
-/** @brief for sector access 
- */
 #define EMMC_4B_BOUNDARY_CHECK_MASK         0x00000003  /* 4Bytes boundary check mask */
 #define EMMC_SECTOR_SIZE_SHIFT              9           /* 512 = 2^9 */
 #define EMMC_SECTOR_SIZE                    512
 #define EMMC_BLOCK_LENGTH                   512
 #define EMMC_BLOCK_LENGTH_DW                128
 
-/** @brief eMMC specification clock
- */
 #define EMMC_CLOCK_SPEC_400K                400000UL     /**< initialize clock 400KHz */
 #define EMMC_CLOCK_SPEC_20M                 20000000UL   /**< normal speed 20MHz */
 #define EMMC_CLOCK_SPEC_26M                 26000000UL   /**< high speed 26MHz */
 #define EMMC_CLOCK_SPEC_52M                 52000000UL   /**< high speed 52MHz */
 #define EMMC_CLOCK_SPEC_100M                100000000UL  /**< high speed 100MHz */
 
-/** @brief EMMC driver error code. (extended HAL_MEMCARD_RETURN)
- */
 typedef enum
 {
     EMMC_ERR                    = 0,            /**< unknown error */
@@ -169,7 +88,6 @@ typedef enum
 	EMMC_ERR_INFO2                              /**< exec cmd error info2 */
 } EMMC_ERROR_CODE;
 
-/** @brief Function number */
 #define EMMC_FUNCNO_NONE							0
 #define EMMC_FUNCNO_DRIVER_INIT						1
 #define EMMC_FUNCNO_CARD_POWER_ON					2
@@ -188,9 +106,6 @@ typedef enum
 #define EMMC_FUNCNO_WRITE_SECTOR					15
 #define EMMC_FUNCNO_ERASE_SECTOR					16
 
-/** @brief Response
- */
-/** R1 */
 #define EMMC_R1_ERROR_MASK                      0xFDBFE080UL        /* Type 'E' bit and bit14(must be 0). ignore bit22 */
 #define EMMC_R1_STATE_MASK                      0x00001E00UL        /* [12:9] */
 #define EMMC_R1_READY                           0x00000100UL        /* bit8 */
@@ -355,21 +270,17 @@ typedef enum
 #define EMMC_MAX_CSD_LENGTH             16
 #define EMMC_MAX_EXT_CSD_LENGTH         512
 
-/** @brief for TAAC mask
- */
 #define TAAC_TIME_UNIT_MASK         (0x07)
 #define TAAC_MULTIPLIER_FACTOR_MASK (0x0F)
 
 
 /* ********************** STRUCTURES, TYPE DEFINITIONS ********************* */
 
-/** @brief Partition id
- */
 typedef enum
 {
     PARTITION_ID_USER   = 0x0,      /**< User Area */
-    PARTITION_ID_BOOT_1 = 0x1,      /**< boot partition 1 */
-    PARTITION_ID_BOOT_2 = 0x2,      /**< boot partition 2 */
+    PARTITION_ID_BOOT_0 = 0x1,      /**< boot partition 0 */
+    PARTITION_ID_BOOT_1 = 0x2,      /**< boot partition 1 */
     PARTITION_ID_RPMB   = 0x3,      /**< Replay Protected Memory Block */
     PARTITION_ID_GP_1   = 0x4,      /**< General Purpose partition 1 */
     PARTITION_ID_GP_2   = 0x5,      /**< General Purpose partition 2 */
@@ -378,8 +289,6 @@ typedef enum
     PARTITION_ID_MASK   = 0x7       /**< [2:0] */
 } EMMC_PARTITION_ID;
 
-/** @brief card state in R1 response [12:9]
- */
 typedef enum
 {
     EMMC_R1_STATE_IDLE  = 0,
@@ -410,8 +319,6 @@ typedef enum{
     ESTATE_END
 }EMMC_INT_STATE;
 
-/** @brief eMMC boot driver error information
- */
 typedef struct {
     uint16_t  num;                /**< error no */
     uint16_t  code;               /**< error code */
@@ -424,8 +331,6 @@ typedef struct {
 } st_error_info;
 
 
-/** @brief Command information
- */
 typedef struct {
     HAL_MEMCARD_COMMAND         cmd;    /**< Command information */
     uint32_t                      arg;    /**< argument */
@@ -434,8 +339,6 @@ typedef struct {
 } st_command_info;
 
 
-/** @brief MMC driver base
- */
 typedef struct {
     st_error_info   error_info;         /**< error information */
     st_command_info cmd_info;           /**< command information */

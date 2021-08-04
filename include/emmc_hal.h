@@ -1,39 +1,25 @@
-/*
- * Copyright (c) 2015-2016, Renesas Electronics Corporation
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *   - Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *
- *   - Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *
- *   - Neither the name of Renesas nor the names of its contributors may be
- *     used to endorse or promote products derived from this software without
- *     specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- */
-
-/** 
- * @file  emmc_hal.h
- * @brief emmc boot driver is expecting this header file
- *
- */
+/*******************************************************************************
+* DISCLAIMER
+* This software is supplied by Renesas Electronics Corporation and is only
+* intended for use with Renesas products. No other uses are authorized. This
+* software is owned by Renesas Electronics Corporation and is protected under
+* all applicable laws, including copyright laws.
+* THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+* THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT
+* LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+* AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED.
+* TO THE MAXIMUM EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS
+* ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES SHALL BE LIABLE
+* FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR
+* ANY REASON RELATED TO THIS SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE
+* BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+* Renesas reserves the right, without notice, to make changes to this software
+* and to discontinue the availability of this software. By using this software,
+* you agree to the additional terms and conditions found by accessing the
+* following link:
+* http://www.renesas.com/disclaimer
+* Copyright (C) 2021 Renesas Electronics Corporation. All rights reserved.
+*******************************************************************************/ 
 
 #ifndef __EMMC_HAL_H__
 #define __EMMC_HAL_H__
@@ -41,8 +27,6 @@
 #include "types.h"
 /* ***************** MACROS, CONSTANTS, COMPILATION FLAGS ****************** */
 
-/** @brief memory card error/status types
- */
 #define HAL_MEMCARD_OUT_OF_RANGE            0x80000000L
 #define HAL_MEMCARD_ADDRESS_ERROR           0x40000000L
 #define HAL_MEMCARD_BLOCK_LEN_ERROR         0x20000000L
@@ -69,14 +53,10 @@
 #define HAL_MEMCARD_AKE_SEQ_ERROR           0x00000008L
 #define HAL_MEMCARD_NO_ERRORS               0x00000000L
 
-/** @brief Memory card response types 
- */
 #define HAL_MEMCARD_COMMAND_INDEX_MASK      0x0003f
 
 /* ********************** STRUCTURES, TYPE DEFINITIONS ********************* */
 
-/** @brief Type of the return value. 
- */
 typedef enum
 {
     HAL_MEMCARD_FAIL                = 0U,
@@ -90,16 +70,12 @@ typedef enum
     HAL_MEMCARD_DATA_CRC_ERROR      = 8U     /**< Data CRC error occurred */
 } HAL_MEMCARD_RETURN; 
 
-/** @brief memory access operation 
- */
 typedef enum
 {
     HAL_MEMCARD_READ    = 0U,    /**< read */
     HAL_MEMCARD_WRITE   = 1U     /**< write */
 } HAL_MEMCARD_OPERATION;
 
-/** @brief Type of data width on memorycard bus
- */
 typedef enum
 {
     HAL_MEMCARD_DATA_WIDTH_1_BIT    = 0U,
@@ -107,25 +83,18 @@ typedef enum
     HAL_MEMCARD_DATA_WIDTH_8_BIT    = 2U
 } HAL_MEMCARD_DATA_WIDTH; /**< data (bus) width types */ 
 
-/** @brief Presence of the memory card
- */
 typedef enum
 {
     HAL_MEMCARD_CARD_IS_IN  = 0U,
     HAL_MEMCARD_CARD_IS_OUT = 1U
 } HAL_MEMCARD_PRESENCE_STATUS; /* presence status of the memory card*/
 
-/** @brief mode of data transfer
- */
 typedef enum
 {
     HAL_MEMCARD_DMA         = 0U,
     HAL_MEMCARD_NOT_DMA     = 1U
 } HAL_MEMCARD_DATA_TRANSFER_MODE; 
 
-
-/** @brief Memory card response types. 
- */
 typedef enum hal_memcard_response_type
 {
     HAL_MEMCARD_RESPONSE_NONE       = 0x00000U,
@@ -141,8 +110,6 @@ typedef enum hal_memcard_response_type
 } HAL_MEMCARD_RESPONSE_TYPE; 
 
 
-/** @brief Memory card command types. 
- */
 typedef enum hal_memcard_command_type
 {
     HAL_MEMCARD_COMMAND_TYPE_BC         = 0x00000U,
@@ -153,8 +120,6 @@ typedef enum hal_memcard_command_type
     HAL_MEMCARD_COMMAND_TYPE_MASK       = 0x07000U
 } HAL_MEMCARD_COMMAND_TYPE;
 
-/** @brief Type of memory card
- */
 typedef enum hal_memcard_command_card_type
 {
     HAL_MEMCARD_COMMAND_CARD_TYPE_COMMON    = 0x00000U,
@@ -163,8 +128,6 @@ typedef enum hal_memcard_command_card_type
     HAL_MEMCARD_COMMAND_CARD_TYPE_MASK      = 0x18000U
 } HAL_MEMCARD_COMMAND_CARD_TYPE; 
 
-/** @brief Memory card application command. 
- */
 typedef enum hal_memcard_command_app_norm
 {
     HAL_MEMCARD_COMMAND_NORMAL          = 0x00000U,
@@ -173,8 +136,6 @@ typedef enum hal_memcard_command_app_norm
 } HAL_MEMCARD_COMMAND_APP_NORM;
 
 
-/** @brief Memory card command codes. 
- */
 typedef enum
 {
 /* class 0 and class 1 */
@@ -275,54 +236,6 @@ typedef enum
 } HAL_MEMCARD_COMMAND;
 
 
-/** @brief Configuration structure from HAL layer.
- *
- * If some field is not available it should be filled with 0xFF.
- * The API version is 32-bit unsigned integer telling the version of the API. The integer is divided to four sections which each can be treated as a 8-bit unsigned number:
- * Bits 31-24 make the most significant part of the version number. This number starts from 1 i.e. the second version of the API will be 0x02xxxxxx. This number changes only, if the API itself changes so much that it is not compatible anymore with older releases.
- * Bits 23-16 API minor version number. For example API version 2.1 would be 0x0201xxxx.
- * Bits 15-8 are the number of the year when release is done. The 0 is year 2000, 1 is year 2001 and so on
- * Bits 7- are the week number when release is done. First full week of the year is 1 
- *
- * @note Example: let's assume that release 2.1 is done on week 10 year 2008 the version will get the value 0x0201080A
- */
-typedef struct
-{
-    /**
-    * Version of the chipset API implementation 
-    * 
-    * bits [31:24] API specification major version number.<br> 
-    * bits [23:16] API specification minor version number.<br> 
-    * bits [15:8] API implemention year. (2000 = 0, 2001 = 1, ...)<br> 
-    * bits [7:0] API implemention week.<br> 
-    * Example: API specification version 4.0, implementation w46 2008 => 0x0400082E 
-    */ 
-    uint32_t api_version;
-
-    /** maximum block count which can be transferred at once */
-    uint32_t max_block_count;
-
-    /** maximum clock frequence in Hz supported by HW */
-    uint32_t max_clock_freq;
-
-    /** maximum data bus width supported by HW */
-    uint16_t max_data_width;
-
-    /** Is high-speed mode supported by HW (yes=1, no=0) */
-    uint8_t hs_mode_supported;
-
-    /** Is memory card removable (yes=1, no=0) */
-    uint8_t card_removable;
-
-} HAL_MEMCARD_HW_CONF;
-
-/** @brief Configuration structure to HAL layer.
- */
-typedef struct
-{
-    /** how many times to try after fail, for instance sending command */
-    uint32_t retries_after_fail;
-} HAL_MEMCARD_INIT_CONF; 
 
 /* ********************** DECLARATION OF EXTERNAL DATA ********************* */
 

@@ -1,208 +1,92 @@
-/*
- * Copyright (c) 2015-2019, Renesas Electronics Corporation
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *   - Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *
- *   - Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *
- *   - Neither the name of Renesas nor the names of its contributors may be
- *     used to endorse or promote products derived from this software without
- *     specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- */
+/*******************************************************************************
+* DISCLAIMER
+* This software is supplied by Renesas Electronics Corporation and is only
+* intended for use with Renesas products. No other uses are authorized. This
+* software is owned by Renesas Electronics Corporation and is protected under
+* all applicable laws, including copyright laws.
+* THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+* THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT
+* LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+* AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED.
+* TO THE MAXIMUM EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS
+* ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES SHALL BE LIABLE
+* FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR
+* ANY REASON RELATED TO THIS SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE
+* BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+* Renesas reserves the right, without notice, to make changes to this software
+* and to discontinue the availability of this software. By using this software,
+* you agree to the additional terms and conditions found by accessing the
+* following link:
+* http://www.renesas.com/disclaimer
+* Copyright (C) 2021 Renesas Electronics Corporation. All rights reserved.
+*******************************************************************************/ 
 
 #include "common.h"
 #include "main.h"
 #include "dgtable.h"
 #include "bit.h"
-#include "cpudrv.h"
-#if EMMC == 1
 #include "dgemmc.h"
-#endif /* EMMC == 1 */
+#include "rdk_cmn_gic.h"
 #include "scifdrv.h"
 #include "devdrv.h"
-#include "boardid.h"
-#include "reg_rzg2.h"
-#if USB_ENABLE == 1
-#include "usb_lib.h"
-#endif /* USB_ENABLE == 1 */
+#include "init_scif.h"
+#include "HardwareSetup.h"
 
-#define WRITER_VERSION	" V1.04"		/* Software Version	*/
-#define WRITER_DATE	" Dec.02,2020"		/* Release date		*/
-
-/* This definition sets the delay time in 10 milliseconds unit from */
-/* USB enumeration completion until the message is displayed.       */
-#define USB_BANNER_DELAY_TIME	(10 * 50)	/* 5000ms  */
+#define WRITER_VERSION	" V1.00"	    	/* Software Version	*/
+#define WRITER_DATE	" July 9, 2021"	    	/* Release date		*/
 
 extern const com_menu MonCom[COMMAND_UNIT];
-extern uint8_t	gCOMMAND_Area[COMMAND_BUFFER_SIZE];
 
 char gKeyBuf[64];
 int32_t gComNo;
 
 void Main(void)
 {
-	CheckBoard();
-	InitMain();
+	/* Initialize the GIC for core0 */
+	Init_GIC(0);
+    
+	/* Set Pin Function */
+	InitPFC();
+	/* Initialize for CPG */
+	InitCPG();
+
+    /* Initialize for System ram with RAMB */
+	PowerOnRAMB();
+    
+    /* Initialize for UART */
+	InitScif();
+	
+    /* Initialize for eMM */
+	dg_init_emmc();
+    
+    /* Output the stating messages */
 	StartMess();
+    
+    /* Main routine */
 	DecCom();
 }
 
-void InitMain(void)
-{
-#if EMMC == 1
-	dg_init_emmc();
-#endif /* EMMC == 1 */
-#if USB_ENABLE == 1
-	USB_Init();
-#endif /* USB_ENABLE == 1 */
-}
 
 void StartMess( void )
 {
 	uint32_t product;
 
-	product = *((volatile uint32_t*)PRR) & PRR_PRODUCT_MASK;
 	PutStr("  ",1);
 	PutStr("Flash writer for ",0);
-	switch (product)
-	{
-		case PRR_PRODUCT_G2H:
-			PutStr("RZ/G2H", 0);
-		break;
-		case PRR_PRODUCT_G2M:
-			PutStr("RZ/G2M", 0);
-		break;
-		case PRR_PRODUCT_G2N:
-			PutStr("RZ/G2N", 0);
-		break;
-		case PRR_PRODUCT_G2E:
-			PutStr("RZ/G2E", 0);
-		break;
-		default:
-		break;
-	}
+	PutStr("RZ/V2M", 0);
 	PutStr(WRITER_VERSION, 0);
 	PutStr(WRITER_DATE,1);
 	PutStr(">", 0);
 }
 
-#if USB_ENABLE == 1
-void StartMessUSB( void )
-{
-	uint32_t product;
-
-	product = *((volatile uint32_t*)PRR) & PRR_PRODUCT_MASK;
-	PutStrUSB("Flash writer for ",0);
-	switch (product)
-	{
-		case PRR_PRODUCT_G2H:
-			PutStrUSB("RZ/G2H", 0);
-		break;
-		case PRR_PRODUCT_G2M:
-			PutStrUSB("RZ/G2M", 0);
-		break;
-		case PRR_PRODUCT_G2N:
-			PutStrUSB("RZ/G2N", 0);
-		break;
-		case PRR_PRODUCT_G2E:
-			PutStrUSB("RZ/G2E", 0);
-		break;
-		default:
-		break;
-	}
-	PutStrUSB(WRITER_VERSION, 0);
-	PutStrUSB(WRITER_DATE,1);
-}
-#endif
-
 void DecCom(void)
 {
 	char tmp[64], chCnt, chPtr;
 	uint32_t rtn = 0;
-	uint32_t res;
 	chCnt = 1;
-#if USB_ENABLE == 1
-	State usb_state;	/* current USB state */
-	State usb_state_before;	/* lase USB state */
-	int USB_banner = 0;	/* 0:no display 1:display 2:displayed  */
-	int cnt;
-
-	usb_state = USB_Get_Status();
-	usb_state_before = usb_state;
-#endif /* USB_ENABLE == 1 */
 
 	while (rtn == 0)
 	{
-#if USB_ENABLE == 1
-		/* Display the boot message for USB connection */
-		usb_state = USB_Get_Status();
-		if (usb_state != usb_state_before)
-		{
-			usb_state_before = usb_state;
-			if (usb_state == CONFIGURED)
-			{
-				if (USB_banner == 0)
-				{
-					USB_banner = 1;
-				}
-			}
-		}
-		else if (usb_state == CONFIGURED)
-		{
-			if (USB_banner == 1)
-			{
-				StartTMU0(1);	/* 10msec delay */
-				cnt++;
-				/* Wait for specified time after USB connection is detected */
-				if (cnt >= USB_BANNER_DELAY_TIME)
-				{
-					USB_banner = 2;
-
-					PutStrUSB("  ",1);
-					StartMessUSB();
-					PutStrUSB(">", 0);
-				}
-			}
-		}
-
-		/* Confirm key input from USB */
-		rtn = USB_TerminalInputCheck(gCOMMAND_Area);
-		if (rtn > 0)
-		{
-			gTerminal = USB_TERMINAL;
-			gKeyBuf[0] = gCOMMAND_Area[0];
-			if (USB_banner == 1)
-			{
-				USB_banner = 2;
-
-				PutStrUSB("  ",1);
-				StartMessUSB();
-				PutStrUSB(">", 0);
-			}
-		}
-		USB_IntCheck();
-
-#endif /* USB_ENABLE == 1 */
-
 		if (rtn == 0)
 		{
 			rtn = SCIF_TerminalInputCheck(gKeyBuf);
@@ -242,9 +126,6 @@ void DecCom(void)
 		}
 		PutStr(">",0);
 		chCnt=0;
-#if USB_ENABLE == 1
-		USB_IntCheck();
-#endif /* USB_ENABLE == 1 */
 	}
 }
 

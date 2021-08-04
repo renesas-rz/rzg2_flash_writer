@@ -1,33 +1,25 @@
-/*
- * Copyright (c) 2015-2019, Renesas Electronics Corporation
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *   - Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *
- *   - Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *
- *   - Neither the name of Renesas nor the names of its contributors may be
- *     used to endorse or promote products derived from this software without
- *     specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- */
+/*******************************************************************************
+* DISCLAIMER
+* This software is supplied by Renesas Electronics Corporation and is only
+* intended for use with Renesas products. No other uses are authorized. This
+* software is owned by Renesas Electronics Corporation and is protected under
+* all applicable laws, including copyright laws.
+* THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+* THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT
+* LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+* AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED.
+* TO THE MAXIMUM EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS
+* ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES SHALL BE LIABLE
+* FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR
+* ANY REASON RELATED TO THIS SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE
+* BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+* Renesas reserves the right, without notice, to make changes to this software
+* and to discontinue the availability of this software. By using this software,
+* you agree to the additional terms and conditions found by accessing the
+* following link:
+* http://www.renesas.com/disclaimer
+* Copyright (C) 2021 Renesas Electronics Corporation. All rights reserved.
+*******************************************************************************/ 
 
 #include "emmc_config.h"
 #include "emmc_hal.h"
@@ -39,14 +31,8 @@
 #include "common.h"
 #include "types.h"
 
-#include "reg_rzg2.h"
 #include "ramckmdl.h"
-#include "dgmodul1.h"
 #include "devdrv.h"
-#include "boardid.h"
-#if USB_ENABLE == 1
-#include "usb_lib.h"
-#endif /* USB_ENABLE == 1 */
 
 #define	SIZE2SECTOR(x)			( (x) >> 9 )	/* 512Byte		*/
 
@@ -54,19 +40,19 @@
 #define	EMMC_MAX_SECTOR			((SIZE2SECTOR( EMMC_MAX_SIZE * 1024 )) * 1024 * 1024 ) /* MAX SECTOR (8Gbyte) */
 #define	MULTI_PARTITION_SIZE		(128 * 1024)	/* 128 Kbyte	*/
 
-#define	EMMC_WORK_DRAM_SADD		0x50000000U
-#define	EMMC_WORK_DRAM_EADD_2M		0x501FFFFFU
-#define	EMMC_WORK_DRAM_EADD_4M		0x503FFFFFU
-#define	EMMC_WORK_DRAM_EADD_16M		0x50FFFFFFU
-#define	EMMC_WORK_DRAM_EADD_64M		0x53FFFFFFU
-#define	EMMC_WORK_DRAM_EADD_512M	0x6FFFFFFFU
-#define	EMMC_WORK_DRAM_SECTOR_MAX	((EMMC_WORK_DRAM_EADD_512M - EMMC_WORK_DRAM_SADD + 1)>>9)
+#define BASEADDR_RAMB0		0xB6000000
+#define	EMMC_WORK_RAMB_SADD BASEADDR_RAMB0
+#define EMMC_WORK_RAMB_MAX_SIZ 0x100000 //1Mbyte
+#define	EMMC_WORK_RAMB_EADD 0xB60FFFFF
+#define	EMMC_WORK_RAMB_SECTOR_MAX	(EMMC_WORK_RAMB_MAX_SIZ >>9)
 
 #define	EMMC_SECURERAM_SADD		0xE6300000U
 #define	EMMC_SECURERAM_EADD		0xE635FFFFU
 
 #define	DMA_TRANSFER_SIZE		(0x20)		/* DMA Transfer size =  32 Bytes*/
 #define	DMA_ROUNDUP_VALUE		(0xFFFFFFE0)
+
+#define DATA_RECV_TIMEOUT   3000*1000    /*3000ms*/
 
 typedef enum
 {
@@ -97,20 +83,17 @@ typedef struct
 
 typedef enum
 {
-	EMMC_WRITE_MOT = 0,
 	EMMC_WRITE_BINARY,
 } EMMC_WRITE_COMMAND;
 
-static void dg_emmc_write_bin_serial(uint32_t* workStartAdd, uint32_t fileSize);
+static int32_t dg_emmc_write_bin_serial(uint32_t* workStartAdd, uint32_t fileSize);
 static EMMC_ERROR_CODE dg_emmc_init(void);
 static uint32_t InputEmmcSector( EMMC_PARTITION partitionArea, uint32_t maxSectorCnt, uint32_t *startSector, uint32_t *sizeSector, EMMC_INPUT_TYPE type );
 static uint32_t InputEmmcSectorArea( EMMC_PARTITION *partitionArea );
-static uint32_t InputEmmcPrgStartAdd( uint32_t *prgStartAdd );
 static uint32_t InputFileSize( uint32_t *fileSize );
 static int32_t ChkSectorSize( uint32_t maxSectorCnt, uint32_t startSector, uint32_t sizeSector );
 static void SetSectorData(EMMC_SECTOR *sectorData);
 static void DispAreaData(EMMC_SECTOR sectorData);
-static int8_t dg_emmc_mot_load(uint32_t *maxADD ,uint32_t *minADD, uint32_t gUserPrgStartAdd );
 
 static uint32_t emmcInit;	/* eMMC drv init */
 
@@ -209,7 +192,7 @@ void	dg_emmc_write(EMMC_WRITE_COMMAND wc)
 	uint32_t	*Load_workStartAdd;
 	uint32_t	*Load_workEndAdd;
 
-	uint32_t	flags = 0x00000001;
+	uint32_t	flags = 0x00000000;
 	uint32_t	sectorStartAddress;
 	uint32_t	sectorSize;
 	uint32_t	prgStartAdd;
@@ -233,11 +216,9 @@ void	dg_emmc_write(EMMC_WRITE_COMMAND wc)
 	int8_t motLoad = 1;
 	int8_t oldPartitionConfig;
 
-	static const int8_t startMessage[][32] = {"EM_W Start --------------",
-					   "EM_WB Start --------------"};
+	static const int8_t startMessage[][32] = {"EM_WB Start --------------"};
 
-	static const int8_t endMessage[][32] =	{"EM_W Complete!",
-					 "EM_WB Complete!"};
+	static const int8_t endMessage[][32] =	{"EM_WB Complete!"};
 
 	result = dg_emmc_check_init();
 	if (EMMC_SUCCESS != result)
@@ -259,22 +240,20 @@ void	dg_emmc_write(EMMC_WRITE_COMMAND wc)
 		return;
 	}
 
-	Load_workStartAdd = (uint32_t*)EMMC_WORK_DRAM_SADD;
+	Load_workStartAdd = (uint32_t*)EMMC_WORK_RAMB_SADD;
 	switch(partitionArea)
 	{
 		case EMMC_PARTITION_USER_AREA:		//User Partition Area Program
-			Load_workEndAdd		= (uint32_t*)EMMC_WORK_DRAM_EADD_512M;
 			PutStr("-- User Partition Area Program --------------------------",1);
 		break;
 		case EMMC_PARTITION_BOOT_1:		//Boot Partition 1 Program
-			Load_workEndAdd		= (uint32_t*)EMMC_WORK_DRAM_EADD_16M;
 			PutStr("-- Boot Partition 1 Program -----------------------------",1);
 		break;
 		case EMMC_PARTITION_BOOT_2:		//Boot Partition 2 Program
-			Load_workEndAdd		= (uint32_t*)EMMC_WORK_DRAM_EADD_16M;
 			PutStr("-- Boot Partition 2 Program -----------------------------",1);
 		break;
 	}
+	Load_workEndAdd		= (uint32_t*)EMMC_WORK_RAMB_EADD;
 
 //Input address(mmc sector)
 	chkInput = InputEmmcSector( partitionArea, sectorData.maxSectorCount[partitionArea], 
@@ -287,34 +266,11 @@ void	dg_emmc_write(EMMC_WRITE_COMMAND wc)
 	mmcPrgStartAdd = sectorStartAddress<<9;
 
 //Input address( program start address)
-	if (wc == EMMC_WRITE_MOT)
-	{
-		chkInput = InputEmmcPrgStartAdd( &prgStartAdd );
-		if (1 != chkInput)
-		{
-			return;
-		}
-	}
 
 // WorkMemory CLEAR (Write H'00000000)
-	switch( partitionArea)
-	{
-		case EMMC_PARTITION_USER_AREA:		//User Partition Area Program
-			PutStr("Work RAM(H'50000000-H'6FFFFFFF) Clear....",1);
-			FillData32Bit((uint32_t *)Load_workStartAdd,(uint32_t *)Load_workEndAdd,0x00000000);
-		break;
-		default:
-			PutStr("Work RAM(H'50000000-H'50FFFFFF) Clear....",1);
-			FillData32Bit((uint32_t *)Load_workStartAdd,(uint32_t *)Load_workEndAdd,0x00000000);
-		break;
-	}
+	PutStr("Work RAM(H'B6000000-H'B60FFFFF) Clear....",1);
+	FillData32Bit((uint32_t *)Load_workStartAdd,(uint32_t *)Load_workEndAdd,0x00000000);
 
-// MOT file load
-	if (wc == EMMC_WRITE_MOT)
-	{
-		motLoad = dg_emmc_mot_load(&workAdd_Max ,&workAdd_Min, prgStartAdd);
-	}
-	else
 	{
 		chkInput = InputFileSize( &fileSize );
 		if (1 != chkInput)
@@ -323,20 +279,13 @@ void	dg_emmc_write(EMMC_WRITE_COMMAND wc)
 		}
 		PutStr("please send binary file!",1);
 
-#if USB_ENABLE == 1
-		if (gTerminal == USB_TERMINAL)
-		{
-			totalDownloadSize = ((fileSize + (DMA_TRANSFER_SIZE - 1)) & DMA_ROUNDUP_VALUE);
-			USB_ReadDataWithDMA((unsigned long)Load_workStartAdd, totalDownloadSize);
-		}
-		else
-		{
-			dg_emmc_write_bin_serial(Load_workStartAdd, fileSize);
-		}
-#else  /* USB_ENABLE == 1 */
-		dg_emmc_write_bin_serial(Load_workStartAdd, fileSize);
-#endif /* USB_ENABLE == 1 */
-
+        //If send a file smaller than the specified file size,
+	    //Flash writer will output the message and command exit force.
+	    if (dg_emmc_write_bin_serial(Load_workStartAdd, fileSize) != 0)
+	    {
+    		PutStr("Time out! Unable to receive data for the specified size!",1);
+	        return;
+	    }
 		workAdd_Min = (uintptr_t)Load_workStartAdd;
 		workAdd_Max = workAdd_Min + fileSize - 1;
 	}
@@ -349,15 +298,6 @@ void	dg_emmc_write(EMMC_WRITE_COMMAND wc)
 	Hex2Ascii(workAdd_Max,buf,&chCnt);
 	PutStr(buf,1);
 #endif /* EMMC_DEBUG */
-
-	if (wc == EMMC_WRITE_MOT)
-	{
-		if (1 == motLoad )
-		{
-			PutStr("EM_W mot file read ERR",1);
-			return;
-		}
-	}
 
 //transfer data calc
 	mmcPrgStartAdd = mmcPrgStartAdd + (workAdd_Min - (uintptr_t)Load_workStartAdd);
@@ -421,36 +361,34 @@ void	dg_emmc_write_bin(void)
 	dg_emmc_write(EMMC_WRITE_BINARY);
 }
 
-/****************************************************************
-	MODULE			: dg_emmc_write_mot		*
-	FUNCTION		: Write Memory to eMMC		*
-	COMMAND			: EMMC_W			*
-	INPUT PARAMETER		: EMMC_W			*
-*****************************************************************/
-void dg_emmc_write_mot(void)
-{
-	dg_emmc_write(EMMC_WRITE_MOT);
-}
-
 /************************************************************************
 	MODULE			: dg_emmc_write_bin_serial		*
 	FUNCTION		: Write Memory to eMMC (Binary(Serial))	*
 	COMMAND			: EMMC_WB				*
 	INPUT PARAMETER		: EMMC_WB				*
 *************************************************************************/
-static void dg_emmc_write_bin_serial(uint32_t* workStartAdd, uint32_t fileSize)
+static int32_t dg_emmc_write_bin_serial(uint32_t* workStartAdd, uint32_t fileSize)
 {
 	uint32_t i;
 	int8_t byteData = 0;
 	uintptr_t ptr;
-
+    int32_t isTimeout;
+    
 	ptr = (uintptr_t)workStartAdd;
 	for (i = 0; i < fileSize; i++)
 	{
-		GetChar(&byteData);
+		if( i != 0 ) {
+			isTimeout = GetCharTimeOut(&byteData,DATA_RECV_TIMEOUT);
+			if (isTimeout == -1) //if time out is occured.
+				return -1;
+		}
+		else {
+			GetChar(&byteData);
+		}
 		*((uint8_t *)ptr) = byteData;
 		ptr++;
 	}
+    return 0;
 }
 
 /****************************************************************
@@ -523,208 +461,6 @@ void	dg_emmc_erase(void)
 
 // Change original EXT_CSD
 	PutStr("EM_E Complete!",1);
-}
-
-
-/****************************************************************
-	MODULE			: dg_emmc_mot_load		*
-	FUNCTION		: load emmc mot file		*
-	COMMAND			: 				*
-	INPUT PARAMETER		: 				*
-*****************************************************************/
-static int8_t dg_emmc_mot_load(uint32_t *maxADD ,uint32_t *minADD, uint32_t gUserPrgStartAdd )
-{
-//MIN,MAX address calc
-	int8_t 	str[12];			//max getByteCount=4 ->  4 * 2 +1 (NULL) = 9
-	uint32_t data,getByteCount,byteCount;
-	uint32_t loadGetCount,adByteCount,loadGetData,loadGetSum,loadGetCR;
-	uintptr_t loadGetAddress;
-	uint32_t loop,loop_S0,s0flag,errFlg,endFlg;
-//**** Add dgLS_Load2 ********************************************************************
-	uint32_t workAdd_Min,workAdd_Max;
-//****************************************************************************************
-//LAGER Add------------------------------------------------------------------------
-	uint32_t WorkStartAdd,Calculation;
-	uint32_t loadOffset;
-
-	workAdd_Min = 0xFFFFFFFFU;
-	workAdd_Max = 0x00000000U;
-
-	WorkStartAdd = LS_WORK_DRAM_SADD;	//H'50000000
-
-	if ((0x40000000U <= gUserPrgStartAdd) && (gUserPrgStartAdd < WorkStartAdd))
-	{
-		//H'40000000 =< gUserPrgStartAdd < H'50000000
-		loadOffset = WorkStartAdd - gUserPrgStartAdd ;
-		Calculation = ADDITION;
-	}
-	else if ((WorkStartAdd <= gUserPrgStartAdd) && (gUserPrgStartAdd < 0xC0000000U))
-	{
-		//H'50000000 =< gUserPrgStartAdd < H'C0000000
-		loadOffset = gUserPrgStartAdd - WorkStartAdd ;
-		Calculation = SUBTRACTION;
-	}
-	else if ((EMMC_SECURERAM_SADD <= gUserPrgStartAdd) && (gUserPrgStartAdd <= EMMC_SECURERAM_EADD))
-	{
-		//H'E6300000 =< gUserPrgStartAdd < H'E631FFFF  1st cut
-		loadOffset = gUserPrgStartAdd - WorkStartAdd ;
-		Calculation = SUBTRACTION;
-	}
-	else
-	{
-		PutStr("ERROR Load file.   <Download  file  DRAM(H'40000000-H'BFFFFFFF) , SecureRAM(H'E6300000-H'E631FFFF) ONLY > ",1);
-		return(1);
-	}
-
-	loop	= 1;
-	loop_S0	= 1;
-	errFlg	= 0;
-	endFlg	= 0;
-
-	PutStr("please send ! ('.' & CR stop load)",1);
-	while(loop)
-	{
-		loop_S0 = 1;
-		s0flag  = 0;
-		while(1)
-		{
-			GetChar(str);
-			if (*str == '.' || *str == 's' || *str =='S')
-			{
-				break;
-			}
-		}
-		if (*str == '.')
-		{
-			while(1)
-			{
-				GetChar(str);
-				if (*str == CR_CODE)
-				{
-					return(1);
-				}
-			}
-		}
-		else if (*str == 's' || *str == 'S')
-		{
-			GetChar(str);
-			switch(*str)
-			{
-				case '0':	// S0:Title
-					s0flag = 1;
-					while(loop_S0)
-					{
-						// loop CRorLR code
-						GetChar(str);
-						if ((*str == CR_CODE) || (*str == LF_CODE))
-						{
-							loop_S0 = 0;
-						}
-					}
-				break;
-				case '1':	// S1:2Byte Address
-					adByteCount = 2;
-				break;
-				case '2':	// S2:3Byte Address
-					adByteCount = 3;
-				break;
-				case '3':	// S3:4Byte Address
-					adByteCount = 4;
-				break;
-				case '7':	// S7,S8,S9:end code
-				case '8':
-				case '9':
-					endFlg = 1;
-				break;
-				default:
-					errFlg = 1;
-				break;
-			}
-		}
-		if (endFlg == 1 || errFlg == 1)
-		{
-			// end code etc.
-			while(1)
-			{
-				// loop CRorLR code ,CRorLR Return
-				GetChar(str);
-				if ((*str == CR_CODE) || (*str == LF_CODE))
-				{
-
-//**** Add dgLS_Load2 ********************************************************************
-					*maxADD = workAdd_Max;
-					*minADD = workAdd_Min;
-//****************************************************************************************
-					return(0);
-				}
-			}
-		}
-		if (s0flag == 0)
-		{
-			//Get Byte count (addressByteCount + dataByteCount + sumCheckByteCount(=1) )
-			getByteCount =1;
-			GetStr_ByteCount(str,getByteCount);
-			HexAscii2Data((uint8_t*)str,&data);
-			loadGetCount = data;
-			//Get Address
-			getByteCount =adByteCount;
-			GetStr_ByteCount(str,getByteCount);
-			HexAscii2Data((uint8_t*)str,&data);
-			loadGetAddress = data;
-
-//LAGER Add------------------------------------------------------------------------
-			if (Calculation == SUBTRACTION)
-			{
-				loadGetAddress = loadGetAddress - loadOffset;
-   			}
-			else
-			{
-				loadGetAddress = loadGetAddress + loadOffset;
-			}
-//---------------------------------------------------------------------------------
-
-			loadGetCount = loadGetCount - getByteCount;  // Get Address byte count -
-
-
-//**** Add dgLS_Load2 ********************************************************************
-			//Min Address Check
-			if (loadGetAddress < workAdd_Min)
-			{
-				workAdd_Min = loadGetAddress;
-			}
-//****************************************************************************************
-
-			//Get Data & Data write
-			getByteCount = 1;
-			for(byteCount = loadGetCount; loadGetCount > 1; loadGetCount = loadGetCount - 1)
-			{
-				GetStr_ByteCount(str,getByteCount);
-				HexAscii2Data((uint8_t*)str,&data);
-				loadGetData = data;
-				*((uint8_t *)loadGetAddress) = loadGetData;
-				loadGetAddress = loadGetAddress +1;
-			}
-//**** Add dgLS_Load2 ********************************************************************
-			//Max Address Check
-			if ((loadGetAddress - 1) > workAdd_Max)
-			{
-				workAdd_Max = (loadGetAddress-1);
-			}
-//****************************************************************************************
-			//Get sum
-			getByteCount =1;
-			GetStr_ByteCount(str,getByteCount);
-			HexAscii2Data((uint8_t*)str,&data);
-			loadGetSum = data;
-			//Get CR code
-			GetChar(str);	//  char input
-			loadGetCR = *str;
-			if ((loadGetCR == CR_CODE) || (loadGetCR == LF_CODE))
-			{
-				loop=1;
-			}
-		}
-	}
 }
 
 /************************************************************************
@@ -888,62 +624,6 @@ static uint32_t InputEmmcSectorArea( EMMC_PARTITION *partitionArea )
 }
 
 /****************************************************************
-	MODULE			: InputEmmcPrgStartAdd		*
-	FUNCTION		: Input Program Start Add	*
-	COMMAND			: 				*
-	INPUT PARAMETER		: 				*
-*****************************************************************/
-static uint32_t InputEmmcPrgStartAdd( uint32_t *prgStartAdd )
-{
-	uint32_t loop;
-	uint32_t wrData;
-	int8_t key[16];
-	int8_t buf[16];
-	int8_t chCnt = 0;
-	int8_t chPtr;
-
-	loop = 1;
-	while(loop)
-	{
-		PutStr("Please Input Program Start Address : ",0);
-		GetStr(key,&chCnt);
-		chPtr = 0;
-		if (!GetStrBlk(key,buf,&chPtr,0))
-		{
-			if (chPtr==1)
-			{	/* Case Return */
-				return(0);
-			}
-			else if (chPtr > (int8_t)((SIZE_32BIT<<1)+1))
-			{	/* Case Data Size Over */
-				PutStr("Syntax Error",1);
-			}
-			else
-			{
-				if (HexAscii2Data((uint8_t*)buf,&wrData))
-				{
-					PutStr("Syntax Error",1);
-				}
-				else
-				{
-					if (wrData & 0x000001FFU)
-					{
-						PutStr("Memory Boundary Error",1);
-					}
-					else
-					{
-						*prgStartAdd = wrData;
-						loop = 0;
-					}
-				}
-			}
-		}
-	}
-
-	return(1);
-}
-
-/****************************************************************
 	MODULE			: InputFileSize			*
 	FUNCTION		: Input Binary File Size	*
 	COMMAND			: 				*
@@ -978,8 +658,14 @@ static uint32_t InputFileSize( uint32_t *fileSize )
 				}
 				else
 				{
-					*fileSize = wrData;
-					loop = 0;
+					if ( wrData > EMMC_WORK_RAMB_MAX_SIZ )
+					{
+						PutStr("Size Parameter Error",1);
+					}
+					else{
+						*fileSize = wrData;
+						loop = 0;
+					}
 				}
 			}
 		}
@@ -999,7 +685,7 @@ static int32_t ChkSectorSize( uint32_t maxSectorCnt, uint32_t startSector, uint3
 {
 	uint32_t sumSector;
 
-	if (EMMC_WORK_DRAM_SECTOR_MAX < sizeSector)
+	if (EMMC_WORK_RAMB_SECTOR_MAX < sizeSector)
 	{
 		return(-1);	/* Size Over */
 	}

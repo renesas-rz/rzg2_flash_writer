@@ -1,189 +1,193 @@
-;/*
-; * Copyright (c) 2015-2018, Renesas Electronics Corporation
-; * All rights reserved.
-; *
-; * Redistribution and use in source and binary forms, with or without
-; * modification, are permitted provided that the following conditions are met:
-; *
-; *   - Redistributions of source code must retain the above copyright notice,
-; *     this list of conditions and the following disclaimer.
-; *
-; *   - Redistributions in binary form must reproduce the above copyright
-; *     notice, this list of conditions and the following disclaimer in the
-; *     documentation and/or other materials provided with the distribution.
-; *
-; *   - Neither the name of Renesas nor the names of its contributors may be
-; *     used to endorse or promote products derived from this software without
-; *     specific prior written permission.
-; *
-; * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-; * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-; * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-; * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
-; * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-; * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-; * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-; * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-; * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-; * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-; * POSSIBILITY OF SUCH DAMAGE.
-; */
+/*******************************************************************************
+* DISCLAIMER
+* This software is supplied by Renesas Electronics Corporation and is only
+* intended for use with Renesas products. No other uses are authorized. This
+* software is owned by Renesas Electronics Corporation and is protected under
+* all applicable laws, including copyright laws.
+* THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+* THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT
+* LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+* AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED.
+* TO THE MAXIMUM EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS
+* ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES SHALL BE LIABLE
+* FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR
+* ANY REASON RELATED TO THIS SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE
+* BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+* Renesas reserves the right, without notice, to make changes to this software
+* and to discontinue the availability of this software. By using this software,
+* you agree to the additional terms and conditions found by accessing the
+* following link:
+* http://www.renesas.com/disclaimer
+* Copyright (C) 2021 Renesas Electronics Corporation. All rights reserved.
+*******************************************************************************/ 
+#define CONFIG_ARM_ERRATA_855873 1
 
-;# W0-W30 : 32bit Register (W30=Link Register)
-;# X0-X30 : 64bit Register (X30=Link Register)
-;# WZR    : 32bit Zero Register
-;# XZR    : 64bit Zero Register
-;# WSP    : 32bit Stack Pointer
-;# SP     : 64bit Stack Pointer
+#define EL3 1
 
-	.INCLUDE		"boot_mon.h"
-	.ALIGN	4
+.global _prestart
+.global _boot
 
-;# Initialize registers
-Register_init:
-	LDR		X0, =0
-	LDR		X1, =0
-	LDR		X2, =0
-	LDR		X3, =0
-	LDR		X4, =0
-	LDR		X5, =0
-	LDR		X6, =0
-	LDR		X7, =0
-	LDR		X8, =0
-	LDR		X9, =0
-	LDR		X10, =0
-	LDR		X11, =0
-	LDR		X12, =0
-	LDR		X13, =0
-	LDR		X14, =0
-	LDR		X15, =0
-	LDR		X16, =0
-	LDR		X17, =0
-	LDR		X18, =0
-	LDR		X19, =0
-	LDR		X20, =0
-	LDR		X21, =0
-	LDR		X22, =0
-	LDR		X23, =0
-	LDR		X24, =0
-	LDR		X25, =0
-	LDR		X26, =0
-	LDR		X27, =0
-	LDR		X28, =0
-	LDR		X29, =0
-	LDR		X30, =0
+.global __el3_stack
+.global _vector_table
 
-Set_EnableRAM:
-	LDR		X0, =0xE67F0018
-	LDR		W1, =0x00000001			;#Enable  DRAM/SECRAM/PUBRAM
-	STR		W1, [X0]
+.set EL3_stack,		__el3_stack
 
-;# Loader
-    LDR x0, =__STACKS_END__
-    MSR SP_EL0,x0
-    MSR SP_EL1,x0
-    MSR SP_EL2,x0
-    MOV sp,x0
-    MSR ELR_EL1,x0
-    MSR ELR_EL2,x0
-    MSR ELR_EL3,x0
-    MSR SPSR_EL1,x0
-    MSR SPSR_EL2,x0
-    MSR SPSR_EL3,x0
+.set TT_S1_FAULT,	0x0
+.set TT_S1_TABLE,	0x3
+
+.set vector_base,	_vector_table
+.set rvbar_base,	0xA3F02020	// CA53_RVA0CRL
+
+.set counterfreq,	24000000
+.set MODE_EL1, 0x5
+.set DAIF_BIT,	0x1C0
+
+.section .boot,"ax"
 
 
-;# Board Initialize
-.ifdef Area0Boot
+/* this initializes the various processor modes */
 
-Init_set_WDT:
-	LDR		W0, =RWDT_RWTCSRA
-	LDR		W1, =0xA5A5A500				;#Timer disabled
-	STR		W1, [X0]
+_prestart:
+_boot:
+	mov      x0, #0
+	mov      x1, #0
+	mov      x2, #0
+	mov      x3, #0
+	mov      x4, #0
+	mov      x5, #0
+	mov      x6, #0
+	mov      x7, #0
+	mov      x8, #0
+	mov      x9, #0
+	mov      x10, #0
+	mov      x11, #0
+	mov      x12, #0
+	mov      x13, #0
+	mov      x14, #0
+	mov      x15, #0
+	mov      x16, #0
+	mov      x17, #0
+	mov      x18, #0
+	mov      x19, #0
+	mov      x20, #0
+	mov      x21, #0
+	mov      x22, #0
+	mov      x23, #0
+	mov      x24, #0
+	mov      x25, #0
+	mov      x26, #0
+	mov      x27, #0
+	mov      x28, #0
+	mov      x29, #0
+	mov      x30, #0
 
-Init_set_SYSWDT:
-	LDR		W0, =SYSWDT_WTCSRA
-	LDR		W1, =0xA5A5A500				;#Timer  disabled (Enable -> disabled)
-	STR		W1, [X0]
+OKToRun:
 
-.endif
+	mrs	x0, currentEL
+	cmp	x0, #0xC
+	beq	InitEL3
 
+	b 	error			// go to error if current exception level is neither EL3
+InitEL3:
+	/*Set vector table base address*/
+	ldr	x1, =vector_base
+	msr	VBAR_EL3,x1
 
+	/* Set reset vector address */
+	/* Get the cpu ID */
+	mrs  x0, MPIDR_EL1
+	and  x0, x0, #0xFF
+	mov  w0, w0
+	ldr	 w2, =rvbar_base
+	/* calculate the rvbar base address for particular CPU core */
+	mov	 w3, #0x8
+	mul	 w0, w0, w3
+	add	 w2, w2, w0
+	/* store vector base address to RVBAR */
+	mov  w3, w1
+	str  w3, [x2]
+	lsr  x3, x1, #32
+	mov  w3, w3
+	str  w3, [x2, #4]
 
-;# Enable cache
-;#	mov x1, #(SCTLR_I_BIT | SCTLR_A_BIT | SCTLR_SA_BIT)
-	mrs x0, sctlr_el3
-	orr x0, x0, #(0x1 << 12)
-	orr x0, x0, #(0x1 <<  1)
-	orr x0, x0, #(0x1 <<  3)
-	msr sctlr_el3, x0
+	/*Define stack pointer for current exception level*/
+	ldr	 x2,=EL3_stack
+	mov	 sp,x2
+
+	/* Enable Trapping of SIMD/FPU register for standalone BSP */
+	mov      x0, #0
+	msr      CPTR_EL3, x0
 	isb
 
+	/* program the counter frequency */
+	bl SYC_enable
+	bl CMN_InitSysCnt
+	ldr	x0, =counterfreq
+	msr	CNTFRQ_EL0, x0
+
+	/*Enable hardware coherency between cores*/
+	mrs      x0, S3_1_c15_c2_1  	//Read EL1 CPU Extended Control Register
+	orr      x0, x0, #(1 << 6)  	//Set the SMPEN bit
+	msr      S3_1_c15_c2_1, x0  	//Write EL1 CPU Extended Control Register
+	isb
+
+	/**********************************************
+	* Set up memory attributes
+	* This equates to:
+	* 0 = b01000100 = Normal, Inner/Outer Non-Cacheable
+	* 1 = b11111111 = Normal, Inner/Outer WB/WA/RA
+	* 2 = b00000000 = Device-nGnRnE
+	* 3 = b00000100 = Device-nGnRE
+	* 4 = b10111011 = Normal, Inner/Outer WT/WA/RA
+	**********************************************/
+	ldr      x1, =0x000000BB0400FF44
+	msr      MAIR_EL3, x1
+
+	/**********************************************
+	 * Set up TCR_EL3
+	 * Physical Address Size PS =  001 -> 36bits 64GB
+	 * Granual Size TG0 = 00 -> 4KB
+	 * size offset of the memory region T0SZ = 30 -> (region size 2^(64-30) = 2^34)
+	 ***************************************************/
+	ldr     x1,=0x8081351E
+	msr     TCR_EL3, x1
+	isb
+
+	/* Enable SError Exception for asynchronous abort */
+	mrs 	x1,DAIF
+	bic	x1,x1,#(0x1<<8)
+	msr	DAIF,x1
+
+	/* Configure SCTLR_EL3 */
+	ldr	x1, = 0x30C50830
+	orr	x1, x1, #(1 << 3)	//Enable SP alignment check
+	msr	SCTLR_EL3, x1
+	dsb	sy
+	isb
+
+	b 	 _startup		//jump to start
+
+	b 	error			// present exception level and selected exception level mismatch
+
+error: 	b	error
+
+_startup:
 
 	/* clear bss section */
 	mov	X0, #0x0
-	ldr	X1, =__BSS_START__
-	ldr	X2, =__BSS_SIZE__
+	ldr	X1, =__bss_start
+	ldr	X2, =__bss_end
 bss_loop:
-	subs	X2, X2, #4
-	bcc	bss_end
-	str	W0, [X1, X2]
+	cmp	X1,X2
+	bge	bss_end
+	str	X0, [X1], #8
 	b	bss_loop
 bss_end:
 
-.ifdef Area0Boot
-	/* copy data section */
-	ldr	X0, =__DATA_COPY_START__
-	ldr	X1, =__DATA_START__
-	ldr	X2, =__DATA_SIZE__
-data_loop:
-	subs	X2, X2, #4
-	bcc	data_end
-	ldr	W3, [X0, X2]
-	str	W3, [X1, X2]
-	b	data_loop
-.endif
+	bl		Main
 
-data_end:
+exit:	/* should never get here */
+	bl		exit
 
-	BL InitPORT
-	BL InitGPIO
-	BL InitLBSC
-	BL InitScif
-	BL InitDram
-
-	cmp	x0, #0
-	beq	2f	/* InitDram success */
-	mov	x19, x0
-
-	ldr	x0, =dram_err_msg
-	mov	x1, #0
-	bl	PutStr
-
-	mov	x0, x19	/* return value of InitDram */
-	ldr	x1, =str_buf
-	ldr	x2, =cnt
-	bl	Hex2Ascii
-	mov	x0, x1
-	mov	x1, #1
-	bl	PutStr
-1:
-	wfi		/* InitDram fail */
-	b	1b
-
-2:
-	BL		Main
-
-
-	.section .rodata
-dram_err_msg:
-	.asciz "InitDram error=0x"
-
-	.section .bss
-	.align	4
-cnt:
-	.space	4
-str_buf:
-	.space	16
-
-	.END
+.end
 

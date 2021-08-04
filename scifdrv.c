@@ -1,86 +1,106 @@
-/*
- * Copyright (c) 2015-2019, Renesas Electronics Corporation
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *   - Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *
- *   - Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *
- *   - Neither the name of Renesas nor the names of its contributors may be
- *     used to endorse or promote products derived from this software without
- *     specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- */
+/*******************************************************************************
+* DISCLAIMER
+* This software is supplied by Renesas Electronics Corporation and is only
+* intended for use with Renesas products. No other uses are authorized. This
+* software is owned by Renesas Electronics Corporation and is protected under
+* all applicable laws, including copyright laws.
+* THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+* THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT
+* LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+* AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED.
+* TO THE MAXIMUM EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS
+* ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES SHALL BE LIABLE
+* FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR
+* ANY REASON RELATED TO THIS SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE
+* BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+* Renesas reserves the right, without notice, to make changes to this software
+* and to discontinue the availability of this software. By using this software,
+* you agree to the additional terms and conditions found by accessing the
+* following link:
+* http://www.renesas.com/disclaimer
+* Copyright (C) 2021 Renesas Electronics Corporation. All rights reserved.
+*******************************************************************************/ 
+
 
 #include "common.h"
 #include "scifdrv.h"
 #include "bit.h"
-#include "reg_rzg2.h"
+#include "rdk_cmn_cpg.h"
 #include "devdrv.h"
-
+#include "rdk_common.h"
 /************************************************************************/
 /*									*/
 /*	Debug Seirial(SCIF2)						*/
 /*									*/
 /************************************************************************/
+#define	UART_LSR_RXRDY_MASK		(UART_16550_LINE_STATUS_DR)
+#define	UART_LSR_TXRDY_MASK		(UART_16550_LINE_STATUS_TEMT | UART_16550_LINE_STATUS_THRE)
+#define	UART_LSR_READY_MASK		(UART_LSR_TXRDY_MASK | UART_LSR_RXRDY_MASK)
+
+static st_UART_REG_t	*gs_uART_cReg = 0;		/** UART Control Regster Top Pointer */
+
+
 int32_t PutCharSCIF2(char outChar)
 {
-	while(!(0x60 & *((volatile uint16_t*)SCIF2_SCFSR)));
-	*((volatile unsigned char*)SCIF2_SCFTDR) = outChar;
-	*((volatile uint16_t*)SCIF2_SCFSR) &= ~0x60;	/* TEND,TDFE clear */
+		
+	while(!((UART_16550_LINE_STATUS_THRE | UART_16550_LINE_STATUS_TEMT) & (gs_uART_cReg->LSR)));
+	gs_uART_cReg->RBR_THR =  outChar;
+
 	return(0);
 }
 
 int32_t GetCharSCIF2(char *inChar)
 {
+	uint16_t sts;
+
 	do
 	{
-		if (0x91 & *((volatile uint16_t *)SCIF2_SCFSR))
+		sts = gs_uART_cReg->LSR;			/** Read Line Status */
+		
+		if (UART_16550_LINE_STATUS_FE & sts)
 		{
-			*((volatile uint16_t *)SCIF2_SCFSR) &= ~0x91;
+			/*Framing Error*/
 		}
-		if (0x01 & *((volatile uint16_t *)SCIF2_SCLSR))
+		if (UART_16550_LINE_STATUS_OE & sts)
 		{
-			PutStr("ORER",1);
-			*((volatile uint16_t *)SCIF2_SCLSR) &= ~0x01;
+			/*Overrun Error*/
 		}
-	} while(!(0x02 & *((volatile uint16_t *)SCIF2_SCFSR)));
+	} while(!(sts & UART_LSR_RXRDY_MASK));
 
-	*inChar = *((volatile unsigned char*)SCIF2_SCFRDR);
-	*((volatile uint16_t*)SCIF2_SCFSR) &= ~0x02;
+	*inChar = gs_uART_cReg->RBR_THR;		/** Read Rx data */
 	return(0);
 }
 
-void PowerOnScif2(void)
+int32_t GetCharTimeOutSCIF2(char *inChar, uint64_t us)
 {
-	uint32_t dataL;
+	uint16_t sts;
+    int32_t  err = 0;
+    
+    uint64_t start = CMN_GetSysCnt();
+    uint64_t cycles = (CMN_GetFreq4SysCnt() / 1000000UL) * us;
 
-	dataL = *((volatile uint32_t*)CPG_MSTPSR3);
-	if (dataL & BIT10)
+	do
 	{
-		/* case SCIF2(IrDA) Standby */
-		dataL &= ~BIT10;
-		*((volatile uint32_t*)CPG_CPGWPR)    = ~dataL;
-		*((volatile uint32_t*)CPG_SMSTPCR3)  =  dataL;
-		while(BIT10 & *((volatile uint32_t*)CPG_MSTPSR3));  /* wait bit=0 */
-	}
+	    if ((CMN_GetSysCnt() - start) > cycles) {
+	        err = -1;
+	        break;
+	    }
+		sts = gs_uART_cReg->LSR;			/** Read Line Status */
+		
+		if (UART_16550_LINE_STATUS_FE & sts)
+		{
+			/*Framing Error*/
+		}
+		if (UART_16550_LINE_STATUS_OE & sts)
+		{
+			/*Overrun Error*/
+		}
+	} while(!(sts & UART_LSR_RXRDY_MASK));
+
+    if (err != -1) //not time out
+    	*inChar = gs_uART_cReg->RBR_THR;		/** Read Rx data */
+    
+	return(err);
 }
 
 void WaitPutScif2SendEnd(void)
@@ -91,115 +111,64 @@ void WaitPutScif2SendEnd(void)
 	loop=1;
 	while(loop)
 	{
-		dataW = *((volatile uint16_t*)SCIF2_SCFSR);
-		if (dataW & BIT6)
+		dataW = gs_uART_cReg->LSR;
+		if (dataW & UART_16550_LINE_STATUS_THRE)
 		{
 			loop = 0;
 		}
 	}
 }
 
-#ifdef RZG2_HIHOPE
 void InitScif2_SCIFCLK(void)
 {
-	volatile uint16_t dataW;
-	uint32_t prr;
+	volatile unsigned long i;
+	unsigned long bit_rate;
+	
+	// UART Target Channel set
+	gs_uART_cReg = (st_UART_REG_t *)UART_CH0_BASE;
 
-	PowerOnScif2();
+	// UART initialize reset.
+	gs_uART_cReg->FCR = UART_MODE_CONST_FCR_RST;			// Reset Rx,Rx FIFO
+	gs_uART_cReg->HCR0 |= 0x0080;							// S/W Reset
+	for(i=0; i < 1000; i++);								// Delay Over 6*PLCK(For fail soft)
+	gs_uART_cReg->HCR0 &= ~(0x0080);						// S/W Reset release
+	for(i=0; i < 1000; i++);								// Delay Over 6*PLCK(For fail soft)
 
-	dataW = *((volatile uint16_t*)SCIF2_SCLSR);	/* dummy read     		*/
-	*((volatile uint16_t*)SCIF2_SCLSR) = 0x0000;	/* clear ORER bit 		*/
-	*((volatile uint16_t*)SCIF2_SCFSR) = 0x0000;	/* clear all error bit	*/
+	// UART set bit rate.
+	gs_uART_cReg->LCR |= 0x0080;							// Select Div. Latch Register
 
-	*((volatile uint16_t*)SCIF2_SCSCR) = 0x0000;	/* clear SCR.TE & SCR.RE*/
-	*((volatile uint16_t*)SCIF2_SCFCR) = 0x0006;	/* reset tx-fifo, reset rx-fifo. */
-	*((volatile uint16_t*)SCIF2_SCFSR) = 0x0000;	/* clear ER, TEND, TDFE, BRK, RDF, DR */
+	bit_rate = SCLK / (UART_BAUDRATE *16);
 
-	*((volatile uint16_t*)SCIF2_SCSCR) = 0x0002;	/* external clock, SC_CLK pin used for input pin */
-	*((volatile uint16_t*)SCIF2_SCSMR) = 0x0000;	/* 8bit data, no-parity, 1 stop, Po/1 */
-	SoftDelay(100);
+	gs_uART_cReg->DLL = (uint8_t)bit_rate;
+	gs_uART_cReg->DLM = (uint8_t)(bit_rate>>8);
 
-	*((volatile uint16_t*)SCIF2_DL)    = 0x0091;	/* 266.66MHz / (115200*16) = 144.67 */
-	*((volatile uint16_t*)SCIF2_CKS)   = 0x4000;	/* select S3D1-Clock */
+	gs_uART_cReg->LCR = UART_MODE_CONST_LCR;				// Select Data Buff & Set Parity,etc.
 
-	SoftDelay(100);
-	*((volatile uint16_t*)SCIF2_SCFCR) = 0x0000;	/* reset-off tx-fifo, rx-fifo. */
-	*((volatile uint16_t*)SCIF2_SCSCR) = 0x0032;	/* enable TE, RE; SC_CLK=input */
+	gs_uART_cReg->IER = UART_MODE_CONST_IER_P;			// Set Int. All Disable
+	gs_uART_cReg->FCR = UART_MODE_CONST_FCR_P;			// Set Int. FIFO Trigger Level,etc.
+	gs_uART_cReg->MCR = UART_MODE_CONST_MCR_P;			// Set Flow Ctl. Enable/Disble,etc.
 
-	SoftDelay(100);
+	// Reset Tx&Rx DMA_REQ
+	gs_uART_cReg->HCR0 = 0x0000;
 }
-#endif /* RZG2_HIHOPE */
-
-#ifdef RZG2_EK874
-void InitScif2_SCIFCLK_G2E(void)
-{
-	volatile uint16_t dataW;
-	uint32_t md;
-	uint32_t sscg;
-
-	PowerOnScif2();
-
-	md = *((volatile uint32_t*)RST_MODEMR);
-	sscg = (md & 0x00001000) >> 12;
-
-	dataW = *((volatile uint16_t*)SCIF2_SCLSR);	/* dummy read     		*/
-	*((volatile uint16_t*)SCIF2_SCLSR) = 0x0000;	/* clear ORER bit 		*/
-	*((volatile uint16_t*)SCIF2_SCFSR) = 0x0000;	/* clear all error bit	*/
-
-	*((volatile uint16_t*)SCIF2_SCSCR) = 0x0000;	/* clear SCR.TE & SCR.RE*/
-	*((volatile uint16_t*)SCIF2_SCFCR) = 0x0006;	/* reset tx-fifo, reset rx-fifo. */
-	*((volatile uint16_t*)SCIF2_SCFSR) = 0x0000;	/* clear ER, TEND, TDFE, BRK, RDF, DR */
-
-	*((volatile uint16_t*)SCIF2_SCSCR) = 0x0002;	/* external clock, SC_CLK pin used for input pin */
-	*((volatile uint16_t*)SCIF2_SCSMR) = 0x0000;	/* 8bit data, no-parity, 1 stop, Po/1 */
-	SoftDelay(100);
-
-	if (sscg == 0x0)
-	{
-		/* MD12=0 (SSCG off) F S3D1C=266.6MHz */
-		*((volatile uint16_t*)SCIF2_DL) = 0x0091;	/* 266.66MHz / (115200*16) = 144.67 */
-	}
-	else
-	{	/* MD12=1 (SSCG on)  F S3D1C=250MHz */
-		*((volatile uint16_t*)SCIF2_DL) = 0x0082;	/* 240.00MHz / (115200*16) = 130.21 */
-	}
-	*((volatile uint16_t*)SCIF2_CKS)   = 0x4000;	/* select S3D1-Clock */
-	SoftDelay(100);
-	*((volatile uint16_t*)SCIF2_SCFCR) = 0x0000;	/* reset-off tx-fifo, rx-fifo. */
-	*((volatile uint16_t*)SCIF2_SCSCR) = 0x0032;	/* enable TE, RE; SC_CLK=input */
-
-	SoftDelay(100);
-}
-#endif /* RZG2_EK874 */
-
-void SetScif2_DL(uint16_t setData)
-{
-	*((volatile uint16_t*)SCIF2_DL)    = setData;
-}
-
-void SetScif2_BRR(uint8_t setData)
-{
-	*((volatile uint8_t*)SCIF2_SCBRR)  = setData;
-}
-
 
 uint32_t SCIF_TerminalInputCheck(char* str)
 {
-	char result = 0;
+	uint32_t result = 0;
+	uint16_t sts;
 	
-	if (0x91 & *((volatile uint16_t *)SCIF2_SCFSR))
+	sts = gs_uART_cReg->LSR;			/** Read Line Status */
+	
+	if (UART_16550_LINE_STATUS_FE & sts)
 	{
-		*((volatile uint16_t *)SCIF2_SCFSR) &= ~0x91;
+		/*Framing Error*/
 	}
-	if (0x01 & *((volatile uint16_t *)SCIF2_SCLSR))
+	if (UART_16550_LINE_STATUS_OE & sts)
 	{
-		PutStr("ORER",1);
-		*((volatile uint16_t *)SCIF2_SCLSR) &= ~0x01;
+		/*Overrun Error*/
 	}
-	if (0x02 & *((volatile uint16_t *)SCIF2_SCFSR))
-	{
-		*str = *((volatile unsigned char*)SCIF2_SCFRDR);
-		*((volatile uint16_t*)SCIF2_SCFSR) &= ~0x02;
+	if(sts & UART_LSR_RXRDY_MASK){
+		*str = gs_uART_cReg->RBR_THR;		/** Read Rx data */
 		result = 1;
 	}
 	return result;

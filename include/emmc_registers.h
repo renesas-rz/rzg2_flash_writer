@@ -1,39 +1,25 @@
-/*
- * Copyright (c) 2015-2019, Renesas Electronics Corporation
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *   - Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *
- *   - Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *
- *   - Neither the name of Renesas nor the names of its contributors may be
- *     used to endorse or promote products derived from this software without
- *     specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- */
-
-/** 
- * @file  emmc_registers.h
- * @brief emmc boot driver is expecting this header file. HS-MMC module header file.
- *
- */
+/*******************************************************************************
+* DISCLAIMER
+* This software is supplied by Renesas Electronics Corporation and is only
+* intended for use with Renesas products. No other uses are authorized. This
+* software is owned by Renesas Electronics Corporation and is protected under
+* all applicable laws, including copyright laws.
+* THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+* THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT
+* LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+* AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED.
+* TO THE MAXIMUM EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS
+* ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES SHALL BE LIABLE
+* FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR
+* ANY REASON RELATED TO THIS SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE
+* BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+* Renesas reserves the right, without notice, to make changes to this software
+* and to discontinue the availability of this software. By using this software,
+* you agree to the additional terms and conditions found by accessing the
+* following link:
+* http://www.renesas.com/disclaimer
+* Copyright (C) 2021 Renesas Electronics Corporation. All rights reserved.
+*******************************************************************************/ 
 
 #ifndef __EMMC_REGISTERS_H__
 #define __EMMC_REGISTERS_H__
@@ -45,12 +31,10 @@
 #define MMC_CH0		(0U)		/* SDHI2/MMC0 */
 #define MMC_CH1		(1U)		/* SDHI3/MMC1 */
 
-#define USE_MMC_CH	(MMC_CH1)	/* RZ/G2E, RZ/G2M, RZ/G2N	*/
+#define USE_MMC_CH	(MMC_CH1)
 
-/** @brief eMMC registers
- */
-#define	MMC0_SD_BASE		(0xEE140000U)
-#define MMC1_SD_BASE		(0xEE160000U)
+#define	MMC0_SD_BASE		(0x85020000U)
+#define MMC1_SD_BASE		(0x85020000U)
 
 #if USE_MMC_CH == MMC_CH0
 #define	MMC_SD_BASE		(MMC0_SD_BASE)
@@ -100,8 +84,6 @@
 
 
 
-/** @brief SD_INFO1 Registers
- */
 #define SD_INFO1_HPIRES				0x00010000UL		/* Response Reception Completion	*/
 #define SD_INFO1_INFO10				0x00000400UL		/* Indicates the SDDAT3 state		*/
 #define SD_INFO1_INFO9				0x00000200UL		/* SDDAT3 Card Insertion		*/
@@ -113,8 +95,6 @@
 #define SD_INFO1_INFO2				0x00000004UL		/* Access end				*/
 #define SD_INFO1_INFO0				0x00000001UL		/* Response end				*/
 
-/** @brief SD_INFO2 Registers
- */
 #define SD_INFO2_ILA				0x00008000UL		/* Illegal Access Error			*/
 #define SD_INFO2_CBSY				0x00004000UL		/* Command Type Register Busy		*/
 #define SD_INFO2_SCLKDIVEN			0x00002000UL
@@ -131,12 +111,8 @@
 #define SD_INFO2_ALL_ERR			0x0000807FUL
 #define SD_INFO2_CLEAR				0x00000800UL		/* BIT11 The write value should always be 1. HWM_0003 */
 
-/** @brief SOFT_RST
- */
 #define SOFT_RST_SDRST				0x00000001UL
 
-/** @brief SD_CLK_CTRL
- */
 #define SD_CLK_CTRL_SDCLKOFFEN			0x00000200UL
 #define SD_CLK_CTRL_SCLKEN			0x00000100UL
 #define SD_CLK_CTRL_CLKDIV_MASK			0x000000FFUL
@@ -145,14 +121,9 @@
 #define SD_CLK_WRITE_MASK			0x000003FFUL
 #define SD_CLK_CLKDIV_CLEAR_MASK		0xFFFFFF0FUL
 
-/** @brief SD_OPTION
- */
 #define SD_OPTION_TIMEOUT_CNT_MASK	0x000000F0UL
 
 
-/** @brief MMC Clock Frequency
- * 200MHz * 1/x = output clock
- */
 #define MMC_CLK_OFF			0UL			/* Clock output is disabled				*/
 #define MMC_400KHZ			512UL			/* 200MHz * 1/512 = 390 KHz 				*/
 #define MMC_20MHZ			16UL			/* 200MHz * 1/16   = 12.5 MHz Normal speed mode		*/
@@ -167,8 +138,6 @@
 #define MMC_FREQ_20MHZ		20000000UL
 
 
-/** @brief MMC Clock DIV
- */
 #define MMC_SD_CLK_START	0x00000100UL	/* CLOCK On	*/
 #define MMC_SD_CLK_STOP		(~0x00000100UL)	/* CLOCK stop   */
 #define MMC_SD_CLK_DIV1		0x000000FFUL	/* 1/1          */
@@ -182,33 +151,21 @@
 #define MMC_SD_CLK_DIV256	0x00000040UL	/* 1/256        */
 #define MMC_SD_CLK_DIV512	0x00000080UL	/* 1/512        */
 
-/** @brief DM_CM_DTRAN_MODE
- */
 #define DM_CM_DTRAN_MODE_CH0		0x00000000UL		/* CH0(downstream)	*/
 #define DM_CM_DTRAN_MODE_CH1		0x00010000UL		/* CH1(upstream)	*/
 #define DM_CM_DTRAN_MODE_BIT_WIDTH	0x00000030UL
 
-/** @brief CC_EXT_MODE
- */
 #define CC_EXT_MODE_DMASDRW_ENABLE	0x00000002UL		/* SD_BUF Read/Write DMA Transfer */
 #define CC_EXT_MODE_CLEAR		0x00001010UL		/* BIT 12 & 4 always 1. */
 
-/** @brief DM_CM_INFO_MASK
- */
 #define DM_CM_INFO_MASK_CLEAR		0xFFFCFFFEUL
 #define DM_CM_INFO_CH0_ENABLE		0x00010001UL
 #define DM_CM_INFO_CH1_ENABLE		0x00020001UL
 
-/** @brief DM_DTRAN_ADDR
- */
 #define DM_DTRAN_ADDR_WRITE_MASK	0xFFFFFFF8UL
 
-/** @brief DM_CM_DTRAN_CTRL
- */
 #define DM_CM_DTRAN_CTRL_START		0x00000001UL
 
-/** @brief SYSC Registers
- */
 #define CPG_MSTP_MMC		        0x00001000UL	//MMC0:0x00001000 MMC1:0x00000800
 
 

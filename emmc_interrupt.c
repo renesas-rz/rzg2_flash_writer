@@ -1,33 +1,25 @@
-/*
- * Copyright (c) 2015-2016, Renesas Electronics Corporation
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *   - Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *
- *   - Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *
- *   - Neither the name of Renesas nor the names of its contributors may be
- *     used to endorse or promote products derived from this software without
- *     specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- */
+/*******************************************************************************
+* DISCLAIMER
+* This software is supplied by Renesas Electronics Corporation and is only
+* intended for use with Renesas products. No other uses are authorized. This
+* software is owned by Renesas Electronics Corporation and is protected under
+* all applicable laws, including copyright laws.
+* THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+* THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT
+* LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+* AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED.
+* TO THE MAXIMUM EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS
+* ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES SHALL BE LIABLE
+* FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR
+* ANY REASON RELATED TO THIS SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE
+* BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+* Renesas reserves the right, without notice, to make changes to this software
+* and to discontinue the availability of this software. By using this software,
+* you agree to the additional terms and conditions found by accessing the
+* following link:
+* http://www.renesas.com/disclaimer
+* Copyright (C) 2021 Renesas Electronics Corporation. All rights reserved.
+*******************************************************************************/ 
 
 /** 
  * @file  emmc_interrupt.c
@@ -129,7 +121,7 @@ uint32_t emmc_interrupt(void)
 #endif /* EMMC_DEBUG */
 
     	result = emmc_trans_sector((uint32_t *)mmc_drv_obj.buff_address_virtual);                 /* sector R/W */
-        mmc_drv_obj.buff_address_virtual += EMMC_BLOCK_LENGTH;
+    	mmc_drv_obj.buff_address_virtual += EMMC_BLOCK_LENGTH/sizeof(uint32_t);
     	mmc_drv_obj.remain_size -= EMMC_BLOCK_LENGTH;
 
 #ifdef EMMC_DEBUG
@@ -155,12 +147,11 @@ uint32_t emmc_interrupt(void)
         }
     	else
     	{
-#ifdef EMMC_DEBUG
-		    PutStr("Transfer End", 0);
-#endif /* EMMC_DEBUG */
-			mmc_drv_obj.during_transfer = FALSE;
+    		if(mmc_drv_obj.remain_size < EMMC_BLOCK_LENGTH){
+    			mmc_drv_obj.during_transfer = FALSE;
+    			mmc_drv_obj.state_machine_blocking = FALSE;
+    		}
         }
-        mmc_drv_obj.state_machine_blocking = FALSE;
     }
 
 /* DMA_TRANSFER */
@@ -260,10 +251,10 @@ static EMMC_ERROR_CODE emmc_trans_sector (
 {
 	uint32_t length,i;
 	uint64_t *bufPtrLL;
-#ifdef EMMC_DEBUG
+//#ifdef EMMC_DEBUG
 	char str[16];
 	int32_t chCnt;
-#endif /* EMMC_DEBUG */
+//#endif /* EMMC_DEBUG */
 
     if (buff_address_virtual == NULL)
     {
@@ -282,11 +273,14 @@ static EMMC_ERROR_CODE emmc_trans_sector (
     }
 
 	bufPtrLL = (uint64_t*)buff_address_virtual;
-	length = mmc_drv_obj.remain_size;
+	length = EMMC_BLOCK_LENGTH;
 
 #ifdef EMMC_DEBUG
 	PutStr("remain_size = 0x",0);
 	Hex2Ascii(mmc_drv_obj.remain_size, str, &chCnt);
+    PutStr(str, 1);
+	PutStr("buff_address_virtual = 0x",0);
+	Hex2Ascii(buff_address_virtual, str, &chCnt);
     PutStr(str, 1);
 	PutStr("length      = 0x",0);
 	Hex2Ascii(length, str, &chCnt);

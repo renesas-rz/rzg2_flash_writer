@@ -1,33 +1,25 @@
-/*
- * Copyright (c) 2015-2019, Renesas Electronics Corporation
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *   - Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *
- *   - Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *
- *   - Neither the name of Renesas nor the names of its contributors may be
- *     used to endorse or promote products derived from this software without
- *     specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- */
+/*******************************************************************************
+* DISCLAIMER
+* This software is supplied by Renesas Electronics Corporation and is only
+* intended for use with Renesas products. No other uses are authorized. This
+* software is owned by Renesas Electronics Corporation and is protected under
+* all applicable laws, including copyright laws.
+* THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+* THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT
+* LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+* AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED.
+* TO THE MAXIMUM EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS
+* ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES SHALL BE LIABLE
+* FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR
+* ANY REASON RELATED TO THIS SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE
+* BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+* Renesas reserves the right, without notice, to make changes to this software
+* and to discontinue the availability of this software. By using this software,
+* you agree to the additional terms and conditions found by accessing the
+* following link:
+* http://www.renesas.com/disclaimer
+* Copyright (C) 2021 Renesas Electronics Corporation. All rights reserved.
+*******************************************************************************/ 
 
 /** 
  * @file  emmc_init.c
@@ -41,7 +33,6 @@
 #include "emmc_std.h"
 #include "emmc_registers.h"
 #include "emmc_def.h"
-#include "reg_rzg2.h"
 #include "common.h"
 #include "bit.h"
 
@@ -253,41 +244,6 @@ static EMMC_ERROR_CODE emmc_dev_init(void)
 	uint32_t dataL;
 	uint32_t tmp_val;
 	volatile uint32_t* adr_cpg_sdxckcr;
-
-	switch(mmc_ch) {
-		case 0x0 :
-			tmp_val	= BIT12;
-			adr_cpg_sdxckcr	= (volatile uint32_t*)CPG_SD2CKCR;
-			break;
-		case 0x1 :
-			tmp_val	= BIT11;
-			adr_cpg_sdxckcr	= (volatile uint32_t*)CPG_SD3CKCR;
-			break;
-	}
-
-	/* Power on eMMC */
-	dataL = *((volatile uint32_t*)CPG_SMSTPCR3);
-	if ((dataL) & (tmp_val)) {
-		dataL &= ~(tmp_val);
-		*((volatile uint32_t*)CPG_CPGWPR)   = ~dataL;
-		*((volatile uint32_t*)CPG_SMSTPCR3) = dataL;
-	}
-
-	dataL = *((volatile uint32_t*)CPG_MSTPSR3);
-	while ( (dataL & (tmp_val)) != 0x0 ) {// wait tmp_val=0
-		dataL = *((volatile uint32_t*)CPG_MSTPSR3);
-	}
-	
-	/* Set SD clock */
-	*((volatile uint32_t*)CPG_CPGWPR) = ~(BIT9|BIT0);	//SD phy 200MHz
-	/* Stop SDnH clock & SDn=200MHz */
-	*adr_cpg_sdxckcr = (BIT9|BIT0); 
-
-#ifdef EMMC_VOLTAGE_1_8
-	InitMmcPinFunction();
-	SetMmcVoltage(1);	/* I/O Voltage=1.8V */
-	StartTMU2(10);		/* wait 100ms		*/
-#endif /* EMMC_VOLTAGE_1_8 */
 	
 	/* MMCIF initialize */
 	SETR_32(SD_INFO1, 0x00000000U);			/* all interrupt clear */
@@ -331,30 +287,11 @@ static EMMC_ERROR_CODE emmc_dev_finalize(void)
     }
 
     /* host controller reset */
-//	SETR_32(SOFT_RST, ( GETR(SOFT_RST) & (~SOFT_RST_SDRST) ) );		/* Soft reset */
-//	SETR_32(SOFT_RST, ( GETR(SOFT_RST) | SOFT_RST_SDRST ) );		/* Soft reset released */
 	SETR_32(SD_INFO1, 0x00000000U);			/* all interrupt clear */
 	SETR_32(SD_INFO2, SD_INFO2_CLEAR );		/* all interrupt clear */
 	SETR_32(SD_INFO1_MASK, 0x00000000U);	/* all interrupt disable */
 	SETR_32(SD_INFO2_MASK, SD_INFO2_CLEAR );	/* all interrupt disable */
 	SETR_32(SD_CLK_CTRL, 0x00000000U);		/* MMC clock stop */
-
-	switch (mmc_ch) {
-		case 0x0 :
-			tmp_val	= BIT12;
-			break;
-		case 0x1 :
-			tmp_val	= BIT11;
-			break;
-	}
-
-	
-	dataL = *((volatile uint32_t*)CPG_SMSTPCR3);
-	if ((dataL & tmp_val) == 0U) {
-		dataL |= (tmp_val);
-		*((volatile uint32_t*)CPG_CPGWPR)   = ~dataL;
-		*((volatile uint32_t*)CPG_SMSTPCR3) = dataL;
-	}
 
     return result;
 }

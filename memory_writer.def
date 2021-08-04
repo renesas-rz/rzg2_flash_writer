@@ -1,70 +1,75 @@
-/*
- * Copyright (c) 2015-2018, Renesas Electronics Corporation
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- *   - Redistributions of source code must retain the above copyright notice,
- *     this list of conditions and the following disclaimer.
- *
- *   - Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in the
- *     documentation and/or other materials provided with the distribution.
- *
- *   - Neither the name of Renesas nor the names of its contributors may be
- *     used to endorse or promote products derived from this software without
- *     specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- */
+/* DISCLAIMER
+# This software is supplied by Renesas Electronics Corporation and is only
+# intended for use with Renesas products. No other uses are authorized. This
+# software is owned by Renesas Electronics Corporation and is protected under
+# all applicable laws, including copyright laws.
+# THIS SOFTWARE IS PROVIDED "AS IS" AND RENESAS MAKES NO WARRANTIES REGARDING
+# THIS SOFTWARE, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING BUT NOT
+# LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE
+# AND NON-INFRINGEMENT. ALL SUCH WARRANTIES ARE EXPRESSLY DISCLAIMED.
+# TO THE MAXIMUM EXTENT PERMITTED NOT PROHIBITED BY LAW, NEITHER RENESAS
+# ELECTRONICS CORPORATION NOR ANY OF ITS AFFILIATED COMPANIES SHALL BE LIABLE
+# FOR ANY DIRECT, INDIRECT, SPECIAL, INCIDENTAL OR CONSEQUENTIAL DAMAGES FOR
+# ANY REASON RELATED TO THIS SOFTWARE, EVEN IF RENESAS OR ITS AFFILIATES HAVE
+# BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+# Renesas reserves the right, without notice, to make changes to this software
+# and to discontinue the availability of this software. By using this software,
+# you agree to the additional terms and conditions found by accessing the
+# following link:
+# http://www.renesas.com/disclaimer
+# Copyright (C) 2021 Renesas Electronics Corporation. All rights reserved.#
+*/
+EL3_STACK_SIZE = DEFINED(_EL3_STACK_SIZE) ? _EL3_STACK_SIZE : 0x2000;
 
 MEMORY {
-	RAM  (rwxa): ORIGIN = 0xE6304000, LENGTH = 0x0002A800
-	RAM2 (rwxa): ORIGIN = 0xE632E800, LENGTH = 0x00031800
+    RAMA	(rw) : ORIGIN = 0x80100000, LENGTH = 0x00032000
 }
+
+ENTRY(_boot)
 
 SECTIONS
 {
+	.vect : ALIGN(4096) {
+		KEEP (*(.vectors))
+	} > RAMA
+	
+	.boot : {
+		KEEP (*(.boot))
+	} > RAMA
+
 	.text : {
 		*(.text*)
 		*(.rodata*)
 		. = NEXT(64);
 		__RO_END__ = .;
-	} > RAM
+	} > RAMA
 
 	.data : {
 		__DATA_START__ = .;
 		 *(.data)
 		. = NEXT(64);
 		__DATA_END__ = .;
-	} > RAM
+	} > RAMA
 
 	__DATA_SIZE__ = SIZEOF(.data);
 
-	.bss : {
-		__BSS_START__ = .;
-		 *(.bss)
-		 *(COMMON)
-		 . = NEXT(64);
-		__BSS_END__ = .;
-	} > RAM2
+	.bss (NOLOAD) : ALIGN( 0x20 ) {
+		__bss_start = .;
+		_fbss = . ;
+		* (.bss .bss.*)
+		* (COMMON)
+		. = ALIGN( 0x8 );
+		__bss_end = .;
+		_end = . ;
+		_heap = . ;
+	} > RAMA
 
 	stacks (NOLOAD) : ALIGN(64) {
-		__STACKS_START__ = .;
-		KEEP(*(writer_stack))
-		__STACKS_END__ = .;
-	} > RAM2
+		. = ALIGN(64);
+		_el3_stack_end = .;
+		. += EL3_STACK_SIZE;
+		__el3_stack = .;
+	} > RAMA
 
 	__BSS_SIZE__ = SIZEOF(.bss);
 }
