@@ -41,6 +41,7 @@
 #include "reg_rzg2.h"
 #include "boot_init_lbsc.h"
 
+#define	WRFLG	(BIT5)
 
 extern const char *const AllHelpMess[ALL_HELP_MESS_LINE];
 extern const com_menu MonCom[COMMAND_UNIT];
@@ -135,4 +136,28 @@ void	dgScifSpeedUp_921600(void)
 	}
 #endif /* RZG2_EK874 */
 	SetScif2_DL(setData);
+}
+
+void	dgReset(void)
+{
+	volatile uint32_t val;
+
+#ifdef RZG2_EK874
+	*((volatile uint32_t*)RST_CA53BAR)  = 0x02;
+#else
+	*((volatile uint32_t*)RST_CA57BAR)  = 0x02;
+#endif
+	*((volatile uint32_t*)RST_WDTRSTCR) = 0xA55AC002;
+
+	*((volatile uint32_t*)RWDT_RWTCSRA) = 0xA5A5A500;
+	SoftDelay(10);
+	*((volatile uint32_t*)RWDT_RWTCNT)  = 0x5A5AFFFF;
+	*((volatile uint32_t*)RWDT_RWTCSRA) = 0xA5A5A507;
+	*((volatile uint32_t*)RWDT_RWTCSRB) = 0xA5A5A500;
+	do
+	{
+		val = *((volatile uint32_t*)RWDT_RWTCSRA);
+	} while(val & WRFLG);
+	*((volatile uint32_t*)RWDT_RWTCSRA) = 0xA5A5A587;
+//	*((volatile uint32_t*)RWDT_RWTCNT)  = 0x5A5AFFFF;
 }
