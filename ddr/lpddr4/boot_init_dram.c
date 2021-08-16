@@ -4074,7 +4074,15 @@ int32_t InitDram(void)
 	}
 
 	/* THCTR Bit6: PONM = 0 , Bit0: THSST = 0 */
-	dataL = mmio_read_32(THS1_THCTR) & 0xFFFFFFBE;
+	dataL = mmio_read_32(THS1_THCTR);
+	if (dataL & 0x00000040U)
+	{
+		dataL = dataL & 0xFFFFFFBEU;
+	}
+	else
+	{
+		dataL = dataL | 0x00000001U;
+	}
 	mmio_write_32(THS1_THCTR, dataL);
 
 	/***********************************************************************

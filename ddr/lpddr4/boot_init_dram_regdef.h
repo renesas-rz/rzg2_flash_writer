@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#define RZG2_DDR_VERSION        "rev.0.40"
+#define RZG2_DDR_VERSION        "rev.0.41"
 #define DRAM_CH_CNT		0x04
 #define SLICE_CNT		0x04
 #define CS_CNT			0x02
