@@ -3,7 +3,7 @@
 <Div Align="right">
 Renesas Electronics Corporation
 
-Dec-02-2020
+Aug-17-2020
 </Div>
 
 The RZ/G2 flash writer is sample software for Renesas RZ/G2 Group MPUs.
@@ -194,6 +194,7 @@ The following table shows the command list.
 | EM_WB    | Write to the raw binary images to the user data area of eMMC, and the boot partition of eMMC.      |
 | EM_E     | Erase the user data area of eMMC, and the boot partition of eMMC.                                  |
 | SUP      | Change the SCIF baud rate setting.                                                                 |
+| RESET    | Perform RESET of the CPU.                                                                          |
 | H        | Display the command help.                                                                          |
 
 #### 3.4.1. Write to the S-record format images to the Serial Flash
@@ -498,7 +499,7 @@ Get the source code of RZ/G2 flash writer.
 cd ~/
 git clone https://github.com/renesas-rz/rzg2_flash_writer.git
 cd rzg2_flash_writer
-git checkout -b v1.04 v1.04
+git checkout -b v1.05 v1.05
 ```
 
 ### 4.3. Build the RZ/G2 flash writer
@@ -638,3 +639,8 @@ Describe the revision history of RZ/G2 flash writer.
 ### 7.5. v1.04
 
 - Support SiLinux EK874 Rev.D/Rev.E boards
+
+### 7.6. v1.05
+
+- Update DDR initialization sequences
+- Support the RESET command
