@@ -17,6 +17,14 @@ DDR_TYPE = DDR4
 DDR_SIZE = 2GB
 SWIZZLE  = T1C
 #--------------------------------------
+else ifeq ("$(BOARD)", "RZG2L_SMARC_PMIC")
+# RZ/G2L Smarc PMIC Edition board
+FILENAME_ADD = _RZG2L_SMARC_PMIC
+DEVICE   = RZG2L
+DDR_TYPE = DDR4
+DDR_SIZE = 2GB_1PCS
+SWIZZLE  = T1BC
+#--------------------------------------
 else ifeq ("$(BOARD)", "RZG2L_15MMSQ_DEV")
 # RZ/G2L 15MMSQ Dev board
 FILENAME_ADD = _RZG2L_15MMSQ_DEV
@@ -98,12 +106,19 @@ endif
 ifeq ("$(DDR_SIZE)", "2GB")
 	CFLAGS += -DDDR_SIZE_2GB=1
 endif
+ifeq ("$(DDR_SIZE)", "2GB_1PCS")
+	CFLAGS += -DDDR_SIZE_2GB_1PCS=1
+endif
 ifeq ("$(DDR_SIZE)", "1GB")
 	CFLAGS += -DDDR_SIZE_1GB=1
 endif
 
 ifeq ("$(SWIZZLE)", "T1C")
 	CFLAGS += -DSWIZZLE_T1C=1
+endif
+
+ifeq ("$(SWIZZLE)", "T1BC")
+	CFLAGS += -DSWIZZLE_T1BC=1
 endif
 
 ifeq ("$(SWIZZLE)", "T2C")

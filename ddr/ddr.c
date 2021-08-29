@@ -23,11 +23,15 @@
 #include "param_mc_C-010_D4-01-1.c"
 #elif (DDR_SIZE_2GB == 1)
 #include "param_mc_C-010_D4-01-2.c"
+#elif (DDR_SIZE_2GB_1PCS == 1)
+#include "param_mc_C-011_D4-01-1.c"
 #else
 #error "Unknown size."
 #endif
 #if (SWIZZLE_T1C == 1)
 #include "param_swizzle_T1c.c"
+#elif (SWIZZLE_T1BC == 1)
+#include "param_swizzle_T1bc.c"
 #elif (SWIZZLE_T2C == 1)
 #include "param_swizzle_T2c.c"
 #else

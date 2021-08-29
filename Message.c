@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020, Renesas Electronics Corporation. All rights reserved.
+ * Copyright (c) 2015-2021, Renesas Electronics Corporation. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -8,8 +8,8 @@
 /**********************
 *  TITLE              *
 ***********************/
-#define WRITER_VERSION	"V0.89"		/* Software Version */
-#define WRITER_DATE	"Jun.04,2021"	/* Release date */
+#define WRITER_VERSION	"V0.90"		/* Software Version */
+#define WRITER_DATE	"Aug.27,2021"	/* Release date */
 
 const char *const StartMessMonitor[START_MESS_MON_LINE] = {
 				"Flash writer for RZ/G2 Series "
