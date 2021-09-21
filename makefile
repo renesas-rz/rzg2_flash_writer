@@ -62,7 +62,7 @@ endif
 endif
 
 #CPU
-CPU     = -march=armv8-a
+CPU     = 
 AArch   = 64
 THUMB   = 
 AS_NEON = 
@@ -73,6 +73,7 @@ BOOTDIR     = AArch64_boot
 OUTPUT_DIR  = AArch64_output
 OBJECT_DIR  = AArch64_obj
 CROSS_COMPILE ?= aarch64-elf-
+CFLAGS = -fno-stack-protector
 
 ifeq ("$(BOARD)", "EK874")
 	BOARD_NAME   =  EK874
