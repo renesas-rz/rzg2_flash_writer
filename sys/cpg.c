@@ -47,11 +47,12 @@ typedef struct {
 
 static CPG_PLL_SETDATA_146 cpg_pll4_setdata = {
 #if (DDR4 == 1)
-	{ CPG_PLL4_CLK1, 0x00003203 },
+	{ CPG_PLL4_CLK1, 0xFAE13203 },
+	{ CPG_PLL4_CLK2, 0x00081000 },
 #else
-	{ CPG_PLL4_CLK1, 0x40005346 },
+	{ CPG_PLL4_CLK1, 0xA66629C3 },
+	{ CPG_PLL4_CLK2, 0x00080D00 },
 #endif
-	{ CPG_PLL4_CLK2, 0x00082400 },
 	{ CPG_PLL4_STBY, 0x00010001 }
 };
 
@@ -483,6 +484,9 @@ static CPG_REG_SETTING cpg_static_select_tbl[] = {
 
 static CPG_REG_SETTING cpg_dynamic_select_tbl[] = {
 	{ (uintptr_t)CPG_PL4_DSEL,              0x00010001 },
+#if (EMMC_IO_1_8V == 0)
+	{ (uintptr_t)CPG_PL2SDHI_DSEL,          0x00110022 },
+#endif
 };
 
 #define CPG_SEL_PLL1_ON_OFF					(0)

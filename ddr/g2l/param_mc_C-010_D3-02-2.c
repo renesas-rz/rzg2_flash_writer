@@ -1,12 +1,13 @@
 /*
- * Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
+ * Copyright (c) 2020-2021, Renesas Electronics Corporation. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #include <stdint.h>
+#include <ddr_mc_regs.h>
 
-const uint32_t mc_init_tbl[][2] = {
+const uint32_t mc_init_tbl[MC_INIT_NUM][2] = {
 	{	DENALI_CTL_00,	0x00000600	},
 	{	DENALI_CTL_01,	0x00000000	},
 	{	DENALI_CTL_02,	0x00000000	},
@@ -134,13 +135,13 @@ const uint32_t mc_init_tbl[][2] = {
 	{	DENALI_CTL_124,	0x07FF0000	},
 	{	DENALI_CTL_125,	0x0000FF00	},
 	{	DENALI_CTL_126,	0x0FFF0800	},
-	{	DENALI_CTL_127,	0x0000FF01	},
+	{	DENALI_CTL_127,	0x0000FF00	},
 	{	DENALI_CTL_128,	0xFFFF0A00	},
 	{	DENALI_CTL_129,	0x01010001	},
 	{	DENALI_CTL_130,	0x01010101	},
 	{	DENALI_CTL_131,	0x01030101	},
 	{	DENALI_CTL_132,	0x0C030000	},
-	{	DENALI_CTL_133,	0x00000000	},
+	{	DENALI_CTL_133,	0x01000000	},
 	{	DENALI_CTL_134,	0x00000000	},
 	{	DENALI_CTL_135,	0x00010000	},
 	{	DENALI_CTL_136,	0x00000000	},
@@ -420,9 +421,9 @@ const uint32_t mc_init_tbl[][2] = {
 	{	DENALI_CTL_410,	0x00000000	},
 	{	DENALI_CTL_411,	0x00000000	},
 	{	DENALI_CTL_412,	0x0000000F	},
-	{	DENALI_CTL_413,	0x01F105DD	},
-	{	DENALI_CTL_414,	0x4F7206E8	},
-	{	DENALI_CTL_415,	0x00002822	},
+	{	DENALI_CTL_413,	0x017105DD	},
+	{	DENALI_CTL_414,	0x4F6C01E8	},
+	{	DENALI_CTL_415,	0x00007822	},
 	{	DENALI_CTL_416,	0x1E1E3C22	},
 	{	DENALI_CTL_417,	0x00000000	},
 	{	DENALI_CTL_418,	0x00000000	},

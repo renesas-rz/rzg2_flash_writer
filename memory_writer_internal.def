@@ -15,13 +15,14 @@ SECTIONS
 {
 	.cert : {
 		. = 0x00000000;
-		KEEP(*(.boot_param))
+		LONG(__LOAD_SIZE__)
+		FILL(0xFF)
 		. = 0x000001FC;
-		KEEP(*(.sig_55aa))
-
+		LONG(0xAA55FFFF)
 	} > CERT
 
 	.text : {
+		__RO_START__ = .;
 		*(.text*)
 		*(.rodata*)
 		. = NEXT(64);
@@ -36,6 +37,8 @@ SECTIONS
 	} > RAM
 
 	__DATA_SIZE__ = SIZEOF(.data);
+
+	__LOAD_SIZE__ = __DATA_END__ - __RO_START__;
 
 	.bss : {
 		__BSS_START__ = .;

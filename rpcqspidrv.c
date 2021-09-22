@@ -695,10 +695,10 @@ void SetRPC_ClockMode(uint32_t mode)
 {
 	uint32_t dataL=0;
 
-	/* --- Set 16.6MHz on PLL3 for SPI Multi --- */
+	/* --- Set 66.6MHz on PLL3 for SPI Multi --- */
 	dataL = *((volatile uint32_t*)CPG_PL3A_DDIV);
 	dataL &= (~0x00000700U);
-	dataL |=  0x01000300U;	/* DIV_PLL3_C = 1/8 */
+	dataL |=  0x01000100U;	/* DIV_PLL3_C = 1/2 */
 	*((volatile uint32_t*)CPG_PL3A_DDIV) = dataL;
 
 	*((volatile uint32_t*)CPG_PL3_SSEL) = 0x01110011U;
@@ -770,13 +770,8 @@ uint32_t ReadQspiFlashID(uint32_t *readData)	//for QSPIx1ch
 {
 	char str[64];
 
-#if 1	/* 2020/12/21 S.Hirai	*/
 	*((volatile uint32_t*)RPC_PHYCNT)    = 0x00030060;
 	*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030060;
-#else	/* 1 */
-	*((volatile uint32_t*)RPC_PHYCNT)    = 0x00030260;
-	*((volatile uint32_t*)RPC_PHYCNT)    = 0x80030260;
-#endif	/* 1 */
 	*((volatile uint32_t*)RPC_CMNCR)      = 0x81FFF300;
 		//bit31  MD       =  1 : Manual mode
 		//bit1-0 BSZ[1:0] = 00 : QSPI Flash x 1

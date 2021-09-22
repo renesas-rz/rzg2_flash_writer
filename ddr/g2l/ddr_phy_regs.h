@@ -7,7 +7,7 @@
 #ifndef __DDR_PHY_REGS_H__
 #define __DDR_PHY_REGS_H__
 
-#include "rzg2l_def.h"
+#include <rzg2l_def.h>
 
 #define DDR_PHY_BASE		RZG2L_DDR_PHY_BASE
 
@@ -90,15 +90,6 @@
 #define	DDRPHY_R76			(0x1F0)
 #define	DDRPHY_R77			(0x200)
 #define	DDRPHY_R78			(0x204)
-#define	DDRPHY_R79			(0x240)
-#define	DDRPHY_R80			(0x244)
-#define	DDRPHY_R81			(0x248)
-#define	DDRPHY_R82			(0x24C)
-#define	DDRPHY_R83			(0x250)
-#define	DDRPHY_R84			(0x254)
-#define	DDRPHY_R85			(0x258)
-#define	DDRPHY_R86			(0x25C)
-#define	DDRPHY_R87			(0x260)
-#define	DDRPHY_R88			(0x264)
+#define DDRPHY_R79			(0x240)
 
 #endif	// __DDR_PHY_REGS_H__

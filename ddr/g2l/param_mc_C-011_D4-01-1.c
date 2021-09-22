@@ -1,12 +1,13 @@
 /*
- * Copyright (c) 2021, Renesas Electronics Corporation. All rights reserved.
+ * Copyright (c) 2020-2021, Renesas Electronics Corporation. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #include <stdint.h>
+#include <ddr_mc_regs.h>
 
-const uint32_t mc_init_tbl[][2] = {
+const uint32_t mc_init_tbl[MC_INIT_NUM][2] = {
 	{	DENALI_CTL_00,	0x00000A00	},
 	{	DENALI_CTL_01,	0x00000000	},
 	{	DENALI_CTL_02,	0x00000000	},

@@ -139,7 +139,7 @@ AArch32_64  = AArch64
 BOOTDIR     = AArch64_boot
 OUTPUT_DIR  = AArch64_output
 OBJECT_DIR  = AArch64_obj
-CROSS_COMPILE ?= aarch64-elf-
+CROSS_COMPILE ?= aarch64-none-elf-
 
 CFLAGS += -O0 -fno-stack-protector -fno-exceptions -fno-unwind-tables -fno-asynchronous-unwind-tables
 BOOT_DEF    = Writer
@@ -307,17 +307,17 @@ DEPEND_FILE = $(patsubst %.lib, ,$(OBJ_FILE:%.o=%.d))
 
 ###################################################
 #C compiler
-CC ?= $(CROSS_COMPILE)gcc
+CC = $(CROSS_COMPILE)gcc
 #Assembler
-AS ?= $(CROSS_COMPILE)as
+AS = $(CROSS_COMPILE)as
 #Linker
-LD ?= $(CROSS_COMPILE)ld
+LD = $(CROSS_COMPILE)ld
 #Liblary
-AR ?= $(CROSS_COMPILE)ar
+AR = $(CROSS_COMPILE)ar
 #Object dump
-OBJDUMP ?= $(CROSS_COMPILE)objdump
+OBJDUMP = $(CROSS_COMPILE)objdump
 #Object copy
-OBJCOPY ?= $(CROSS_COMPILE)objcopy
+OBJCOPY = $(CROSS_COMPILE)objcopy
 
 #clean
 CL = rm -rf

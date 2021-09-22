@@ -8,15 +8,20 @@
 /**********************
 *  TITLE              *
 ***********************/
-#define WRITER_VERSION	"V0.90"		/* Software Version */
-#define WRITER_DATE	"Aug.27,2021"	/* Release date */
+#define WRITER_VERSION	"V1.00"		/* Software Version */
+#define WRITER_DATE	"Sep.17,2021"	/* Release date */
 
-const char *const StartMessMonitor[START_MESS_MON_LINE] = {
+const char *const StartMessMonitorG2[START_MESS_MON_LINE] = {
 				"Flash writer for RZ/G2 Series "
 				WRITER_VERSION " " WRITER_DATE,
 				MESSAGE_END,
 };
 
+const char *const StartMessMonitorV2[START_MESS_MON_LINE] = {
+				"Flash writer for RZ/V2 Series "
+				WRITER_VERSION " " WRITER_DATE,
+				MESSAGE_END,
+};
 
 const char *const AllHelpMess[ALL_HELP_MESS_LINE] = {
 #if SERIAL_FLASH == 1

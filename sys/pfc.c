@@ -157,6 +157,12 @@ static void pfc_qspi_setup(void)
 {
 	int      cnt;
 
+#if (QSPI_IO_1_8V == 1)
+	mmio_write_32(PFC_QSPI, 1);
+#else
+	mmio_write_32(PFC_QSPI, 0);
+#endif
+
 	for (cnt = 0; cnt < PFC_QSPI_TBL_NUM; cnt++) {
 		/* IOLH */
 		if (pfc_qspi_reg_tbl[cnt].iolh.flg == PFC_ON) {
@@ -178,7 +184,11 @@ static void pfc_sd_setup(void)
 	int      cnt;
 
 	/* Since SDx is 3.3V, the initial value will be set. */
+#if (EMMC_IO_1_8V == 1)
 	mmio_write_32(PFC_SD_ch0, 1);
+#else
+	mmio_write_32(PFC_SD_ch0, 0);
+#endif
 	mmio_write_32(PFC_SD_ch1, 0);
 
 	for (cnt = 0; cnt < PFC_SD_TBL_NUM; cnt++) {

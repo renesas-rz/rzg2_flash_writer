@@ -25,7 +25,11 @@
 #include "ddr.h"
 #include "sysc.h"
 
-extern const char *const StartMessMonitor[START_MESS_MON_LINE];
+#define	RZG2L_DEVID	(0x841C447)
+#define	RZV2L_DEVID	(0x8447447)
+
+extern const char *const StartMessMonitorG2[START_MESS_MON_LINE];
+extern const char *const StartMessMonitorV2[START_MESS_MON_LINE];
 extern const com_menu MonCom[COMMAND_UNIT];
 extern uint8_t	gCOMMAND_Area[COMMAND_BUFFER_SIZE];
 
@@ -85,15 +89,31 @@ void InitMain(void)
 
 void StartMess( void )
 {
+	unsigned int devceid;
+
+	devceid = sysc_get_device_id();
+
 	PutStr("  ",1);
-	PutMess(StartMessMonitor);
-	PutStr(" Product Code : ", 0);
+
+	switch(devceid)
+	{
+		case RZG2L_DEVID:
+			PutMess(StartMessMonitorG2);
+			PutStr(" Product Code : ", 0);
 #if (RZG2L == 1)
-	PutStr("RZ/G2L" ,1);
+			PutStr("RZ/G2L" ,1);
 #endif
 #if (RZG2LC == 1)
-	PutStr("RZ/G2CL" ,1);
+			PutStr("RZ/G2LC" ,1);
 #endif
+		break;
+		case RZV2L_DEVID:
+			PutMess(StartMessMonitorV2);
+			PutStr(" Product Code : ", 0);
+			PutStr("RZ/V2L" ,1);
+		default:
+		break;
+	}
 	PutStr(">", 0);
 }
 
