@@ -380,7 +380,7 @@ void dgDdrTest(void)
 	{
 		PutStr(" Pass!",1);
 	}
-#if (DDR_SIZE_1GB == 0) && (DDR_SIZE_1GB_1PCS == 0)
+#if (DDR_SIZE_1GB == 0) && (DDR_SIZE_1GB_1PCS == 0) && (DDR_SIZE_512MB_1PCS == 0)
 	PutStr("Check:0x00_80000000 ... ",0);
 	if (CkExtendDdrRamCheck((void*)0x000000080000000))
 	{

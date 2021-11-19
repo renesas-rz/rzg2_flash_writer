@@ -30,6 +30,10 @@
 #include "param_swizzle_T2c.c"
 #elif (SWIZZLE_T3BC == 1)
 #include "param_swizzle_T3bc.c"
+#elif (SWIZZLE_T3BCUD == 1)
+#include "param_swizzle_T3bcud.c"
+#elif (SWIZZLE_T3BCUD2 == 1)
+#include "param_swizzle_T3bcud2.c"
 #else
 #error "Unknown swizzle."
 #endif
@@ -38,11 +42,15 @@
 
 #if (DDR_SIZE_1GB == 1)
 #include "param_mc_C-010_D3-02-2.c"
+#elif (DDR_SIZE_512MB_1PCS == 1)
+#include "param_mc_C-011_D3-01-2.c"
 #else
 #error "Unknown size."
 #endif
 #if (SWIZZLE_T3CL == 1)
 #include "param_swizzle_T3cl.c"
+#elif (SWIZZLE_T3BCUL == 1)
+#include "param_swizzle_T3bcul.c"
 #else
 #error "Unknown swizzle."
 #endif

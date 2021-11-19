@@ -62,6 +62,46 @@ DEVICE   = RZG2LC
 DDR_TYPE = DDR3L
 DDR_SIZE = 1GB
 SWIZZLE  = T3CL
+else ifeq ("$(BOARD)", "RZG2UL_TYPE1_DEV")
+#--------------------------------------
+# RZ/G2UL Type1 DDR4 Dev board
+#--------------------------------------
+FILENAME_ADD = _RZG2UL_TYPE1_DEV
+DEVICE   = RZG2UL
+DDR_TYPE = DDR4
+DDR_SIZE = 1GB_1PCS
+SWIZZLE  = T3BCUD
+DEVICE_TYPE = 1
+else ifeq ("$(BOARD)", "RZG2UL_TYPE1_DDR3L_DEV")
+#--------------------------------------
+# RZ/G2UL Type1 DDR3L Dev board
+#--------------------------------------
+FILENAME_ADD = _RZG2UL_TYPE1_DEV
+DEVICE   = RZG2UL
+DDR_TYPE = DDR3L
+DDR_SIZE = 512MB_1PCS
+SWIZZLE  = T3BCUL
+DEVICE_TYPE = 1
+else ifeq ("$(BOARD)", "RZG2UL_SMARC")
+#--------------------------------------
+# RZ/G2UL Smarc board
+#--------------------------------------
+FILENAME_ADD = _RZG2UL_SMARC
+DEVICE   = RZG2UL
+DDR_TYPE = DDR4
+DDR_SIZE = 1GB_1PCS
+SWIZZLE  = T3BCUD2
+DEVICE_TYPE = 1
+else ifeq ("$(BOARD)", "RZG2UL_TYPE2_DEV")
+#--------------------------------------
+# RZ/G2UL Type2 Dev board
+#--------------------------------------
+FILENAME_ADD = _RZG2UL_TYPE2_DEV
+DEVICE   = RZG2UL
+DDR_TYPE = DDR3L
+DDR_SIZE = 1GB
+SWIZZLE  = T3CL
+DEVICE_TYPE = 2
 else ifeq ("$(BOARD)", "RZV2L_SMARC")
 #--------------------------------------
 # RZ/V2L Smarc board
@@ -151,6 +191,9 @@ endif
 ifeq ("$(DEVICE)", "RZG2LC")
 	CFLAGS += -DRZG2LC=1
 endif
+ifeq ("$(DEVICE)", "RZG2UL")
+	CFLAGS += -DRZG2UL=1
+endif
 ifeq ("$(DEVICE)", "RZV2L")
 	CFLAGS += -DRZV2L=1
 endif
@@ -177,6 +220,9 @@ endif
 ifeq ("$(DDR_SIZE)", "1GB_1PCS")
 	CFLAGS += -DDDR_SIZE_1GB_1PCS=1
 endif
+ifeq ("$(DDR_SIZE)", "512MB_1PCS")
+	CFLAGS += -DDDR_SIZE_512MB_1PCS=1
+endif
 
 ifeq ("$(SWIZZLE)", "T1C")
 	CFLAGS += -DSWIZZLE_T1C=1
@@ -196,6 +242,26 @@ endif
 
 ifeq ("$(SWIZZLE)", "T3CL")
 	CFLAGS += -DSWIZZLE_T3CL=1
+endif
+
+ifeq ("$(SWIZZLE)", "T3BCUL")
+	CFLAGS += -DSWIZZLE_T3BCUL=1
+endif
+
+ifeq ("$(SWIZZLE)", "T3BCUD")
+	CFLAGS += -DSWIZZLE_T3BCUD=1
+endif
+
+ifeq ("$(SWIZZLE)", "T3BCUD2")
+	CFLAGS += -DSWIZZLE_T3BCUD2=1
+endif
+
+ifeq ("$(DEVICE_TYPE)", "1")
+	CFLAGS += -DDEVICE_TYPE=1
+endif
+
+ifeq ("$(DEVICE_TYPE)", "2")
+	CFLAGS += -DDEVICE_TYPE=2
 endif
 
 ifeq ("$(SERIAL_FLASH)", "ENABLE")
@@ -237,6 +303,8 @@ INCLUDE_DIR = include
 DDR_COMMON = ddr/common
 ifeq ("$(DEVICE)", "RZV2L")
 DDR_SOC    = ddr/v2l
+else ifeq ("$(DEVICE)", "RZG2UL")
+DDR_SOC    = ddr/g2ul
 else
 DDR_SOC    = ddr/g2l
 endif
@@ -275,6 +343,9 @@ endif
 ifeq ("$(DEVICE)", "RZV2L")
 SRC_FILE +=				\
 	ddr/v2l/ddr_v2l.c
+else ifeq ("$(DEVICE)", "RZG2UL")
+SRC_FILE +=				\
+	ddr/g2ul/ddr_g2ul.c
 else
 SRC_FILE +=				\
 	ddr/g2l/ddr_g2l.c

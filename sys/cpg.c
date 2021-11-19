@@ -118,6 +118,7 @@ static CPG_SETUP_DATA cpg_clk_on_tbl[] = {
 		0x00010000,
 		CPG_T_CLK
 	},
+#if !RZG2UL
 	{		/* GPT */
 		(uintptr_t)CPG_CLKON_GPT,
 		(uintptr_t)CPG_CLKMON_GPT,
@@ -130,10 +131,15 @@ static CPG_SETUP_DATA cpg_clk_on_tbl[] = {
 		0x000F0000,
 		CPG_T_CLK
 	},
+#endif
 	{		/* WDT */
 		(uintptr_t)CPG_CLKON_WDT,
 		(uintptr_t)CPG_CLKMON_WDT,
+#if RZG2UL
+		0x00300000,
+#else
 		0x003C0000,
+#endif
 		CPG_T_CLK
 	},
 #if !DEBUG_RZG2L_FPGA
@@ -163,36 +169,42 @@ static CPG_SETUP_DATA cpg_clk_on_tbl[] = {
 		0x00ff00ff,
 		CPG_T_CLK
 	},
+#if !RZG2UL
 	{		/* GPU */
 		(uintptr_t)CPG_CLKON_GPU,
 		(uintptr_t)CPG_CLKMON_GPU,
 		0x00070000,
 		CPG_T_CLK
 	},
+#endif
 	{		/* Image Scaling Unit */
 		(uintptr_t)CPG_CLKON_ISU,
 		(uintptr_t)CPG_CLKMON_ISU,
 		0x00030000,
 		CPG_T_CLK
 	},
+#if !RZG2UL
 	{		/* H.264 codec */
 		(uintptr_t)CPG_CLKON_H264,
 		(uintptr_t)CPG_CLKMON_H264,
 		0x00010001,
 		CPG_T_CLK
 	},
+#endif
 	{		/* Camera Data Receive Unit */
 		(uintptr_t)CPG_CLKON_CRU,
 		(uintptr_t)CPG_CLKMON_CRU,
 		0x001f0000,
 		CPG_T_CLK
 	},
+#if !RZG2UL
 	{		/* MIPI-DSI */
 		(uintptr_t)CPG_CLKON_MIPI_DSI,
 		(uintptr_t)CPG_CLKMON_MIPI_DSI,
 		0x003f0000,
 		CPG_T_CLK
 	},
+#endif
 	{		/* LCDC */
 		(uintptr_t)CPG_CLKON_LCDC,
 		(uintptr_t)CPG_CLKMON_LCDC,
@@ -316,6 +328,7 @@ static CPG_SETUP_DATA cpg_reset_tbl[] = {
 		0x00010000,
 		CPG_T_RST
 	},
+#if !RZG2UL
 	{		/* GPT */
 		(uintptr_t)CPG_RST_GPT,
 		(uintptr_t)CPG_RSTMON_GPT,
@@ -328,10 +341,15 @@ static CPG_SETUP_DATA cpg_reset_tbl[] = {
 		0x000f0000,
 		CPG_T_RST
 	},
+#endif
 	{		/* WDT */
 		(uintptr_t)CPG_RST_WDT,
 		(uintptr_t)CPG_RSTMON_WDT,
+#if RZG2UL
+		0x00040000,
+#else
 		0x00060000,
+#endif
 		CPG_T_RST
 	},
 #if !DEBUG_RZG2L_FPGA
@@ -361,36 +379,42 @@ static CPG_SETUP_DATA cpg_reset_tbl[] = {
 		0x00030003,
 		CPG_T_RST
 	},
+#if !RZG2UL
 	{		/* GPU */
 		(uintptr_t)CPG_RST_GPU,
 		(uintptr_t)CPG_RSTMON_GPU,
 		0x00070000,
 		CPG_T_RST
 	},
+#endif
 	{		/* Image Scaling Unit */
 		(uintptr_t)CPG_RST_ISU,
 		(uintptr_t)CPG_RSTMON_ISU,
 		0x00030000,
 		CPG_T_RST
 	},
+#if !RZG2UL
 	{		/* H.264 codec */
 		(uintptr_t)CPG_RST_H264,
 		(uintptr_t)CPG_RSTMON_H264,
 		0x00030003,
 		CPG_T_RST
 	},
+#endif
 	{		/* Camera Data Receive Unit */
 		(uintptr_t)CPG_RST_CRU,
 		(uintptr_t)CPG_RSTMON_CRU,
 		0x00070000,
 		CPG_T_RST
 	},
+#if !RZG2UL
 	{		/* MIPI-DSI */
 		(uintptr_t)CPG_RST_MIPI_DSI,
 		(uintptr_t)CPG_RSTMON_MIPI_DSI,
 		0x00070000,
 		CPG_T_RST
 	},
+#endif
 	{		/* LCDC */
 		(uintptr_t)CPG_RST_LCDC,
 		(uintptr_t)CPG_RSTMON_LCDC,
@@ -515,7 +539,9 @@ static CPG_REG_SETTING cpg_sel_pll2_1_on_off[] = {
 
 static CPG_REG_SETTING cpg_sel_pll2_2_on_off[] = {
 	{(uintptr_t)CPG_CLKON_SDHI, 0x00770077 },
+#if !RZG2UL
 	{(uintptr_t)CPG_CLKON_MIPI_DSI, 0x00200020 },
+#endif
 };
 
 static CPG_REG_SETTING cpg_sel_pll3_1_on_off[] = {
@@ -533,14 +559,18 @@ static CPG_REG_SETTING cpg_sel_pll3_1_on_off[] = {
 	{(uintptr_t)CPG_CLKON_DDR, 0x00030003 },
 	{(uintptr_t)CPG_CLKON_ETH, 0x00030003 },
 	{(uintptr_t)CPG_CLKON_GIC600, 0x00010001 },
+#if !RZG2UL
 	{(uintptr_t)CPG_CLKON_GPU, 0x00070007 },
 	{(uintptr_t)CPG_CLKON_H264, 0x00010001 },
+#endif
 	{(uintptr_t)CPG_CLKON_IA55, 0x00030003 },
 	{(uintptr_t)CPG_CLKON_IM33, 0x00030003 },
 	{(uintptr_t)CPG_CLKON_ISU, 0x00030003 },
 	{(uintptr_t)CPG_CLKON_JAUTH, 0x00010001 },
 	{(uintptr_t)CPG_CLKON_LCDC, 0x00010001 },
+#if !RZG2UL
 	{(uintptr_t)CPG_CLKON_MIPI_DSI, 0x000C000C },
+#endif
 	{(uintptr_t)CPG_CLKON_OTP, 0x00020002 },
 	{(uintptr_t)CPG_CLKON_PERI_COM, 0x00030003 },
 	{(uintptr_t)CPG_CLKON_PERI_CPU, 0x000D000D },
@@ -559,8 +589,10 @@ static CPG_REG_SETTING cpg_sel_pll3_1_on_off[] = {
 
 static CPG_REG_SETTING cpg_sel_pll3_2_on_off[] = {
 	{(uintptr_t)CPG_CLKON_CRU, 0x00030003 },
+#if !RZG2UL
 	{(uintptr_t)CPG_CLKON_MIPI_DSI, 0x00020002 },
 	{(uintptr_t)CPG_CLKON_GPU, 0x00010001 },
+#endif
 	{(uintptr_t)CPG_CLKON_SPI_MULTI, 0x00030003 },
 	{(uintptr_t)CPG_CLKON_AXI_MCPU_BUS, 0x02080208 },
 };
@@ -571,36 +603,52 @@ static CPG_REG_SETTING cpg_sel_pll3_3_on_off[] = {
 };
 
 static CPG_REG_SETTING cpg_sel_pll5_1_on_off[] = {
+#if !RZG2UL
 	{(uintptr_t)CPG_CLKON_MIPI_DSI, 0x00010001 },
+#endif
 	{(uintptr_t)CPG_CLKON_CRU, 0x00100010 },
+#if !RZG2UL
 	{(uintptr_t)CPG_CLKON_MIPI_DSI, 0x00100010 },
+#endif
 	{(uintptr_t)CPG_CLKON_LCDC, 0x00020002 }
 };
 
 static CPG_REG_SETTING cpg_sel_pll5_3_on_off[] = {
+#if !RZG2UL
 	{(uintptr_t)CPG_CLKON_MIPI_DSI, 0x00100010 },
+#endif
 	{(uintptr_t)CPG_CLKON_LCDC, 0x00020002 }
 };
 
 static CPG_REG_SETTING cpg_sel_pll5_4_on_off[] = {
+#if !RZG2UL
 	{(uintptr_t)CPG_CLKON_MIPI_DSI, 0x00100010 },
+#endif
 	{(uintptr_t)CPG_CLKON_LCDC, 0x00020002 }
 };
 
 static CPG_REG_SETTING cpg_sel_pll6_1_on_off[] = {
+#if !RZG2UL
 	{(uintptr_t)CPG_CLKON_GPU, 0x00010001 }
+#endif
 };
 
 static CPG_REG_SETTING cpg_sel_gpu1_1_on_off[] = {
+#if !RZG2UL
 	{(uintptr_t)CPG_CLKON_GPU, 0x00010001 }
+#endif
 };
 
 static CPG_REG_SETTING cpg_sel_gpu1_2_on_off[] = {
+#if !RZG2UL
 	{(uintptr_t)CPG_CLKON_GPU, 0x00010001 }
+#endif
 };
 
 static CPG_REG_SETTING cpg_sel_gpu2_on_off[] = {
+#if !RZG2UL
 	{(uintptr_t)CPG_CLKON_GPU, 0x00010001 }
+#endif
 };
 
 
