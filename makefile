@@ -147,7 +147,7 @@ endif
 
 # Select EMMC("ENABLE"or"DISABLE" )
 ifeq ("$(EMMC)", "")
-EMMC = DISABLE
+EMMC = ENABLE
 endif
 
 # Select QSPI IO Voltage("1_8V"or"3_3V" )

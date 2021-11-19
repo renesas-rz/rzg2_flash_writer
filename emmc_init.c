@@ -224,30 +224,6 @@ static void emmc_drv_init(void)
  */
 static EMMC_ERROR_CODE emmc_dev_init(void)
 {
-	uint32_t mmc_ch = USE_MMC_CH;
-	uint32_t dataL;
-	uint32_t tmp_val;
-	volatile uint32_t* adr_cpg_sdxckcr;
-
-	/* Set SD clock */
-	dataL = *((volatile uint32_t*)CPG_PL2SDHI_DSEL);
-	dataL |= 0x00010001U;
-	*((volatile uint32_t*)CPG_PL2SDHI_DSEL) = dataL;
-
-	dataL = *((volatile uint32_t*)CPG_CLKON_SDHI);
-	dataL |= 0x0001000FU;
-	*((volatile uint32_t*)CPG_CLKON_SDHI) = dataL;
-	do {
-		dataL = *((volatile uint32_t*)CPG_CLKMON_SDHI);
-	} while ((dataL & BIT0) == 0U);	/* wait until bit0=1 */
-
-	dataL = *((volatile uint32_t*)CPG_RST_SDHI);
-	dataL |= 0x00010001U;
-	*((volatile uint32_t*)CPG_RST_SDHI) = dataL;
-	do {
-		dataL = *((volatile uint32_t*)CPG_RSTMON_SDHI);
-	} while ((dataL & BIT0) == 1U);	/* wait until bit0=1 */
-
 #ifdef EMMC_VOLTAGE_1_8
 	InitMmcPinFunction();
 	SetMmcVoltage(1);	/* I/O Voltage=1.8V */
