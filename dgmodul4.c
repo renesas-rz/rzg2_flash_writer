@@ -162,6 +162,11 @@ static uint32_t CheckQspiFlashId(void)
 						gQspi_sa_size    = SA_64KB;
 						gQspi_end_addess = TOTAL_SIZE_128MB - 0x8000 - 1;
 				break;
+				case DEVICE_ID_MX66UW1G45G:
+						PutStr("MX66UW1G45G", 1);
+						gQspi_sa_size    = SA_64KB;
+						gQspi_end_addess = TOTAL_SIZE_128MB - 0x8000 - 1;
+				break;
 				default:
 					ret = -1;
 				break;
