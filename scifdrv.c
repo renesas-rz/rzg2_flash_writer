@@ -78,26 +78,53 @@ int32_t GetCharTimeOutSCIF2(char *inChar, uint64_t us)
     
     uint64_t start = CMN_GetSysCnt();
     uint64_t cycles = (CMN_GetFreq4SysCnt() / 1000000UL) * us;
+	uint64_t now;
 
 	do
-	{
-	    if ((CMN_GetSysCnt() - start) > cycles) {
-	        err = -1;
+	{	now=CMN_GetSysCnt();
+		if(now < start){
+			now += 0x100000000;		/** Overflow*/
+		}
+		
+		if((now - start) > cycles) {
+	        err = URAT_TIMEOUT_ERR;
 	        break;
 	    }
 		sts = gs_uART_cReg->LSR;			/** Read Line Status */
 		
+		if (UART_16550_LINE_STATUS_BI & sts)
+		{
+			/*Break Interrupt*/
+			err = URAT_BREAK_INT;
+	        break;
+		}
 		if (UART_16550_LINE_STATUS_FE & sts)
 		{
 			/*Framing Error*/
+			err = URAT_FRAMING_ERR;
+	        break;
+		}
+		if (UART_16550_LINE_STATUS_PE & sts)
+		{
+			/*Paeity Error*/
+	        err = URAT_PARITY_ERR;
+	        break;
 		}
 		if (UART_16550_LINE_STATUS_OE & sts)
 		{
 			/*Overrun Error*/
+	        err = URAT_OVERRUN_ERR;
+	        break;
+		}
+		if (UART_16550_LINE_STATUS_RFE & sts)
+		{
+			/*FIFO Error*/
+	        err = URAT_FIFO_ERR;
+	        break;
 		}
 	} while(!(sts & UART_LSR_RXRDY_MASK));
 
-    if (err != -1) //not time out
+    if (err == 0) //not time out
     	*inChar = gs_uART_cReg->RBR_THR;		/** Read Rx data */
     
 	return(err);

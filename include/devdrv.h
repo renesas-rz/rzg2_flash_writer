@@ -21,6 +21,13 @@
 * Copyright (C) 2021 Renesas Electronics Corporation. All rights reserved.
 *******************************************************************************/ 
 
+#define URAT_TIMEOUT_ERR	-1
+#define URAT_BREAK_INT		-2
+#define URAT_FRAMING_ERR	-3
+#define URAT_PARITY_ERR	    -4
+#define URAT_OVERRUN_ERR	-5
+#define URAT_FIFO_ERR		-6
+
 int32_t PutChar(char outChar);
 int32_t GetChar(char *inChar);
 int32_t GetCharTimeOut(char *inChar, uint64_t us);

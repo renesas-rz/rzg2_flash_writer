@@ -32,8 +32,8 @@
 #include "init_scif.h"
 #include "HardwareSetup.h"
 
-#define WRITER_VERSION	" V1.00"	    	/* Software Version	*/
-#define WRITER_DATE	" July 9, 2021"	    	/* Release date		*/
+#define WRITER_VERSION	" V1.20"	    	/* Software Version	*/
+#define WRITER_DATE	" January 14, 2022"	    /* Release date		*/
 
 extern const com_menu MonCom[COMMAND_UNIT];
 

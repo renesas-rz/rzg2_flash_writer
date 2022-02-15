@@ -210,6 +210,7 @@ void	dg_emmc_write(EMMC_WRITE_COMMAND wc)
 
 	uint32_t	totalDownloadSize;
 	uint32_t	fileSize;
+	int32_t		ret;
 
 	int32_t chCnt;
 	int8_t buf[16];
@@ -281,10 +282,33 @@ void	dg_emmc_write(EMMC_WRITE_COMMAND wc)
 
         //If send a file smaller than the specified file size,
 	    //Flash writer will output the message and command exit force.
-	    if (dg_emmc_write_bin_serial(Load_workStartAdd, fileSize) != 0)
-	    {
-    		PutStr("Time out! Unable to receive data for the specified size!",1);
-	        return;
+	    ret = dg_emmc_write_bin_serial(Load_workStartAdd, fileSize);
+		if(ret != 0)
+		{
+			switch(ret){
+				case URAT_TIMEOUT_ERR:
+    				PutStr("Time out! Unable to receive data for the specified size!",1);
+	        		break;
+				case URAT_BREAK_INT:
+					PutStr("Received a break signal",1);
+					break;
+				case URAT_FRAMING_ERR:
+					PutStr("Framing Error! Failed to receive data!",1);
+					break;
+				case URAT_PARITY_ERR:
+					PutStr("Parity  Error! Failed to receive data!",1);
+					break;
+				case URAT_OVERRUN_ERR:
+					PutStr("Overrun Error! Failed to receive data!",1);
+					break;
+				case URAT_FIFO_ERR:
+					PutStr("FIFO Error! Failed to receive data!",1);
+					break;
+				default:
+					PutStr("System Error! Failed to receive data!",1);
+					break;
+			}
+			return;
 	    }
 		workAdd_Min = (uintptr_t)Load_workStartAdd;
 		workAdd_Max = workAdd_Min + fileSize - 1;
@@ -372,15 +396,15 @@ static int32_t dg_emmc_write_bin_serial(uint32_t* workStartAdd, uint32_t fileSiz
 	uint32_t i;
 	int8_t byteData = 0;
 	uintptr_t ptr;
-    int32_t isTimeout;
+    int32_t ret;
     
 	ptr = (uintptr_t)workStartAdd;
 	for (i = 0; i < fileSize; i++)
 	{
 		if( i != 0 ) {
-			isTimeout = GetCharTimeOut(&byteData,DATA_RECV_TIMEOUT);
-			if (isTimeout == -1) //if time out is occured.
-				return -1;
+			ret = GetCharTimeOut(&byteData,DATA_RECV_TIMEOUT);
+			if (ret != 0) //if could not receive specified data
+				return ret;
 		}
 		else {
 			GetChar(&byteData);
