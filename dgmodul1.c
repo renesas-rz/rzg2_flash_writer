@@ -10,8 +10,12 @@
 #include "devdrv.h"
 #include "devdrv.h"
 #include "bit.h"
+#include "rzg2l_def.h"
 #include "cpudrv.h"
 #include "scifdrv.h"
+
+#define	WDTCNT0	(RZG2L_WDT_BASE + 0x00)
+#define	WDTSET0	(RZG2L_WDT_BASE + 0x04)
 
 extern const char *const AllHelpMess[ALL_HELP_MESS_LINE];
 extern const com_menu MonCom[COMMAND_UNIT];
@@ -75,4 +79,10 @@ void	dgScifSpeedUp(void)
 *****************************************************************/
 void	dgScifSpeedUp_921600(void)
 {
+}
+
+void	dgReset(void)
+{
+	*((volatile uint32_t*)WDTSET0) = 0x001FFFFF;
+	*((volatile uint32_t*)WDTCNT0) = 0x01;
 }

@@ -3,7 +3,7 @@
 <Div Align="right">
 Renesas Electronics Corporation
 
-Sep-15-2021
+Mar-07-2022
 </Div>
 
 The RZ/G2L flash writer is sample software for Renesas RZ/G2L Group MPUs.
@@ -151,6 +151,7 @@ The following table shows the command list.
 | XLS2    | Write the S-record format images to the Serial Flash(SREC format) |
 | XLS3    | Write the S-record format images to the Serial Flash(BIN format)  |
 | XCS     | Erase the Serial Flash.                                           |
+| RESET   | Perform RESET of the CPU.                                         |
 | H       | Display the command help.                                         |
 
 #### 3.3.1. Write to the S-record format images to the Serial Flash
@@ -445,3 +446,15 @@ Describe the revision history of RZ/G2L flash writer.
 
 - First release.
 - Support RZ/G2L Concrete/PMIC EVK board.
+
+### 7.2. v1.01
+
+- Support RZ/G2UL EVK board.
+
+### 7.3. v1.02
+
+- Enable eMMC writing function.
+
+### 7.4. v1.03
+
+- Support the RESET command.

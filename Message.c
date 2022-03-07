@@ -8,8 +8,8 @@
 /**********************
 *  TITLE              *
 ***********************/
-#define WRITER_VERSION	"V1.02"		/* Software Version */
-#define WRITER_DATE	"Nov.15,2021"	/* Release date */
+#define WRITER_VERSION	"V1.03"		/* Software Version */
+#define WRITER_DATE	"Mar.07,2022"	/* Release date */
 
 const char *const StartMessMonitorG2[START_MESS_MON_LINE] = {
 				"Flash writer for RZ/G2 Series "
@@ -42,6 +42,7 @@ const char *const AllHelpMess[ALL_HELP_MESS_LINE] = {
 				" EM_E           erase program to eMMC",
 #endif /* EMMC == 1 */
 				" SUP            Scif speed UP (Change to speed up baud rate setting)",
+				" RESET          Perform RESET of the CPU",
 				" H              help",
 				" D  {sadr {eadr}}          memory dump  (DM sets dump size)",
 				" DM {B|W|L|X}              set&disp dump mode",

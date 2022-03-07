@@ -22,6 +22,7 @@
 #define RZG2L_DDR_MEMC_BASE         (0x11410000)
 #define RZG2L_GIC_BASE              (0x11900000)
 #define RZG2L_SD0_BASE              (0x11C00000)
+#define RZG2L_WDT_BASE              (0x12800800)
 #define RZG2L_SPIROM_BASE           (0x20000000)
 #define RZG2L_DDR1_BASE             (0x40000000)
 #define RZG2L_DDR2_BASE             (0x80000000)
