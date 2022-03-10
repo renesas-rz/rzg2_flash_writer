@@ -1,0 +1,38 @@
+/*
+ * Copyright (c) 2022, Renesas Electronics Corporation. All rights reserved.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+#ifndef __RPC_REGS_H__
+#define __RPC_REGS_H__
+
+#define	RPC_CMNCR		(RZF_SPIMULT_BASE + 0x0000U)	// R/W
+#define	RPC_SSLDR		(RZF_SPIMULT_BASE + 0x0004U)	// R/W
+#define	RPC_DRCR		(RZF_SPIMULT_BASE + 0x000CU)	// R/W
+#define	RPC_DRCMR		(RZF_SPIMULT_BASE + 0x0010U)	// R/W
+#define	RPC_DREAR		(RZF_SPIMULT_BASE + 0x0014U)	// R/W
+#define	RPC_DROPR		(RZF_SPIMULT_BASE + 0x0018U)	// R/W
+#define	RPC_DRENR		(RZF_SPIMULT_BASE + 0x001CU)	// R/W
+#define	RPC_SMCR		(RZF_SPIMULT_BASE + 0x0020U)	// R/W
+#define	RPC_SMCMR		(RZF_SPIMULT_BASE + 0x0024U)	// R/W
+#define	RPC_SMADR		(RZF_SPIMULT_BASE + 0x0028U)	// R/W
+#define	RPC_SMOPR		(RZF_SPIMULT_BASE + 0x002CU)	// R/W
+#define	RPC_SMENR		(RZF_SPIMULT_BASE + 0x0030U)	// R/W
+#define	RPC_SMRDR0		(RZF_SPIMULT_BASE + 0x0038U)	// R
+#define	RPC_SMRDR1		(RZF_SPIMULT_BASE + 0x003CU)	// R
+#define	RPC_SMWDR0		(RZF_SPIMULT_BASE + 0x0040U)	// R/W
+#define	RPC_SMWDR1		(RZF_SPIMULT_BASE + 0x0044U)	// R/W
+#define	RPC_CMNSR		(RZF_SPIMULT_BASE + 0x0048U)	// R
+#define	RPC_DRDMCR		(RZF_SPIMULT_BASE + 0x0058U)	// R/W
+#define	RPC_DRDRENR		(RZF_SPIMULT_BASE + 0x005CU)	// R/W
+#define	RPC_SMDMCR		(RZF_SPIMULT_BASE + 0x0060U)	// R/W
+#define	RPC_SMDRENR		(RZF_SPIMULT_BASE + 0x0064U)	// R/W
+#define RPC_PHYADJ1		(RZF_SPIMULT_BASE + 0x0070U)
+#define RPC_PHYADJ2		(RZF_SPIMULT_BASE + 0x0074U)
+#define	RPC_PHYCNT		(RZF_SPIMULT_BASE + 0x007CU)	// R/W
+#define	RPC_OFFSET1		(RZF_SPIMULT_BASE + 0x0080U)	// 
+#define	RPC_PHYINT		(RZF_SPIMULT_BASE + 0x0088U)	// R/W
+#define	RPC_WRBUF		(RZF_SPIMULT_WBUF_BASE)	// W	RPC Write buffer (Access size=4/8/16/32/64Byte)
+
+#endif	/* __RPC_REGS_H__ */

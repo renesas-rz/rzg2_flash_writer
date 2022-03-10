@@ -1,0 +1,51 @@
+/*
+ * Copyright (c) 2015-2021, Renesas Electronics Corporation. All rights reserved.
+ *
+ * SPDX-License-Identifier: BSD-3-Clause
+ */
+
+MEMORY {
+	RAM2 (rwxa): ORIGIN = 0x00010000, LENGTH = 0x00001E00
+	CERT (rwxa): ORIGIN = 0x00011E00, LENGTH = 0x00000200
+	RAM  (rwxa): ORIGIN = 0x00012000, LENGTH = 0x0001D000
+}
+
+SECTIONS
+{
+	.cert : {
+		. = 0x00000000;
+		LONG(__LOAD_SIZE__)
+		FILL(0x00)
+		. = 0x000001FC;
+		LONG(0xAA55FFFF)
+	} > CERT
+
+	.text : {
+		__RO_START__ = .;
+		*(.text*)
+		*(.rodata*)
+		. = NEXT(64);
+		__RO_END__ = .;
+	} > RAM
+
+	.data : {
+		__DATA_START__ = .;
+		 *(.data)
+		. = NEXT(64);
+		__DATA_END__ = .;
+	} > RAM
+
+	__DATA_SIZE__ = SIZEOF(.data);
+
+	__LOAD_SIZE__ = __DATA_END__ - __RO_START__;
+
+	.bss : {
+		__BSS_START__ = .;
+		 *(.bss)
+		 *(.sbss)
+		 . = NEXT(64);
+		__BSS_END__ = .;
+	} > RAM2
+
+	__BSS_SIZE__ = SIZEOF(.bss);
+}
