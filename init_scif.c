@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Renesas Electronics Corporation. All rights reserved.
+ * Copyright (c) 2022, Renesas Electronics Corporation. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -10,5 +10,6 @@
 
 void InitScif(void)
 {
-	InitScif0_SCIFCLK();
+	PowerOnScif0();
+	InitScif0_SCIFCLK(115200);
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020, Renesas Electronics Corporation. All rights reserved.
+ * Copyright (c) 2015-2022, Renesas Electronics Corporation. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -64,21 +64,34 @@ int32_t	GetStr_ByteCount(char *str,uint32_t getByteCount)
 	*str = 0;
 }
 
-
-
-void	dgScifSpeedUp(void)
-{
-	dgScifSpeedUp_921600();
-}
-
 /****************************************************************
 	MODULE		: dgScifSpeedUp				*
 	FUNCTION	: Scif speed UP	Change 921.6kbps	*
 	COMMAND		: SUP					*
 	INPUT PARAMETER	: SUP					*
 *****************************************************************/
-void	dgScifSpeedUp_921600(void)
+void	dgScifSpeedUp(void)
 {
+	PutStr("Scif speed UP",1);
+	PutStr("Please change to 921.6Kbps baud rate setting of the terminal.",1);
+	WaitPutCharSendEnd();
+
+	InitScif0_SCIFCLK(921600);
+}
+
+/****************************************************************
+	MODULE		: dgScifSpeedDown			*
+	FUNCTION	: Scif speed Down	Change 115.2kbps*
+	COMMAND		: SDP					*
+	INPUT PARAMETER	: SDP					*
+*****************************************************************/
+void	dgScifSpeedDown(void)
+{
+	PutStr("Scif speed DOWN",1);
+	PutStr("Please change to 115.2Kbps baud rate setting of the terminal.",1);
+	WaitPutCharSendEnd();
+
+	InitScif0_SCIFCLK(115200);
 }
 
 void	dgReset(void)

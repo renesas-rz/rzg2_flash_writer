@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2021, Renesas Electronics Corporation. All rights reserved.
+ * Copyright (c) 2015-2022, Renesas Electronics Corporation. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -8,8 +8,8 @@
 /**********************
 *  TITLE              *
 ***********************/
-#define WRITER_VERSION	"V1.03"		/* Software Version */
-#define WRITER_DATE	"Mar.07,2022"	/* Release date */
+#define WRITER_VERSION	"V1.04"		/* Software Version */
+#define WRITER_DATE	"Mar.11,2022"	/* Release date */
 
 const char *const StartMessMonitorG2[START_MESS_MON_LINE] = {
 				"Flash writer for RZ/G2 Series "
@@ -40,8 +40,10 @@ const char *const AllHelpMess[ALL_HELP_MESS_LINE] = {
 				" EM_W           write program to eMMC",
 				" EM_WB          write program to eMMC (Binary)",
 				" EM_E           erase program to eMMC",
+				"",
 #endif /* EMMC == 1 */
 				" SUP            Scif speed UP (Change to speed up baud rate setting)",
+				" SUD            Scif speed DOWN (Change to speed down baud rate setting)",
 				" RESET          Perform RESET of the CPU",
 				" H              help",
 				" D  {sadr {eadr}}          memory dump  (DM sets dump size)",

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2020, Renesas Electronics Corporation. All rights reserved.
+ * Copyright (c) 2015-2022, Renesas Electronics Corporation. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -137,14 +137,10 @@ void InitScif0PinFunction(void)
 //	*((volatile uint32_t*)PFC_PWPR) = dataL;
 }
 
-void InitScif0_SCIFCLK(void)
+void InitScif0_SCIFCLK(uint32_t baudrate)
 {
 	volatile uint16_t dataW;
 	uint32_t prr;
-
-	PowerOnScif0();
-
-	InitScif0PinFunction();
 
 	dataW = *((volatile uint16_t*)SCIF0_LSR);	/* dummy read     		*/
 	*((volatile uint16_t*)SCIF0_LSR) = 0x0000U;	/* clear ORER bit 		*/
@@ -159,8 +155,23 @@ void InitScif0_SCIFCLK(void)
 	*((volatile uint8_t*)SCIF0_SEMR) = 0x00U;
 	SoftDelay(100);
 
-	*((volatile uint8_t*)SCIF0_BRR)  = 0x1AU;	/* 115200bps */
-	*((volatile uint8_t*)SCIF0_SEMR) = 0x10U;
+	if (baudrate == 115200)
+	{
+		*((volatile uint8_t*)SCIF0_BRR)  = 0x1AU;	/* 115200bps */
+	}
+	else
+	{
+		*((volatile uint8_t*)SCIF0_BRR)  = 0x01U;	/* 921600bps */
+	}
+	*((volatile uint8_t*)SCIF0_SEMR) = 0x30U;
+	if (baudrate == 115200)
+	{
+		*((volatile uint8_t*)SCIF0_MDDR) = 0xFFU;	/* 115200bps */
+	}
+	else
+	{
+		*((volatile uint8_t*)SCIF0_MDDR) = 0x97U;	/* 921600bps */
+	}
 
 	SoftDelay(100);
 	*((volatile uint16_t*)SCIF0_FCR) = 0x0000U;	/* reset-off tx-fifo, rx-fifo. */

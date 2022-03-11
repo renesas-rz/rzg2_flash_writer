@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2021, Renesas Electronics Corporation. All rights reserved.
+ * Copyright (c) 2015-2022, Renesas Electronics Corporation. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -39,6 +39,7 @@ const com_menu MonCom[COMMAND_UNIT] = {
 	"EM_E"			, &dg_emmc_erase		,  0	,
 #endif /* EMMC == 1 */
 	"SUP"			, dgScifSpeedUp			,  0	,
+	"SUD"			, dgScifSpeedDown		,  0	,
 	"RESET"			, dgReset			,  0	,
 #if INTERNAL_MEMORY_ONLY == 0
 	"DDRCK"			, dgDdrTest			,  0	,
