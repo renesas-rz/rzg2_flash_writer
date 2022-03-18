@@ -344,7 +344,6 @@ static CPG_REG_SETTING cpg_dynamic_select_tbl[] = {
 #define CPG_SEL_PLL3_3_ON_OFF				(5)
 
 static CPG_REG_SETTING cpg_sel_pll1_on_off[] = {
-	{(uintptr_t)CPG_CLKON_CA55, 0x00010001 }
 };
 
 static CPG_REG_SETTING cpg_sel_pll2_1_on_off[] = {
@@ -358,18 +357,15 @@ static CPG_REG_SETTING cpg_sel_pll2_2_on_off[] = {
 };
 
 static CPG_REG_SETTING cpg_sel_pll3_1_on_off[] = {
-	{(uintptr_t)CPG_CLKON_AXI_ACPU_BUS, 0x000F000F },
+	{(uintptr_t)CPG_CLKON_AXI_ACPU_BUS, 0x000B000B },
 	{(uintptr_t)CPG_CLKON_AXI_COM_BUS, 0x00030003 },
 	{(uintptr_t)CPG_CLKON_AXI_DEFAULT_SLV, 0x00010001 },
 	{(uintptr_t)CPG_CLKON_AXI_MCPU_BUS, 0x01930193 },
 	{(uintptr_t)CPG_CLKON_AXI_TZCDDR, 0x001F001F },
-	{(uintptr_t)CPG_CLKON_CA55, 0x001E001E },
-	{(uintptr_t)CPG_CLKON_CST, 0x07FD07FD },
 	{(uintptr_t)CPG_CLKON_DAMC_REG, 0x00030003 },
 	{(uintptr_t)CPG_CLKON_DDR, 0x00030003 },
 	{(uintptr_t)CPG_CLKON_ETH, 0x00030003 },
 	{(uintptr_t)CPG_CLKON_IA55, 0x00030003 },
-	{(uintptr_t)CPG_CLKON_IM33, 0x00030003 },
 	{(uintptr_t)CPG_CLKON_JAUTH, 0x00010001 },
 	{(uintptr_t)CPG_CLKON_OTP, 0x00020002 },
 	{(uintptr_t)CPG_CLKON_PERI_COM, 0x00030003 },

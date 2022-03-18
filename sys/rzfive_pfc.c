@@ -152,6 +152,10 @@ static void pfc_qspi_setup(void)
 {
 	int      cnt;
 
+	/* multiplexer terminal switching */
+	mmio_write_32(PFC_PWPR, 0x0);
+	mmio_write_32(PFC_PWPR, PWPR_PFCWE);
+
 #if (QSPI_IO_1_8V == 1)
 	mmio_write_32(PFC_QSPI, 1);
 #else
