@@ -8,8 +8,8 @@
 /**********************
 *  TITLE              *
 ***********************/
-#define WRITER_VERSION	"V1.00"		/* Software Version */
-#define WRITER_DATE	"Mar.10,2022"	/* Release date */
+#define WRITER_VERSION	"V1.01"		/* Software Version */
+#define WRITER_DATE	"Mar.18,2022"	/* Release date */
 
 const char *const StartMessMonitorFive[START_MESS_MON_LINE] = {
 				"Flash writer for RZ/Five Series "
