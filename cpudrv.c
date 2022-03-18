@@ -12,46 +12,40 @@
 
 void StartTMU0(uint32_t tenmSec)
 {
-	uint32_t dataL;
+	volatile uint32_t dataL;
 
 	PowerOnTmu0();
 
-	*((volatile uint8_t*)OSTM0CTL)  = 0x00U;		/* Interval Timer Mode */
-
-	*((volatile uint32_t*)OSTM0CMP) = 100000U * tenmSec;	/* (100MHz)*100000=1000us */
-
-	*((volatile uint8_t*)OSTM0TS) |= BIT0;			/* TMU0 Start */
+	*((volatile uint8_t*)OSTM0CTL)= 0x02U;		/* Free Running Mode */
+	*((volatile uint8_t*)OSTM0TS) = 0x01U;		/* TMU0 Start */
 	while(1)
 	{
-		dataL = *((volatile uint8_t*)OSTM0CNT);
-		if (dataL == 0x0U)
+		dataL = *((volatile uint32_t*)OSTM0CNT);
+		if (dataL >= (100000U * tenmSec))
 		{
 			break;
 		}
 	}
-	*((volatile uint8_t*)OSTM0TT) |= BIT0;			/* TMU0 Stop */
+	*((volatile uint8_t*)OSTM0TT) = 0x01U;		/* TMU0 Stop */
 }
 
 void StartTMU0usec(uint32_t tenuSec)
 {
-	uint32_t dataL;
+	volatile uint32_t dataL;
 
 	PowerOnTmu0();
 
-	*((volatile uint8_t*)OSTM0CTL)  = 0x00U;		/* Interval Timer Mode */
-
-	*((volatile uint32_t*)OSTM0CMP) = 100U * tenuSec;	/* (100MHz)*100=1.0us */
-
-	*((volatile uint8_t*)OSTM0TS) |= BIT0;			/* TMU0 Start */
+	*((volatile uint8_t*)OSTM0CTL)= 0x02U;		/* Free Running Mode */
+	*((volatile uint8_t*)OSTM0TS) = 0x01U;		/* TMU0 Start */
 	while(1)
 	{
-		dataL = *((volatile uint8_t*)OSTM0CNT);
-		if (dataL == 0x0U)
+		dataL = *((volatile uint32_t*)OSTM0CNT);
+		if (dataL >= (100U * tenuSec))
 		{
 			break;
 		}
 	}
-	*((volatile uint8_t*)OSTM0TT) |= BIT0;			/* TMU0 Stop */
+	*((volatile uint8_t*)OSTM0TT) = 0x01U;		/* TMU0 Stop */
 }
 
 void udelay(uint32_t count_us)
