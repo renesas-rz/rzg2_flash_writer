@@ -3,7 +3,7 @@
 <Div Align="right">
 Renesas Electronics Corporation
 
-Mar-18-2022
+Mar-31-2022
 </Div>
 
 The RZ/Five flash writer is sample software for Renesas RZ/Five Series MPUs.
@@ -176,8 +176,8 @@ This command writes the S-record format image to Serial Flash.
 
 | Filename                   | Program Top Address | Flash Save Address | Description                                 |
 | -------------------------- | ------------------- | ------------------ | ------------------------------------------- |
-| spl-`<board_name>`.srec    | H'0000              | H'0000             | Secondary Program Loader file               |
-| fit-`<board_name>`.srec    | H'0000              | H'20000            | FIT file（U-BOOT、OpenSBI、DTB)             |
+| spl-`<board_name>`.srec    | H'11E00             | H'00000            | Secondary Program Loader file               |
+| fit-`<board_name>`.srec    | H'00000             | H'20000            | FIT file（U-BOOT、OpenSBI、DTB)             |
 
 The following shows the procedure of this command.
 
@@ -204,7 +204,7 @@ Writes to any of SPI address.
  Dialog : AT25QL128A
 Program Top Address & Qspi Save Address
 ===== Please Input Program Top Address ============
-  Please Input : H'0000
+  Please Input : H'11E00
 
 ===== Please Input Qspi Save Address ===
   Please Input : H'
@@ -220,10 +220,10 @@ Writes to any of SPI address.
  Dialog : AT25QL128A
 Program Top Address & Qspi Save Address
 ===== Please Input Program Top Address ============
-  Please Input : H'0000
+  Please Input : H'11E00
 
 ===== Please Input Qspi Save Address ===
-  Please Input : H'0000
+  Please Input : H'00000
 Work RAM(H'50000000-H'53FFFFFF) Clear....
 please send ! ('.' & CR stop load)
 ```
@@ -238,10 +238,10 @@ Writes to any of SPI address.
  Dialog : AT25QL128A
 Program Top Address & Qspi Save Address
 ===== Please Input Program Top Address ============
-  Please Input : H'0000
+  Please Input : H'11E00
 
 ===== Please Input Qspi Save Address ===
-  Please Input : H'0000
+  Please Input : H'00000
 Work RAM(H'50000000-H'53FFFFFF) Clear....
 please send ! ('.' & CR stop load)
 SPI Data Clear(H'FF) Check :H'00000000-0000FFFF,Clear OK?(y/n)
@@ -259,10 +259,10 @@ Writes to any of SPI address.
  Dialog : AT25QL128A
 Program Top Address & Qspi Save Address
 ===== Please Input Program Top Address ============
-  Please Input : H'0000
+  Please Input : H'11E00
 
 ===== Please Input Qspi Save Address ===
-  Please Input : H'0000
+  Please Input : H'00000
 Work RAM(H'50000000-H'53FFFFFF) Clear....
 please send ! ('.' & CR stop load)
 SPI Data Clear(H'FF) Check :H'00000000-0000FFFF Erasing..Erase Completed
@@ -391,7 +391,7 @@ This command writes the S-record format image to any partition of the eMMC.
 
 | Filename                | eMMC Save Partition | eMMC Save Sectors | Program Top Address | Description                                 |
 |-------------------------|---------------------|-------------------|---------------------|---------------------------------------------|
-| spl-`<board_name>`.srec | boot partition1     | H'00000001        | H'00000000          | Secondary Program Loader file               |
+| spl-`<board_name>`.srec | boot partition1     | H'00000001        | H'00011E00          | Secondary Program Loader file               |
 | fit-`<board_name>`.srec | boot partition1     | H'00000100        | H'00000000          | FIT file（U-BOOT、OpenSBI、DTB)             |
 
 The following shows the procedure of this command.
@@ -415,7 +415,7 @@ Please select,eMMC Partition Area.
   Select area(0-2)>1                                       <<<< Enter "1" here
 -- Boot Partition 1 Program -----------------------------
 Please Input Start Address in sector :1                    <<<< Enter "1" here
-Please Input Program Start Address : 0                     <<<< Enter "0" here
+Please Input Program Start Address : 11E00                 <<<< Enter "11E00" here
 Work RAM(H'50000000-H'50FFFFFF) Clear....
 please send ! ('.' & CR stop load)
 SAVE -FLASH.......
