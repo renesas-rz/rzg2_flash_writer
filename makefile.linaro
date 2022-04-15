@@ -92,11 +92,11 @@ DDR_TYPE = DDR4
 DDR_SIZE = 1GB_1PCS
 SWIZZLE  = T3BCUD2
 DEVICE_TYPE = 1
-else ifeq ("$(BOARD)", "RZG2UL_SMARC_TYPE2")
+else ifeq ("$(BOARD)", "RZG2UL_TYPE2_SMARC")
 #--------------------------------------
-# RZ/G2UL Smarc TYPE2 board
+# RZ/G2UL Type2 Smarc board
 #--------------------------------------
-FILENAME_ADD = _RZG2UL_SMARC_TYPE2
+FILENAME_ADD = _RZG2UL_TYPE2_SMARC
 DEVICE   = RZG2UL
 DDR_TYPE = DDR4
 DDR_SIZE = 1GB_1PCS
