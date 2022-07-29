@@ -6,13 +6,18 @@
 
 MEMORY {
 	RAM2 (rwxa): ORIGIN = 0x00010000, LENGTH = 0x00001E00
+#if (TRUSTED_BOARD_BOOT != 1)
 	CERT (rwxa): ORIGIN = 0x00011E00, LENGTH = 0x00000200
 	RAM  (rwxa): ORIGIN = 0x00012000, LENGTH = 0x0001D000
+#else
+	RAM  (rwxa): ORIGIN = 0x00013000, LENGTH = 0x0001C000
+#endif
 	RAM3 (rwxa): ORIGIN = 0x0002F000, LENGTH = 0x00001000
 }
 
 SECTIONS
 {
+#if (TRUSTED_BOARD_BOOT != 1)
 	.cert : {
 		. = 0x00000000;
 		LONG(__LOAD_SIZE__)
@@ -20,6 +25,13 @@ SECTIONS
 		. = 0x000001FC;
 		LONG(0xAA55FFFF)
 	} > CERT
+#else
+	/* 
+		This is the section where the boot parameter and manifests for 
+		trusted board boot are located.
+		Boot parameter and manifests are created in the external environment.
+	*/
+#endif
 
 	.text : {
 		__RO_START__ = .;

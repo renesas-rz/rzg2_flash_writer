@@ -297,12 +297,18 @@ endif
 
 ifeq ("$(INTERNAL_MEMORY_ONLY)", "DISABLE")
 	CFLAGS += -DINTERNAL_MEMORY_ONLY=0
-	MEMORY_DEF = memory_writer.def
+	LINKER_FILE = memory_writer.def.s
 endif
 ifeq ("$(INTERNAL_MEMORY_ONLY)", "ENABLE")
-	CFLAGS += -DINTERNAL_MEMORY_ONLY=1
-	MEMORY_DEF = memory_writer_internal.def
+	CFLAGS += -Os -DINTERNAL_MEMORY_ONLY=1
+	LINKER_FILE = memory_writer_internal.def.s
 endif
+
+ifeq ("$(TRUSTED_BOARD_BOOT)", "ENABLE")
+	CFLAGS += -DTRUSTED_BOARD_BOOT=1
+endif
+
+MEMORY_DEF := $(LINKER_FILE:%.def.s=$(OBJECT_DIR)/%.def)
 
 DDR_DEF = ddr_qos_init_setting
 
@@ -384,11 +390,13 @@ endif
 OBJ_FILE := $(addprefix $(OBJECT_DIR)/,$(patsubst %.c,%.o,$(SRC_FILE)))
 
 #Dependency File
-DEPEND_FILE = $(patsubst %.lib, ,$(OBJ_FILE:%.o=%.d))
+DEPEND_FILE = $(patsubst %.lib, ,$(OBJ_FILE:%.o=%.d)) $(LINKER_FILE:.s=.d)
 
 ###################################################
 #C compiler
 CC ?= $(CROSS_COMPILE)gcc
+#C++ compiler
+CPP ?= $(CROSS_COMPILE)cpp
 #Assembler
 AS ?= $(CROSS_COMPILE)as
 #Linker
@@ -411,7 +419,7 @@ CL = rm -rf
 # Command
 
 .PHONY: all
-all: $(OBJECT_DIR) $(OUTPUT_DIR) $(OBJ_FILE_BOOT) $(OBJ_FILE) $(OUTPUT_FILE)
+all: $(OBJECT_DIR) $(OUTPUT_DIR) $(OBJ_FILE_BOOT) $(OBJ_FILE) $(OUTPUT_FILE) $(MEMORY_DEF)
 
 #------------------------------------------
 # Make Directory
@@ -431,6 +439,10 @@ $(OBJECT_DIR)/%.o:$(BOOTDIR)/%.s
 $(OBJECT_DIR)/%.o:%.c
 	@if [ ! -e `dirname $@` ]; then mkdir -p `dirname $@`; fi
 	$(CC) -g -Os $(ALIGN) $(CPU) $(CC_NEON) $(THUMB) -MMD -MP -c -I $(BOOTDIR) -I $(INCLUDE_DIR) -I $(DDR_COMMON) -I $(DDR_SOC) $< -o $@ -D$(AArch32_64)=0 -D$(BOOT_DEF)=0 -D$(TOOL_DEF)=0 $(CFLAGS) -D$(DDR_DEF)=0
+
+$(OBJECT_DIR)/%.def:%.def.s
+	@if [ ! -e `dirname $@` ]; then mkdir -p `dirname $@`; fi
+	$(CPP) $(CPU) $(CFLAGS) -I $(BOOTDIR) -I $(INCLUDE_DIR) -x assembler-with-cpp -MMD -MP -P $< -o $@ -D$(AArch32_64)=0 -D$(BOOT_DEF)=0 -D$(TOOL_DEF)=0 -D$(DDR_DEF)=0
 
 #------------------------------------------
 # Linker
