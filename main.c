@@ -31,6 +31,7 @@
 
 extern const char *const StartMessMonitorG2[START_MESS_MON_LINE];
 extern const char *const StartMessMonitorV2[START_MESS_MON_LINE];
+extern const char *const StartMessMonitorA3[START_MESS_MON_LINE];
 extern const com_menu MonCom[COMMAND_UNIT];
 extern uint8_t	gCOMMAND_Area[COMMAND_BUFFER_SIZE];
 
@@ -114,12 +115,18 @@ void StartMess( void )
 			PutStr("RZ/V2L" ,1);
 		break;
 		case RZG2UL_DEVID:
+#if (RZA3UL == 1)
+			PutMess(StartMessMonitorA3);
+			PutStr(" Product Code : ", 0);
+			PutStr("RZ/A3UL" ,1);
+#else
 			PutMess(StartMessMonitorG2);
 			PutStr(" Product Code : ", 0);
 #if (DEVICE_TYPE == 1)
 			PutStr("RZ/G2UL Type1" ,1);
 #else
 			PutStr("RZ/G2UL Type2" ,1);
+#endif
 #endif
 		break;
 		default:

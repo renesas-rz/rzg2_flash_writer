@@ -148,6 +148,36 @@ DEVICE   = RZV2L
 DDR_TYPE = DDR4
 DDR_SIZE = 4GB
 SWIZZLE  = T2C
+else ifeq ("$(BOARD)", "RZA3UL_DEV")
+#--------------------------------------
+# RZ/A3UL DDR4 Dev board
+#--------------------------------------
+FILENAME_ADD = _RZA3UL_DEV
+DEVICE   = RZA3UL
+DDR_TYPE = DDR4
+DDR_SIZE = 1GB_1PCS
+SWIZZLE  = T3BCUD
+DEVICE_TYPE = 1
+else ifeq ("$(BOARD)", "RZA3UL_DDR3L_DEV")
+#--------------------------------------
+# RZ/A3UL DDR3L Dev board
+#--------------------------------------
+FILENAME_ADD = _RZA3UL_DEV
+DEVICE   = RZA3UL
+DDR_TYPE = DDR3L
+DDR_SIZE = 512MB_1PCS
+SWIZZLE  = T3BCUL
+DEVICE_TYPE = 1
+else ifeq ("$(BOARD)", "RZA3UL_SMARC")
+#--------------------------------------
+# RZ/A3UL Smarc board
+#--------------------------------------
+FILENAME_ADD = _RZA3UL_SMARC
+DEVICE   = RZA3UL
+DDR_TYPE = DDR4
+DDR_SIZE = 1GB_1PCS
+SWIZZLE  = T3BCUD2
+DEVICE_TYPE = 1
 endif
 
 # Select SERIAL_FLASH("ENABLE"or"DISABLE" )
@@ -206,6 +236,9 @@ ifeq ("$(DEVICE)", "RZG2UL")
 endif
 ifeq ("$(DEVICE)", "RZV2L")
 	CFLAGS += -DRZV2L=1
+endif
+ifeq ("$(DEVICE)", "RZA3UL")
+	CFLAGS += -DRZA3UL=1
 endif
 
 ifeq ("$(DDR_TYPE)", "DDR4")
@@ -321,6 +354,8 @@ ifeq ("$(DEVICE)", "RZV2L")
 DDR_SOC    = ddr/v2l
 else ifeq ("$(DEVICE)", "RZG2UL")
 DDR_SOC    = ddr/g2ul
+else ifeq ("$(DEVICE)", "RZA3UL")
+DDR_SOC    = ddr/g2ul
 else
 DDR_SOC    = ddr/g2l
 endif
@@ -360,6 +395,9 @@ ifeq ("$(DEVICE)", "RZV2L")
 SRC_FILE +=				\
 	ddr/v2l/ddr_v2l.c
 else ifeq ("$(DEVICE)", "RZG2UL")
+SRC_FILE +=				\
+	ddr/g2ul/ddr_g2ul.c
+else ifeq ("$(DEVICE)", "RZA3UL")
 SRC_FILE +=				\
 	ddr/g2ul/ddr_g2ul.c
 else

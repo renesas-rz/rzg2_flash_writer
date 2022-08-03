@@ -11,7 +11,7 @@
 #include <mmio.h>
 
 static PFC_REGS pfc_mux_reg_tbl[PFC_MUX_TBL_NUM] = {
-#if RZG2UL
+#if (RZG2UL || RZA3UL)
 	/* P0(sd0) & P0(sd1)	*/
 	{
 		{ PFC_ON,  (uintptr_t)PFC_PMC10,  0x0F },					/* PMC */
@@ -41,7 +41,7 @@ static PFC_REGS pfc_mux_reg_tbl[PFC_MUX_TBL_NUM] = {
 		{ PFC_OFF, (uintptr_t)NULL,       0 }						/* IEN */
 	},
 #endif
-#if RZG2UL
+#if (RZG2UL || RZA3UL)
 #if (DEVICE_TYPE == 1)
 	/* P6(scif0) */
 	{
@@ -118,7 +118,7 @@ static PFC_REGS  pfc_qspi_reg_tbl[PFC_QSPI_TBL_NUM] = {
 static PFC_REGS  pfc_sd_reg_tbl[PFC_SD_TBL_NUM] = {
 	/* SD0_CLK */
 	{
-#if RZG2UL
+#if (RZG2UL || RZA3UL)
 		{ PFC_OFF, (uintptr_t)NULL,       0 },						/* PMC */
 		{ PFC_OFF, (uintptr_t)NULL,       0 },						/* PFC */
 #else
@@ -141,7 +141,7 @@ static PFC_REGS  pfc_sd_reg_tbl[PFC_SD_TBL_NUM] = {
 	},
 	/* SD1_CLK */
 	{
-#if RZG2UL
+#if (RZG2UL || RZA3UL)
 		{ PFC_OFF, (uintptr_t)NULL,       0 },						/* PMC */
 		{ PFC_OFF, (uintptr_t)NULL,       0 },						/* PFC */
 #else

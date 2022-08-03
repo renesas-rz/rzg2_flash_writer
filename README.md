@@ -3,7 +3,7 @@
 <Div Align="right">
 Renesas Electronics Corporation
 
-Mar-11-2022
+Aug-03-2022
 </Div>
 
 The RZ/G2L flash writer is sample software for Renesas RZ/G2L Group MPUs.
@@ -74,6 +74,7 @@ The following table lists the hardware needed to use this function.
 |              | RZ/V2L SMARC PMIC Evaluation Kit(RZ/V2L PMIC EVK) |
 |              | RZ/G2LC SMARC Evaluation Kit(RZ/G2LC EVK)         |
 |              | RZ/G2UL SMARC Evaluation Kit(RZ/G2UL EVK)         |
+|              | RZ/A3UL SMARC Evaluation Kit(RZ/A3UL EVK)         |
 | Host PC      | Ubuntu Desktop 20.04(64bit) or later              |
 
 The following table shows Serial Flash and eMMC support for each MPU.
@@ -88,6 +89,7 @@ The following table shows Serial Flash and eMMC support for each MPU.
 | RZ/V2L PMIC EVK | Support                     | Support                    | Support             | Support            |
 | RZ/G2LC EVK     | Support                     | Support                    | Support             | Support            |
 | RZ/G2UL EVK     | Support                     | Support                    | Support             | Support            |
+| RZ/A3UL EVK     | Support                     | Support                    | Support             | Support            |
 
 ## 2.2. Software Environment
 
@@ -139,6 +141,7 @@ If this option is not selected, the default value is RZG2L_SMARC.
 | RZV2L_SMARC_PMIC | Generate binary that works on RZ/V2L PMIC EVK board           |
 | RZG2LC_SMARC     | Generate binary that works on RZ/G2LC EVK board               |
 | RZG2UL_SMARC     | Generate binary that works on RZ/G2UL EVK board               |
+| RZA3UL_SMARC     | Generate binary that works on RZ/A3UL EVK board               |
 
 #### 3.2.2. SERIAL_FLASH
 
@@ -605,6 +608,7 @@ The following table lists the relationship between build option and target files
 | RZ/V2L SMARC PMIC | Flash_Writer_SCIF_RZV2L_SMARC_PMIC_DDR4_2GB_1PCS.mot |
 | RZ/G2LC SMARC     | Flash_Writer_SCIF_RZG2LC_SMARC_DDR4_1GB_1PCS.mot     |
 | RZ/G2UL SMARC     | Flash_Writer_SCIF_RZG2UL_SMARC_DDR4_1GB_1PCS.mot     |
+| RZ/A3UL SMARC     | Flash_Writer_SCIF_RZA3UL_SMARC_DDR4_1GB_1PCS.mot     |
 
 ## 5. How to run the RZ/G2L flash writer
 
@@ -684,4 +688,9 @@ Describe the revision history of RZ/G2L flash writer.
 ### 7.4. v1.04
 
 - Support the SUP,SUD command.
+- Update README.
+
+### 7.4. v1.05
+
+- Support RZ/A3UL EVK board.
 - Update README.
