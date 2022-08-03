@@ -23,8 +23,8 @@ const char *const StartMessMonitorV2[START_MESS_MON_LINE] = {
 				MESSAGE_END,
 };
 
-const char *const StartMessMonitorA3[START_MESS_MON_LINE] = {
-				"Flash writer for RZ/A3 Series "
+const char *const StartMessMonitorA[START_MESS_MON_LINE] = {
+				"Flash writer for RZ/A Series "
 				WRITER_VERSION " " WRITER_DATE,
 				MESSAGE_END,
 };
