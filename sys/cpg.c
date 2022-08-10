@@ -881,8 +881,18 @@ void cpg_reset_ddr_mc(void)
 	udelay(1);
 }
 
+static void cpu_cpg_setup(void)
+{
+	while ((mmio_read_32(CPG_CLKSTATUS) & CLKSTATUS_DIVPL1_STS) != 0x00000000)
+		;
+	mmio_write_32(CPG_PL1_DDIV, PL1_DDIV_DIVPL1_SET_WEN | PL1_DDIV_DIVPL1_SET_1_1);
+	while ((mmio_read_32(CPG_CLKSTATUS) & CLKSTATUS_DIVPL1_STS) != 0x00000000)
+		;
+}
+
 void cpg_early_setup(void)
 {
+	cpu_cpg_setup();
 	cpg_ctrl_clkrst(&early_setup_tbl[0], ARRAY_SIZE(early_setup_tbl));
 }
 

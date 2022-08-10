@@ -3,7 +3,7 @@
 <Div Align="right">
 Renesas Electronics Corporation
 
-Aug-03-2022
+Aug-10-2022
 </Div>
 
 The RZ/G2L flash writer is sample software for Renesas RZ/G2L Group MPUs.
@@ -685,12 +685,16 @@ Describe the revision history of RZ/G2L flash writer.
 
 - Support the RESET command.
 
-### 7.4. v1.04
+### 7.5. v1.04
 
 - Support the SUP,SUD command.
 - Update README.
 
-### 7.4. v1.05
+### 7.6. v1.05
 
 - Support RZ/A3UL EVK board.
 - Update README.
+
+### 7.7. v1.06
+
+- Update according to the Technical Update (Document No. TN-RZ*-A0094A/E, DATE: August 9th).
