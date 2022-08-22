@@ -3,7 +3,7 @@
 <Div Align="right">
 Renesas Electronics Corporation
 
-Mar-31-2022
+Aug-22-2022
 </Div>
 
 The RZ/Five flash writer is sample software for Renesas RZ/Five Series MPUs.
@@ -51,10 +51,11 @@ The following table shows the document related to this function.
 
 ### Related Document
 
-| Number | Issuer  | Title                                                       | Edition           |
-| ------ | ------- | ----------------------------------------------------------- | ----------------- |
-| 1      | JEDEC   | Embedded Multi-Media Card (eMMC) Electrical Standard (5.01) | JESD84-B50.1      |
-| 2      | Renesas | RZ/Five Reference Boards Start-up Guide                     | Rev.1.00 or later |
+| Number | Issuer  | Title                                                                    | Edition           |
+| ------ | ------- | ------------------------------------------------------------------------ | ----------------- |
+| 1      | JEDEC   | Embedded Multi-Media Card (eMMC) Electrical Standard (5.01)              | JESD84-B50.1      |
+| 2      | Renesas | RZ/Five Board Support Package                                            | Rev.1.00 or later |
+| 3      | Renesas | SMARC EVK of RZ/G2L, RZ/G2LC, RZ/G2UL, RZ/V2L, and RZ/Five Start-up Guide| Rev.1.02 or later |
 
 ## 2. Operating Environment
 
@@ -83,9 +84,14 @@ The following table lists the software required to use this sample software.
 
 ### Software environment
 
-| Name                             | Note                                                    |
-| -------------------------------- | ------------------------------------------------------- |
-| RISCV64 Cross-compile Toolchain  | RISCV64 Cross-compile Toolchain Release GCC v11.1.0     |
+| Name                              | Note                                                    |
+| --------------------------------- | ------------------------------------------------------- |
+| RISCV64 Cross-compile Toolchain *1| RISCV64 Cross-compile Toolchain Release GCC v11.1.0     |
+| Yocto SDK *1 *2                   | Yocto SDK built from Yocto environment for RZ/Five Group|
+
+\*1: One of the above environments is required.
+
+\*2: Regarding how to get the Yocto SDK, refer to [Related Document](#related-document) No.2 or No.3.
 
 ## 3. Software
 
@@ -522,6 +528,8 @@ Command is executed in the user's home directory (~ /).
 
 ### 4.1. Prepare the compiler
 
+GNU toolchain:
+
 Compile and install riscv-toolchain for RISC-V 64bit.
 ```shell
 sudo apt-get install -y autoconf automake autotools-dev curl libmpc-dev libmpfr-dev libgmp-dev gawk build-essential bison flex texinfo gperf libtool patchutils bc zlib1g-dev libexpat-dev libncurses-dev device-tree-compiler libssl-dev gdisk swig
@@ -530,6 +538,11 @@ git clone https://github.com/riscv/riscv-gnu-toolchain
 cd riscv-gnu-toolchain
 ./configure --prefix=/opt/riscv
 sudo make linux -j
+```
+
+Yocto SDK:
+```shell
+$ source /usr/local/oecore-x86_64/environment-setup-riscv64-oe-linux
 ```
 
 ### 4.2. Prepare the source code
@@ -547,11 +560,19 @@ git checkout rz_five
 
 S-record file will be built by the following command.
 
+GNU toolchain:
+
 ```shell
 export PATH=$PATH:/opt/riscv/bin
 
 make clean
 make BOARD=RZFIVE_SMARC
+```
+
+Yocto SDK:
+```shell
+make -f makefile.sdk clean
+make -f makefile.sdk BOARD=RZFIVE_SMARC
 ```
 
 Output image will be available in the following directory.
@@ -574,7 +595,7 @@ The following table lists the relationship between build option and target files
 
 Start the target in the SCIF download mode and run the RZ/Five flash writer sample code.
 
-Regarding the DIP switch configuration on the board, refer to [Related Document](#related-document) No.2.
+Regarding the DIP switch configuration on the board, refer to [Related Document](#related-document) No.3.
 
 The following table shows the setting of terminal software.
 
@@ -602,7 +623,7 @@ S-record file:
 After the transfer has succeeded, the following log will be shown.
 
 ```text
-Flash writer for RZ/Five Series V1.01 Mar.18,2022
+Flash writer for RZ/Five Series V1.02 Aug.22,2022
 >
 ```
 
@@ -614,7 +635,7 @@ For details on how to write to the Serial Flash and eMMC, please refer to [Secti
 
 To boot from the eMMC, need to change the DIP switch setting.
 
-Regarding the DIP switch configuration on the board, refer to [Related Document](#related-document) No.2.
+Regarding the DIP switch configuration on the board, refer to [Related Document](#related-document) No.3.
 
 ## 6. Error case to handle
 
@@ -632,3 +653,8 @@ Describe the revision history of RZ/Five flash writer.
 ### 7.2. v1.01
 
 - Enable eMMC writing function.
+
+### 7.3. v1.02
+
+- Update according to the Technical Update (Document No. TN-RZ*-A0094A/E, DATE: August 9th).
+- Update README.

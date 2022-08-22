@@ -598,6 +598,20 @@ void cpg_wdtrst_sel_setup(void)
 	mmio_write_32(CPG_WDTRST_SEL, reg);
 }
 
+static void cpu_cpg_setup(void)
+{
+	while ((mmio_read_32(CPG_CLKSTATUS) & CLKSTATUS_DIVPL1_STS) != 0x00000000)
+		;
+	mmio_write_32(CPG_PL1_DDIV, PL1_DDIV_DIVPL1_SET_WEN | PL1_DDIV_DIVPL1_SET_1_1);
+	while ((mmio_read_32(CPG_CLKSTATUS) & CLKSTATUS_DIVPL1_STS) != 0x00000000)
+		;
+}
+
+void cpg_early_setup(void)
+{
+	cpu_cpg_setup();
+}
+
 void cpg_setup(void)
 {
 	cpg_selector_on_off(CPG_SEL_PLL3_3_ON_OFF, CPG_OFF);

@@ -45,6 +45,9 @@ void Main(void)
 
 	init_tzc_400_spimulti();
 
+	/* early setup */
+	cpg_early_setup();
+
 	/* setup PFC */
 	pfc_setup();
 	/* setup Clock and Reset */
