@@ -1,17 +1,17 @@
-# RZ/V2M Flash Writer
+# RZ/V2MA Flash Writer
 
 <Div Align="right">
 Renesas Electronics Corporation
 
-Feb 15, 2022 updated.
+Sep 29, 2022 updated.
 </Div>
 
-RZ/V2M flash writer is a sample software to write loader binary images to eMMC on RZ/V2M.  
+RZ/V2MA flash writer is a sample software to write loader binary images to eMMC on RZ/V2MA.  
 
 ## 1. Overview
 
-This README explains how to use RZ/V2M flash writer.  
-Refer to "RZ/V2M Linux Package Yocto recipe Start-Up Guide" for the detail.
+This README explains how to use RZ/V2MA flash writer.  
+Refer to "RZ/V2MA Linux Package Start-Up Guide" for the detail.
 
 ## 1.1. README Contents
 
@@ -19,9 +19,9 @@ Refer to "RZ/V2M Linux Package Yocto recipe Start-Up Guide" for the detail.
 
 [Chapter 3](#3-software) describes the software.
 
-[Chapter 4](#4-how-to-build-the-rzv2m-flash-writer) explains an example of how to build the RZ/V2M flash writer.
+[Chapter 4](#4-how-to-build-the-rzv2ma-flash-writer) explains an example of how to build the RZ/V2MA flash writer.
 
-[Chapter 5](#5-how-to-run-the-rzv2m-flash-writer) explains an example of how to perform the RZ/V2M flash writer.
+[Chapter 5](#5-how-to-run-the-rzv2ma-flash-writer) explains an example of how to perform the RZ/V2MA flash writer.
 
 *Note) This sample software does not support file systems. Therefore, only raw binary images can be downloaded and programmed into eMMC.*
 
@@ -31,7 +31,7 @@ BSD-3-Clause (See file [LICENSE.md](LICENSE.md) for details.)
 
 ## 1.3. Notice
 
-RZ/V2M flash writer is distributed by Renesas Electronics Corporation as a sample software without any warranty or support.
+RZ/V2MA flash writer is distributed by Renesas Electronics Corporation as a sample software without any warranty or support.
 
 ## 1.4. Contributing
 
@@ -46,9 +46,8 @@ The following table shows the document related to this function.
 | Number | Issuer  | Title                                                          | Edition           |
 |--------|---------|----------------------------------------------------------------|-------------------|
 | 1      | JEDEC   | Embedded Multi-Media Card (eMMC) Electrical Standard (5.01)    | JESD84-B50.1      |
-| 2      | Renesas | RZ/V2M Linux Package Relese Note                               | Rev.1.00 or later |
-| 3      | Renesas | RZ/V2M Linux Package Start-Up Guide                            | Rev.1.00 or later |
-| 4      | Renesas | RZ/V2M Linux Package Yocto recipe Start-Up Guide               | Rev.1.00 or later |
+| 2      | Renesas | RZ/V2MA Linux Package Relese Note                              | Rev.1.00 or later |
+| 3      | Renesas | RZ/V2MA Linux Package Start-Up Guide                           | Rev.1.00 or later |
 
 ## 2. Operating Environment
 
@@ -60,19 +59,19 @@ The following table lists the hardware needed to use this utility.
 
 | Name                   | Note                                                                                 |
 |------------------------|--------------------------------------------------------------------------------------|
-| Target board           | RZ/V2M Evaluation Kit.                                                               |
-| Linux Host PC          | Build and debug environment. Ubuntu Desktop 16.04(64bit).                            |
+| Target board           | RZ/V2MA Evaluation Kit.                                                              |
+| Linux Host PC          | Build and debug environment. Ubuntu Desktop 20.04(64bit).                            |
 | Windows PC             | Use to control serial console of the target board.                                   |
 | micro SDHC card        | Use for writing flash writer. The card should have 1 partition formatted with FAT32. |
 | micro USB serial cable | Connect between the target board and Host PC.                                        |
 
-The eMMC support status of RZ/V2M is as follows.
+The eMMC support status of RZ/V2MA is as follows.
 
 #### eMMC support status
 
-|  MPU   |       eMMC      | Read/Write the eMMC | Boot from the eMMC | MMC interface |
-|--------|-----------------|---------------------|--------------------|---------------|
-| RZ/V2M | THGBMJG7C1LBAIL |      Support        |        Support     |     MMC1      |
+|   MPU   |       eMMC      | Read/Write the eMMC | Boot from the eMMC | MMC interface |
+|---------|-----------------|---------------------|--------------------|---------------|
+| RZ/V2MA | THGBMJG7C1LBAIL |      Support        |        Support     |     MMC1      |
 
 ## 2.2. Software Environment
 
@@ -186,9 +185,9 @@ EM_E Complete!
 ```
 After running the above command, the selected partition will be erased.  
 
-## 4. How to build the RZ/V2M flash writer
+## 4. How to build the RZ/V2MA flash writer
 
-This chapter describes how to build the RZ/V2M flash writer. The following commands should be executed in your work directory {$WORK} on your Host PC.
+This chapter describes how to build the RZ/V2MA flash writer. The following commands should be executed in your work directory {$WORK} on your Host PC.
 
 ### 4.1. Prepare the compiler
 
@@ -204,16 +203,16 @@ $ tar xvf gcc-linaro-7.3.1-2018.05-x86_64_aarch64-elf.tar.xz
 
 ### 4.2. Prepare the source code
 
-Get the source code of the RZ/V2M flash writer from this repository as follows.
+Get the source code of the RZ/V2MA flash writer from this repository as follows.
 
 ```shell
 cd ${WORK}
-git clone -b rz_v2m https://github.com/renesas-rz/rzg2_flash_writer.git rzv2m_flash_writer
+git clone -b rz_v2ma https://github.com/renesas-rz/rzg2_flash_writer.git rzv2ma_flash_writer
 ```
 
-### 4.3. Build the RZ/V2M flash writer
+### 4.3. Build the RZ/V2MA flash writer
 
-The RZ/V2M flash writer will be built by the following command.
+The RZ/V2MA flash writer will be built by the following command.
 
 Linaro toolchain:
 
@@ -226,11 +225,11 @@ $ CROSS_COMPILE=../gcc-linaro-7.3.1-2018.05-x86_64_aarch64-elf/bin/aarch64-elf- 
 ### 4.4. Check the output file
 The output image will be available in the following directory.
 
-| Generated files | File name    | File stored path                           |
-|-----------------|--------------|--------------------------------------------|
-| Flash writer    | B2_intSW.bin | ${WORK}/rzv2m_flash_writer /AArch64_output |
+| Generated files | File name    | File stored path                            |
+|-----------------|--------------|---------------------------------------------|
+| Flash writer    | B2_intSW.bin | ${WORK}/rzv2ma_flash_writer /AArch64_output |
 
-## 5. How to run the RZ/V2M flash writer
+## 5. How to run the RZ/V2MA flash writer
 ### Step.1 Equipment setting
 Connect your PC and the target board via a serial to micro-USB cable.  
 Start a terminal software on your PC. Set the configuration of terminal software is as follows and select the Standard COM port.  
@@ -242,29 +241,29 @@ Start a terminal software on your PC. Set the configuration of terminal software
 
 ### Step.2 Write the flash writer to the eMMC
 Store the Flash writer binary (B2_intSW.bin) in a micro-SDHC Card that has 1 partition formatted with FAT32.  
-Insert the micro-SD card into the micro-SD card slot on the RZ/V2M Evaluation Kit.  
-Set the Main SW2 on the RZ/V2M Evaluation Kit is as the following table to change the board operation mode to "forced write mode".
+Insert the micro-SD card into the micro-SD card slot on the RZ/V2MA Evaluation Kit.  
+Set the Main SW2 on the RZ/V2MA Evaluation Kit is as the following table to change the board operation mode to "forced write mode".
 | SW1 | SW2 | SW3 | SW4 |
 |-----|-----|-----|-----|
 | OFF | OFF | OFF | ON  |
 
-Power on the RZ/V2M Evaluation Kit.  
-Start RZ/V2M in forced write mode and write the Flash writer binary from the micro-SD card to eMMC.  
+Power on the RZ/V2MA Evaluation Kit.  
+Start RZ/V2MA in forced write mode and write the Flash writer binary from the micro-SD card to eMMC.  
 Check the lighting of Main LED 2.Note that if the LED is blinking, writing the Flash writer binary is failed.
-After checking the LED, power off the RZ/V2M Evaluation Kit.
+After checking the LED, power off the RZ/V2MA Evaluation Kit.
 
 
 ### Step.3 Start the flash writer
-Set the Main SW2 on the RZ/V2M Evaluation Kit is as the following table to change the board operation mode to "normal mode".
+Set the Main SW2 on the RZ/V2MA Evaluation Kit is as the following table to change the board operation mode to "normal mode".
 
 | SW1 | SW2 | SW3 | SW4 |
 |-----|-----|-----|-----|
 | OFF | OFF | OFF | OFF |
 
-Power on the RZ/V2M Evaluation Kit. The following log will appear if RZ/V2M starts in normal mode and run Flash writer successfully.  
+Power on the RZ/V2MA Evaluation Kit. The following log will appear if RZ/V2MA starts in normal mode and run Flash writer successfully.  
 
 ```text
-Flash writer for RZ/V2M V1.20 January 14, 2022
+Flash writer for RZ/V2MA <version> <MM DD, YY>
 >
 ```
 
@@ -274,4 +273,6 @@ For details on how to write to the eMMC, please refer to 3.2 Command specificati
 After completing the writing, turn off the board.
 
 ### Step.5 Confirm booting by the boot loader and U-boot
-Power on the RZ/V2M Evaluation Kit with the normal mode. And then, confirm that the boot loader and U-boot run normally.
+Power on the RZ/V2MA Evaluation Kit with the normal mode.
+Run "env default -a" to load the U-Boot environment variables.
+And then, confirm that the boot loader and U-boot run successfully.
