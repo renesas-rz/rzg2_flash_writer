@@ -3,7 +3,7 @@
 <Div Align="right">
 Renesas Electronics Corporation
 
-Feb 15, 2022 updated.
+Oct 31, 2022 updated.
 </Div>
 
 RZ/V2M flash writer is a sample software to write loader binary images to eMMC on RZ/V2M.  
@@ -11,7 +11,7 @@ RZ/V2M flash writer is a sample software to write loader binary images to eMMC o
 ## 1. Overview
 
 This README explains how to use RZ/V2M flash writer.  
-Refer to "RZ/V2M Linux Package Yocto recipe Start-Up Guide" for the detail.
+Refer to "RZ/V2M Linux Package Start-Up Guide" for details.
 
 ## 1.1. README Contents
 
@@ -48,7 +48,6 @@ The following table shows the document related to this function.
 | 1      | JEDEC   | Embedded Multi-Media Card (eMMC) Electrical Standard (5.01)    | JESD84-B50.1      |
 | 2      | Renesas | RZ/V2M Linux Package Relese Note                               | Rev.1.00 or later |
 | 3      | Renesas | RZ/V2M Linux Package Start-Up Guide                            | Rev.1.00 or later |
-| 4      | Renesas | RZ/V2M Linux Package Yocto recipe Start-Up Guide               | Rev.1.00 or later |
 
 ## 2. Operating Environment
 
@@ -60,9 +59,9 @@ The following table lists the hardware needed to use this utility.
 
 | Name                   | Note                                                                                 |
 |------------------------|--------------------------------------------------------------------------------------|
-| Target board           | RZ/V2M Evaluation Kit.                                                               |
-| Linux Host PC          | Build and debug environment. Ubuntu Desktop 16.04(64bit).                            |
-| Windows PC             | Use to control serial console of the target board.                                   |
+| Target board           | RZ/V2M Evaluation Board Kit.                                                         |
+| Linux Host PC          | Build and debug environment. Refer to the start-up guide for the build machine.      |
+| Windows PC             | Use to control the serial console of the target board.                               |
 | micro SDHC card        | Use for writing flash writer. The card should have 1 partition formatted with FAT32. |
 | micro USB serial cable | Connect between the target board and Host PC.                                        |
 
@@ -233,7 +232,7 @@ The output image will be available in the following directory.
 ## 5. How to run the RZ/V2M flash writer
 ### Step.1 Equipment setting
 Connect your PC and the target board via a serial to micro-USB cable.  
-Start a terminal software on your PC. Set the configuration of terminal software is as follows and select the Standard COM port.  
+Start terminal software on your PC. Set the configuration of terminal software as follows and select the Standard COM port.  
 | Baud rate  | Data bit | Parity bit | Stop bit | Flow control |
 |------------|----------|------------|----------|--------------|
 | 115200bps  | 8bits    | none       | 1bit     | none         |
@@ -243,19 +242,19 @@ Start a terminal software on your PC. Set the configuration of terminal software
 ### Step.2 Write the flash writer to the eMMC
 Store the Flash writer binary (B2_intSW.bin) in a micro-SDHC Card that has 1 partition formatted with FAT32.  
 Insert the micro-SD card into the micro-SD card slot on the RZ/V2M Evaluation Kit.  
-Set the Main SW2 on the RZ/V2M Evaluation Kit is as the following table to change the board operation mode to "forced write mode".
+Set the Main SW2 on the RZ/V2M Evaluation Kit as the following table to change the board operation mode to "forced write mode".
 | SW1 | SW2 | SW3 | SW4 |
 |-----|-----|-----|-----|
 | OFF | OFF | OFF | ON  |
 
 Power on the RZ/V2M Evaluation Kit.  
 Start RZ/V2M in forced write mode and write the Flash writer binary from the micro-SD card to eMMC.  
-Check the lighting of Main LED 2.Note that if the LED is blinking, writing the Flash writer binary is failed.
+Check the lighting of Main LED 2. Note that if the LED is blinking, writing the Flash writer binary is failed.
 After checking the LED, power off the RZ/V2M Evaluation Kit.
 
 
 ### Step.3 Start the flash writer
-Set the Main SW2 on the RZ/V2M Evaluation Kit is as the following table to change the board operation mode to "normal mode".
+Set the Main SW2 on the RZ/V2M Evaluation Kit as the following table to change the board operation mode to "normal mode".
 
 | SW1 | SW2 | SW3 | SW4 |
 |-----|-----|-----|-----|
@@ -264,7 +263,7 @@ Set the Main SW2 on the RZ/V2M Evaluation Kit is as the following table to chang
 Power on the RZ/V2M Evaluation Kit. The following log will appear if RZ/V2M starts in normal mode and run Flash writer successfully.  
 
 ```text
-Flash writer for RZ/V2M V1.20 January 14, 2022
+Flash writer for RZ/V2M <version> <MM DD, YY>
 >
 ```
 

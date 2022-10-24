@@ -32,8 +32,9 @@
 #include "init_scif.h"
 #include "HardwareSetup.h"
 
-#define WRITER_VERSION	" V1.20"	    	/* Software Version	*/
-#define WRITER_DATE	" January 14, 2022"	    /* Release date		*/
+#define WRITER_LSI	"RZ/V2M"		/* LSI */
+#define WRITER_VERSION	" V1.30"		/* Software Version */
+#define WRITER_DATE	" September 2, 2022"	/* Release date */
 
 extern const com_menu MonCom[COMMAND_UNIT];
 
@@ -73,7 +74,7 @@ void StartMess( void )
 
 	PutStr("  ",1);
 	PutStr("Flash writer for ",0);
-	PutStr("RZ/V2M", 0);
+	PutStr(WRITER_LSI, 0);
 	PutStr(WRITER_VERSION, 0);
 	PutStr(WRITER_DATE,1);
 	PutStr(">", 0);
