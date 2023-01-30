@@ -33,8 +33,8 @@
 #include "HardwareSetup.h"
 
 #define WRITER_LSI	"RZ/V2MA"		/* LSI */
-#define WRITER_VERSION	" V1.00"		/* Software Version */
-#define WRITER_DATE	" September 2, 2022"	/* Release date */
+#define WRITER_VERSION	" V1.10"		/* Software Version */
+#define WRITER_DATE	" November 30, 2022"	/* Release date */
 
 extern const com_menu MonCom[COMMAND_UNIT];
 
