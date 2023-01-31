@@ -3,7 +3,7 @@
 <Div Align="right">
 Renesas Electronics Corporation
 
-Sep 29, 2022 updated.
+Jan 31, 2023 updated.
 </Div>
 
 RZ/V2MA flash writer is a sample software to write loader binary images to eMMC on RZ/V2MA.  
@@ -196,7 +196,7 @@ Get the cross compiler for linaro.
 Linaro toolchain:
 
 ```shell
-$ cd {$WORK}
+$ cd $WORK
 $ wget https://releases.linaro.org/components/toolchain/binaries/7.3-2018.05/aarch64-elf/gcc-linaro-7.3.1-2018.05-x86_64_aarch64-elf.tar.xz
 $ tar xvf gcc-linaro-7.3.1-2018.05-x86_64_aarch64-elf.tar.xz
 ```
@@ -206,7 +206,7 @@ $ tar xvf gcc-linaro-7.3.1-2018.05-x86_64_aarch64-elf.tar.xz
 Get the source code of the RZ/V2MA flash writer from this repository as follows.
 
 ```shell
-cd ${WORK}
+cd $WORK
 git clone -b rz_v2ma https://github.com/renesas-rz/rzg2_flash_writer.git rzv2ma_flash_writer
 ```
 
@@ -217,7 +217,7 @@ The RZ/V2MA flash writer will be built by the following command.
 Linaro toolchain:
 
 ```shell
-$ cd ${WORK}
+$ cd $WORK/rzv2ma_flash_writer
 $ make -f makefile.linaro clean
 $ CROSS_COMPILE=../gcc-linaro-7.3.1-2018.05-x86_64_aarch64-elf/bin/aarch64-elf- make -f makefile.linaro
 ```
@@ -227,7 +227,7 @@ The output image will be available in the following directory.
 
 | Generated files | File name    | File stored path                            |
 |-----------------|--------------|---------------------------------------------|
-| Flash writer    | B2_intSW.bin | ${WORK}/rzv2ma_flash_writer /AArch64_output |
+| Flash writer    | B2_intSW.bin | $WORK/rzv2ma_flash_writer /AArch64_output |
 
 ## 5. How to run the RZ/V2MA flash writer
 ### Step.1 Equipment setting
