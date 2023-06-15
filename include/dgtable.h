@@ -32,7 +32,7 @@
 /**********************
 * COMMAND_UNITE       *
 ***********************/
-#define		COMMAND_UNIT		21
+#define		COMMAND_UNIT	26
 #define		NORMAL_END		0
 #define		ERROR_END		1
 
@@ -40,7 +40,7 @@
 * MESSAGE LINE       *
 ***********************/
 #define		START_MESS_MON_LINE	2
-#define		ALL_HELP_MESS_LINE	21
+#define		ALL_HELP_MESS_LINE	26
 
 /**********************
 * TABLE PARAMETER     *
@@ -88,4 +88,3 @@ typedef struct com_menu {
 	void		(*comProg)();	 /* Program Pointer	*/
 	protect_add *protectAdd;
 } com_menu;
-

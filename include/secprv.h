@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015-2019, Renesas Electronics Corporation
+ * Copyright (c) 2023, Renesas Electronics Corporation
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -29,39 +29,13 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-#include "dgtable.h"
-/**********************
-*  TITLE              *
-***********************/
+#ifndef SECPRV_H
+#define SECPRV_H
 
-const char *const AllHelpMess[ALL_HELP_MESS_LINE] = {
-#if SERIAL_FLASH == 1
-	"        SPI Flash write command",
-	" XCS            erase program to SPI Flash",
-	" XLS2           write program to SPI Flash",
-	" XLS3           write program to SPI Flash(Binary)",
-#if SECPROV == 1
-	" XLS2S          re-encrypt program and write to SPI Flash",
-	" XLS3S          re-encrypt program and write to SPI Flash(Binary)",
-#endif /* SECPROV == 1 */
-	"",
-#endif /* SERIAL_FLASH == 1 */
-#if EMMC == 1
-	"        eMMC write command",
-	" EM_DCID        display register CID",
-	" EM_DCSD        display register CSD",
-	" EM_DECSD       display register EXT_CSD",
-	" EM_SECSD       change register EXT_CSD byte",
-	" EM_W           write program to eMMC",
-	" EM_WB          write program to eMMC (Binary)",
-	" EM_E           erase program to eMMC",
-#if SECPROV == 1
-	" EM_WS          re-encrypt program and write to eMMC",
-	" EM_WBS         re-encrypt program and write to eMMC(Binary)",
-#endif /* SECPROV == 1 */
-#endif /* EMMC == 1 */
-	" SUP            Scif speed UP (Change to speed up baud rate setting)",
-	" RESET          Perform RESET of the CPU",
-	" H              help",
-	MESSAGE_END,
-};
+extern void dgG2LoadSpiflash0_2s(void);
+extern void dgG2LoadSpiflash0_3s(void);
+
+extern void dg_emmc_write_mots(void);
+extern void dg_emmc_write_bins(void);
+
+#endif /* SECPRV_H */

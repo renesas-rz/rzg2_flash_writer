@@ -39,6 +39,9 @@
 	.INCLUDE		"boot_mon.h"
 	.ALIGN	4
 
+	.global start
+start:
+
 ;# Initialize registers
 Register_init:
 	LDR		X0, =0
@@ -186,4 +189,3 @@ str_buf:
 	.space	16
 
 	.END
-

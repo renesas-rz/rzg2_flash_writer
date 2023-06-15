@@ -33,6 +33,7 @@
 #include "dgtable.h"
 #include "dgmodul1.h"
 #include "ddrcheck.h"
+#include "secprv.h"
 #if SERIAL_FLASH == 1
 #include "dgmodul4.h"
 #endif /* SERIAL_FLASH == 1 */
@@ -51,6 +52,10 @@ const com_menu MonCom[COMMAND_UNIT] = {
 	"XLS"		, dgG2LoadSpiflash0		,  0	,
 	"XLS2"		, dgG2LoadSpiflash0_2		,  0	,
 	"XLS3"		, dgG2LoadSpiflash0_3		,  0	,
+#if SECPROV == 1
+	"XLS2S"		, dgG2LoadSpiflash0_2s	, 0	,
+	"XLS3S"		, dgG2LoadSpiflash0_3s	, 0	,
+#endif /* SECPROV == 1 */
 	"XINFO_SA0"	, dgG2InfoSpiflash0_SA0		,  0	,
 	"XINFO_SA0_S"	, dgG2InfoSetSpiflash0_SA0	,  0	,
 	"XINFO"		, dgG2InfoSpiflash0		,  0	,
@@ -64,6 +69,10 @@ const com_menu MonCom[COMMAND_UNIT] = {
 	"EM_W"		, &dg_emmc_write_mot		,  0	,
 	"EM_WB"		, &dg_emmc_write_bin		,  0	,
 	"EM_E"		, &dg_emmc_erase		,  0	,
+#if SECPROV == 1
+	"EM_WS"		, dg_emmc_write_mots	, 0	,
+	"EM_WBS"	, dg_emmc_write_bins	, 0	,
+#endif /* SECPROV == 1 */
 #endif /* EMMC == 1 */
 	"SUP"		, dgScifSpeedUp			,  0	,
 	"DDRCK"		, dgDdrTest			,  0	,

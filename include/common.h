@@ -32,7 +32,8 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-#include <stdint-gcc.h>
+#include <stdint.h>
+#include <stddef.h>
 
 #ifdef AArch64
 typedef uint64_t    uintptr_t;
@@ -98,5 +99,7 @@ char GetStrBlk(char *inStr,char *outStr, char *chPtr,char method);
 void SoftDelay(uint32_t roop);
 void WaitKeyIn_Y(void);
 char WaitKeyIn_YorN(void);
+void *memset(void *dst, int val, unsigned long count);
+void *memcpy(void *dst, const void *src, size_t len);
 
 #endif

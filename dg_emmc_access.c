@@ -48,69 +48,7 @@
 #include "usb_lib.h"
 #endif /* USB_ENABLE == 1 */
 
-#define	SIZE2SECTOR(x)			( (x) >> 9 )	/* 512Byte		*/
-
-#define	EMMC_MAX_SIZE			8		/* 8 Gbyte		*/
-#define	EMMC_MAX_SECTOR			((SIZE2SECTOR( EMMC_MAX_SIZE * 1024 )) * 1024 * 1024 ) /* MAX SECTOR (8Gbyte) */
-#define	MULTI_PARTITION_SIZE		(128 * 1024)	/* 128 Kbyte	*/
-
-#define	EMMC_WORK_DRAM_SADD		0x50000000U
-#define	EMMC_WORK_DRAM_EADD_2M		0x501FFFFFU
-#define	EMMC_WORK_DRAM_EADD_4M		0x503FFFFFU
-#define	EMMC_WORK_DRAM_EADD_16M		0x50FFFFFFU
-#define	EMMC_WORK_DRAM_EADD_64M		0x53FFFFFFU
-#define	EMMC_WORK_DRAM_EADD_512M	0x6FFFFFFFU
-#define	EMMC_WORK_DRAM_SECTOR_MAX	((EMMC_WORK_DRAM_EADD_512M - EMMC_WORK_DRAM_SADD + 1)>>9)
-
-#define	EMMC_SECURERAM_SADD		0xE6300000U
-#define	EMMC_SECURERAM_EADD		0xE635FFFFU
-
-#define	DMA_TRANSFER_SIZE		(0x20)		/* DMA Transfer size =  32 Bytes*/
-#define	DMA_ROUNDUP_VALUE		(0xFFFFFFE0)
-
-typedef enum
-{
-	EMMC_PARTITION_USER_AREA = 0,
-	EMMC_PARTITION_BOOT_1,
-	EMMC_PARTITION_BOOT_2,
-	EMMC_PARTITION_MAX
-} EMMC_PARTITION;
-
-typedef enum
-{
-	EMMC_INPUT_SECTOR_END = 0,
-	EMMC_INPUT_SECTOR_SIZE,
-	EMMC_INPUT_SECTOR_ADDRESS
-} EMMC_INPUT_SECTOR;
-
-typedef enum
-{
-	EMMC_INPUT_TYPE_READ = 0,
-	EMMC_INPUT_TYPE_WRITE,
-	EMMC_INPUT_TYPE_ERASE
-} EMMC_INPUT_TYPE;
-
-typedef struct
-{
-	uint32_t	maxSectorCount[EMMC_PARTITION_MAX];
-} EMMC_SECTOR;
-
-typedef enum
-{
-	EMMC_WRITE_MOT = 0,
-	EMMC_WRITE_BINARY,
-} EMMC_WRITE_COMMAND;
-
-static void dg_emmc_write_bin_serial(uint32_t* workStartAdd, uint32_t fileSize);
 static EMMC_ERROR_CODE dg_emmc_init(void);
-static uint32_t InputEmmcSector( EMMC_PARTITION partitionArea, uint32_t maxSectorCnt, uint32_t *startSector, uint32_t *sizeSector, EMMC_INPUT_TYPE type );
-static uint32_t InputEmmcSectorArea( EMMC_PARTITION *partitionArea );
-static uint32_t InputEmmcPrgStartAdd( uint32_t *prgStartAdd );
-static uint32_t InputFileSize( uint32_t *fileSize );
-static int32_t ChkSectorSize( uint32_t maxSectorCnt, uint32_t startSector, uint32_t sizeSector );
-static void SetSectorData(EMMC_SECTOR *sectorData);
-static void DispAreaData(EMMC_SECTOR sectorData);
-static int8_t dg_emmc_mot_load(uint32_t *maxADD ,uint32_t *minADD, uint32_t gUserPrgStartAdd );
 
 static uint32_t emmcInit;	/* eMMC drv init */
 
@@ -277,7 +215,7 @@ void	dg_emmc_write(EMMC_WRITE_COMMAND wc)
 	}
 
 //Input address(mmc sector)
-	chkInput = InputEmmcSector( partitionArea, sectorData.maxSectorCount[partitionArea], 
+	chkInput = InputEmmcSector( partitionArea, sectorData.maxSectorCount[partitionArea],
 								&sectorStartAddress, &sectorSize, EMMC_INPUT_TYPE_WRITE );
 	if (1 != chkInput)
 	{
@@ -438,7 +376,7 @@ void dg_emmc_write_mot(void)
 	COMMAND			: EMMC_WB				*
 	INPUT PARAMETER		: EMMC_WB				*
 *************************************************************************/
-static void dg_emmc_write_bin_serial(uint32_t* workStartAdd, uint32_t fileSize)
+void dg_emmc_write_bin_serial(uint32_t* workStartAdd, uint32_t fileSize)
 {
 	uint32_t i;
 	int8_t byteData = 0;
@@ -532,7 +470,7 @@ void	dg_emmc_erase(void)
 	COMMAND			: 				*
 	INPUT PARAMETER		: 				*
 *****************************************************************/
-static int8_t dg_emmc_mot_load(uint32_t *maxADD ,uint32_t *minADD, uint32_t gUserPrgStartAdd )
+int8_t dg_emmc_mot_load(uint32_t *maxADD ,uint32_t *minADD, uint32_t gUserPrgStartAdd )
 {
 //MIN,MAX address calc
 	int8_t 	str[12];			//max getByteCount=4 ->  4 * 2 +1 (NULL) = 9
@@ -733,7 +671,7 @@ static int8_t dg_emmc_mot_load(uint32_t *maxADD ,uint32_t *minADD, uint32_t gUse
 	COMMAND			: 					*
 	INPUT PARAMETER		: 					*
 *************************************************************************/
-static uint32_t InputEmmcSector( EMMC_PARTITION partitionArea, uint32_t maxSectorCnt, uint32_t *startSector, uint32_t *sizeSector, EMMC_INPUT_TYPE type )
+uint32_t InputEmmcSector( EMMC_PARTITION partitionArea, uint32_t maxSectorCnt, uint32_t *startSector, uint32_t *sizeSector, EMMC_INPUT_TYPE type )
 {
 	uint32_t loop = EMMC_INPUT_SECTOR_ADDRESS;
 	uint32_t wrData;
@@ -827,7 +765,7 @@ static uint32_t InputEmmcSector( EMMC_PARTITION partitionArea, uint32_t maxSecto
 	COMMAND			: 				*
 	INPUT PARAMETER		: 				*
 *****************************************************************/
-static uint32_t InputEmmcSectorArea( EMMC_PARTITION *partitionArea )
+uint32_t InputEmmcSectorArea( EMMC_PARTITION *partitionArea )
 {
 	uint32_t loop;
 	uint32_t wrData;
@@ -893,7 +831,7 @@ static uint32_t InputEmmcSectorArea( EMMC_PARTITION *partitionArea )
 	COMMAND			: 				*
 	INPUT PARAMETER		: 				*
 *****************************************************************/
-static uint32_t InputEmmcPrgStartAdd( uint32_t *prgStartAdd )
+uint32_t InputEmmcPrgStartAdd( uint32_t *prgStartAdd )
 {
 	uint32_t loop;
 	uint32_t wrData;
@@ -949,7 +887,7 @@ static uint32_t InputEmmcPrgStartAdd( uint32_t *prgStartAdd )
 	COMMAND			: 				*
 	INPUT PARAMETER		: 				*
 *****************************************************************/
-static uint32_t InputFileSize( uint32_t *fileSize )
+uint32_t InputFileSize( uint32_t *fileSize )
 {
 	uint32_t loop;
 	uint32_t wrData;
@@ -995,7 +933,7 @@ static uint32_t InputFileSize( uint32_t *fileSize )
 	COMMAND			: 				*
 	INPUT PARAMETER		: 				*
 *****************************************************************/
-static int32_t ChkSectorSize( uint32_t maxSectorCnt, uint32_t startSector, uint32_t sizeSector )
+int32_t ChkSectorSize( uint32_t maxSectorCnt, uint32_t startSector, uint32_t sizeSector )
 {
 	uint32_t sumSector;
 
@@ -1030,7 +968,7 @@ static int32_t ChkSectorSize( uint32_t maxSectorCnt, uint32_t startSector, uint3
 	COMMAND			: 				*
 	INPUT PARAMETER		: 				*
 *****************************************************************/
-static void SetSectorData(EMMC_SECTOR *sectorData)
+void SetSectorData(EMMC_SECTOR *sectorData)
 {
 	uint32_t multiSectorCount;
 	uint32_t bootPartitionSector;
@@ -1057,7 +995,7 @@ static void SetSectorData(EMMC_SECTOR *sectorData)
 	COMMAND			: 				*
 	INPUT PARAMETER		: 				*
 *****************************************************************/
-static void DispAreaData(EMMC_SECTOR sectorData)
+void DispAreaData(EMMC_SECTOR sectorData)
 {
 	uint32_t loop;
 	int8_t str[64];

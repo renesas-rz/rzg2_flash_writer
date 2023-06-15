@@ -62,10 +62,10 @@ endif
 endif
 
 #CPU
-CPU     = 
+CPU     =
 AArch   = 64
-THUMB   = 
-AS_NEON = 
+THUMB   =
+AS_NEON =
 CC_NEON = -mgeneral-regs-only
 ALIGN   = -mstrict-align
 AArch32_64  = AArch64
@@ -73,7 +73,7 @@ BOOTDIR     = AArch64_boot
 OUTPUT_DIR  = AArch64_output
 OBJECT_DIR  = AArch64_obj
 CROSS_COMPILE ?= aarch64-elf-
-CFLAGS = -fno-stack-protector
+CFLAGS = -fno-stack-protector -ffunction-sections -fdata-sections
 
 ifeq ("$(BOARD)", "EK874")
 	BOARD_NAME   =  EK874
@@ -127,8 +127,6 @@ endif
 
 DDR_DEF = ddr_qos_init_setting
 
-LIBS        = -L$(subst libc.a, ,$(shell $(CC) -print-file-name=libc.a 2> /dev/null)) -lc
-LIBS        += -L$(subst libgcc.a, ,$(shell $(CC) -print-libgcc-file-name 2> /dev/null)) -lgcc
 ifeq ("$(USB)", "ENABLE")
 LIBS        += -L./AArch64_lib/ -lusb
 endif
@@ -193,6 +191,8 @@ else
 include ddr/lpddr4/ddr.mk
 endif
 
+include security/secprv.mk
+
 OBJ_FILE := $(addprefix $(OBJECT_DIR)/,$(patsubst %.c,%.o,$(SRC_FILE)))
 
 #Dependency File
@@ -252,7 +252,7 @@ $(OUTPUT_FILE): $(OBJ_FILE_BOOT) $(OBJ_FILE) $(MEMORY_DEF)
 	-T '$(MEMORY_DEF)'			\
 	-o '$(OUTPUT_FILE)'			\
 	-Map '$(FILE_NAME).map' 		\
-	-static					\
+	-static -nostdlib --gc-sections	\
 	$(LIBS)
 
 #   Make MOT file
@@ -265,7 +265,7 @@ $(OUTPUT_FILE): $(OBJ_FILE_BOOT) $(OBJ_FILE) $(MEMORY_DEF)
 	$(OBJDUMP) -d -S "$(OUTPUT_FILE)" > "$(FILE_NAME)_disasm.txt"
 
 #	Time Stamp
-	@echo ==========  %date% %time%  ==========
+	@echo ==========  `date`  ==========
 	@echo ========== !!! Compile Complete !!! ==========
 
 
