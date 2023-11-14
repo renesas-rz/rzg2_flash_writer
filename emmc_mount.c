@@ -21,6 +21,7 @@
 #include "bit.h"
 #include "cpudrv.h"
 
+#define MMC_CMD1_TIMEOUT	3000
 /* ***************** MACROS, CONSTANTS, COMPILATION FLAGS ****************** */
 
 /* ********************** STRUCTURES, TYPE DEFINITIONS ********************* */
@@ -163,7 +164,7 @@ static EMMC_ERROR_CODE emmc_card_init (void)
 
    /* CMD1 */
     emmc_make_nontrans_cmd(CMD1_SEND_OP_COND, EMMC_HOST_OCR_VALUE);
-    for (retry=300; retry > 0; retry--)
+    for (retry=MMC_CMD1_TIMEOUT; retry > 0; retry--)
     {
         result = emmc_exec_cmd(EMMC_R1_ERROR_MASK, mmc_drv_obj.response);
         if (result != EMMC_SUCCESS)
