@@ -69,7 +69,7 @@ EMMC_IOV=1_8V
 endif
 
 #CPU
-CPU     = 
+CPU     =
 AArch   = RISCV
 ALIGN   = -mstrict-align
 BOOTDIR     = riscv_boot
@@ -139,7 +139,13 @@ ifeq ("$(EMMC_IOV)", "1_8V")
 	CFLAGS += -DEMMC_IO_1_8V=1
 endif
 
-MEMORY_DEF = memory_writer.def
+LINKER_FILE := memory_writer.def.s
+
+ifeq ("$(TRUSTED_BOARD_BOOT)", "ENABLE")
+	CFLAGS += -DTRUSTED_BOARD_BOOT=1
+endif
+
+MEMORY_DEF := $(LINKER_FILE:%.def.s=$(OBJECT_DIR)/%.def)
 
 LIBS        = -L$(subst libc.a, ,$(shell $(CC) -print-file-name=libc.a 2> /dev/null)) -lc
 LIBS        += -L$(subst libgcc.a, ,$(shell $(CC) -print-libgcc-file-name 2> /dev/null)) -lgcc
@@ -203,11 +209,13 @@ endif
 OBJ_FILE := $(addprefix $(OBJECT_DIR)/,$(patsubst %.c,%.o,$(SRC_FILE)))
 
 #Dependency File
-DEPEND_FILE = $(patsubst %.lib, ,$(OBJ_FILE:%.o=%.d))
+DEPEND_FILE = $(patsubst %.lib, ,$(OBJ_FILE:%.o=%.d)) $(LINKER_FILE:.s=.d)
 
 ###################################################
 #C compiler
 CC = $(CROSS_COMPILE)gcc
+#C++ compiler
+CPP = $(CROSS_COMPILE)cpp
 #Assembler
 AS = $(CROSS_COMPILE)as
 #Linker
@@ -230,7 +238,7 @@ CL = rm -rf
 # Command
 
 .PHONY: all
-all: $(OBJECT_DIR) $(OUTPUT_DIR) $(OBJ_FILE_BOOT) $(OBJ_FILE) $(OUTPUT_FILE)
+all: $(OBJECT_DIR) $(OUTPUT_DIR) $(OBJ_FILE_BOOT) $(OBJ_FILE) $(MEMORY_DEF) $(OUTPUT_FILE)
 
 #------------------------------------------
 # Make Directory
@@ -250,6 +258,10 @@ $(OBJECT_DIR)/%.o:$(BOOTDIR)/%.s
 $(OBJECT_DIR)/%.o:%.c
 	@if [ ! -e `dirname $@` ]; then mkdir -p `dirname $@`; fi
 	$(CC) -g -Os $(ALIGN) $(CPU) -MMD -MP -c -I $(BOOTDIR) -I $(INCLUDE_DIR) -I $(DDR_COMMON) -I $(DDR_SOC) $< -o $@ -D$(AArch) -D$(BOOT_DEF)=0 -D$(TOOL_DEF)=0 $(CFLAGS)
+
+$(OBJECT_DIR)/%.def:%.def.s
+	@if [ ! -e `dirname $@` ]; then mkdir -p `dirname $@`; fi
+	$(CPP) $(CPU) $(CFLAGS) -I $(BOOTDIR) -I $(INCLUDE_DIR) -x assembler-with-cpp -MMD -MP -P $< -o $@
 
 #------------------------------------------
 # Linker
