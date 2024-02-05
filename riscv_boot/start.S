@@ -21,8 +21,8 @@
 #define CONFIG_SPL_STACK        0x00030000
 
 .section .text
-.globl _start
-_start:
+.globl start
+start:
 	/* mask all interrupts */
 	csrw	MODE_PREFIX(ie), zero
 /*
