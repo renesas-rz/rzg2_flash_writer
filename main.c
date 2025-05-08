@@ -140,7 +140,7 @@ void DecCom(void)
 	char tmp[64], chCnt, chPtr;
 	uint32_t rtn = 0;
 	uint32_t res;
-	chCnt = 1;
+	chCnt = 0;
 
 	while (rtn == 0)
 	{
