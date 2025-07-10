@@ -18,7 +18,7 @@
 #elif (DDR_SIZE_2GB_1PCS == 1)
 #include "param_mc_C-011_D4-01-1.c"
 #elif (DDR_SIZE_1GB_1PCS == 1)
-#include "param_mc_C-011_D4-01-2.c"
+#include "param_mc_C-011_D4-02-2.c"
 #elif (DDR_SIZE_512MB_1PCS == 1)
 #include "param_mc_C-011_D4-02-3.c"
 #else
