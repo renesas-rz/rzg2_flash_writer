@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2021, Renesas Electronics Corporation. All rights reserved.
+ * Copyright (c) 2022, Renesas Electronics Corporation. All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
@@ -7,10 +7,333 @@
 #ifndef __DDR_MC_REGS_H__
 #define __DDR_MC_REGS_H__
 
-#include <rzg2l_def.h>
+#include <rz_soc_def.h>
 
-#define DDR_MC_BASE			RZG2L_DDR_MEMC_BASE
-#define MC_INIT_NUM			(507)
+#define DDR_MC_BASE		RZG2L_DDR_MEMC_BASE
+#define MC_INIT_NUM		(507)
+
+#define START_ADDR						(0x0000)
+#define START_OFFSET					(0)
+#define START_WIDTH						(1)
+
+#define INT_STATUS_INIT_ADDR			(0x0260)
+#define INT_STATUS_INIT_OFFSET			(24)
+#define INT_STATUS_INIT_WIDTH			(8)
+
+#define INT_ACK_INIT_ADDR				(0x0280)
+#define INT_ACK_INIT_OFFSET				(24)
+#define INT_ACK_INIT_WIDTH				(8)
+
+#define ECC_DISABLE_W_UC_ERR_ADDR		(0x0190)
+#define ECC_DISABLE_W_UC_ERR_OFFSET		(16)
+#define ECC_DISABLE_W_UC_ERR_WIDTH		(1)
+
+#define LP_AUTO_ENTRY_EN_ADDR			(0x00F8)
+#define LP_AUTO_ENTRY_EN_OFFSET			(0)
+#define LP_AUTO_ENTRY_EN_WIDTH			(4)
+
+#define LP_AUTO_EXIT_EN_ADDR			(0x00F8)
+#define LP_AUTO_EXIT_EN_OFFSET			(8)
+#define LP_AUTO_EXIT_EN_WIDTH			(4)
+
+#define CONTROLLER_BUSY_ADDR			(0x0230)
+#define CONTROLLER_BUSY_OFFSET			(0)
+#define CONTROLLER_BUSY_WIDTH			(1)
+
+#define PORT_ADDR_PROTECTION_EN_ADDR	(0x02F4)
+#define PORT_ADDR_PROTECTION_EN_OFFSET	(24)
+#define PORT_ADDR_PROTECTION_EN_WIDTH	(1)
+
+#define LP_CMD_ADDR						(0x00E8)
+#define LP_CMD_OFFSET					(8)
+#define LP_CMD_WIDTH					(7)
+
+#define LP_STATE_ADDR					(0x00F4)
+#define LP_STATE_OFFSET					(24)
+#define LP_STATE_WIDTH					(7)
+
+#define PWRUP_SREFRESH_EXIT_ADDR		(0x0094)
+#define PWRUP_SREFRESH_EXIT_OFFSET		(16)
+#define PWRUP_SREFRESH_EXIT_WIDTH		(1)
+
+#define TDFI_PHY_RDLAT_ADDR				(0x074C)
+#define TDFI_PHY_RDLAT_OFFSET			(0)
+#define TDFI_PHY_RDLAT_WIDTH			(7)
+
+#define TDFI_RDDATA_EN_ADDR				(0x0768)
+#define TDFI_RDDATA_EN_OFFSET			(24)
+#define TDFI_RDDATA_EN_WIDTH			(7)
+
+#define MEM_DP_REDUCTION_ADDR			(0x022C)
+#define MEM_DP_REDUCTION_OFFSET			(0)
+#define MEM_DP_REDUCTION_WIDTH			(1)
+
+#define ODT_WR_MAP_CS0_ADDR				(0x02D8)
+#define ODT_WR_MAP_CS0_OFFSET			(24)
+#define ODT_WR_MAP_CS0_WIDTH			(2)
+
+#define ODT_RD_MAP_CS0_ADDR				(0x02D8)
+#define ODT_RD_MAP_CS0_OFFSET			(16)
+#define ODT_RD_MAP_CS0_WIDTH			(2)
+
+#define ODT_WR_MAP_CS1_ADDR				(0x02DC)
+#define ODT_WR_MAP_CS1_OFFSET			(8)
+#define ODT_WR_MAP_CS1_WIDTH			(2)
+
+#define ODT_RD_MAP_CS1_ADDR				(0x02DC)
+#define ODT_RD_MAP_CS1_OFFSET			(0)
+#define ODT_RD_MAP_CS1_WIDTH			(2)
+
+#define CASLAT_LIN_ADDR					(0x003C)
+#define CASLAT_LIN_OFFSET				(16)
+#define CASLAT_LIN_WIDTH				(6)
+
+#define WRLAT_ADDR						(0x003C)
+#define WRLAT_OFFSET					(24)
+#define WRLAT_WIDTH						(5)
+
+#define ADDITIVE_LAT_ADDR				(0x0040)
+#define ADDITIVE_LAT_OFFSET				(0)
+#define ADDITIVE_LAT_WIDTH				(5)
+
+#define CA_PARITY_LAT_ADDR				(0x0040)
+#define CA_PARITY_LAT_OFFSET			(8)
+#define CA_PARITY_LAT_WIDTH				(4)
+
+#define MR1_DATA_0_ADDR					(0x012C)
+#define MR1_DATA_0_OFFSET				(0)
+#define MR1_DATA_0_WIDTH				(17)
+
+#define MR2_DATA_0_ADDR					(0x0130)
+#define MR2_DATA_0_OFFSET				(0)
+#define MR2_DATA_0_WIDTH				(17)
+
+#define MR5_DATA_0_ADDR					(0x0158)
+#define MR5_DATA_0_OFFSET				(0)
+#define MR5_DATA_0_WIDTH				(17)
+
+#define MR6_DATA_0_ADDR					(0x0160)
+#define MR6_DATA_0_OFFSET				(0)
+#define MR6_DATA_0_WIDTH				(17)
+
+#define MR1_DATA_1_ADDR					(0x0138)
+#define MR1_DATA_1_OFFSET				(0)
+#define MR1_DATA_1_WIDTH				(17)
+
+#define MR2_DATA_1_ADDR					(0x013C)
+#define MR2_DATA_1_OFFSET				(0)
+#define MR2_DATA_1_WIDTH				(17)
+
+#define MR5_DATA_1_ADDR					(0x015C)
+#define MR5_DATA_1_OFFSET				(0)
+#define MR5_DATA_1_WIDTH				(17)
+
+#define MR6_DATA_1_ADDR					(0x0164)
+#define MR6_DATA_1_OFFSET				(0)
+#define MR6_DATA_1_WIDTH				(17)
+
+#define MRSINGLE_DATA_0_ADDR			(0x0140)
+#define MRSINGLE_DATA_0_OFFSET			(0)
+#define MRSINGLE_DATA_0_WIDTH			(17)
+
+#define MRSINGLE_DATA_1_ADDR			(0x0144)
+#define MRSINGLE_DATA_1_OFFSET			(0)
+#define MRSINGLE_DATA_1_WIDTH			(17)
+
+#define WRITE_MODEREG_ADDR				(0x0114)
+#define WRITE_MODEREG_OFFSET			(0)
+#define WRITE_MODEREG_WIDTH				(27)
+
+#define INT_STATUS_MODE_ADDR			(0x0264)
+#define INT_STATUS_MODE_OFFSET			(0)
+#define INT_STATUS_MODE_WIDTH			(8)
+
+#define INT_ACK_MODE_ADDR				(0x0284)
+#define INT_ACK_MODE_OFFSET				(0)
+#define INT_ACK_MODE_WIDTH				(8)
+
+#define ECC_ENABLE_ADDR					(0x018C)
+#define ECC_ENABLE_OFFSET				(24)
+#define ECC_ENABLE_WIDTH				(2)
+
+#define ADDR_COLLISION_MPM_DIS_ADDR		(0x021C)
+#define ADDR_COLLISION_MPM_DIS_OFFSET	(8)
+#define ADDR_COLLISION_MPM_DIS_WIDTH	(1)
+
+#define DISABLE_RD_INTERLEAVE_ADDR		(0x0228)
+#define DISABLE_RD_INTERLEAVE_OFFSET	(0)
+#define DISABLE_RD_INTERLEAVE_WIDTH		(1)
+
+#define IN_ORDER_ACCEPT_ADDR			(0x022C)
+#define IN_ORDER_ACCEPT_OFFSET			(16)
+#define IN_ORDER_ACCEPT_WIDTH			(1)
+
+#define SWAP_EN_ADDR					(0x0224)
+#define SWAP_EN_OFFSET					(24)
+#define SWAP_EN_WIDTH					(1)
+
+#define LPC_SR_ZQ_EN_ADDR				(0x0108)
+#define LPC_SR_ZQ_EN_OFFSET				(8)
+#define LPC_SR_ZQ_EN_WIDTH				(1)
+
+#define PHY_INDEP_INIT_MODE_ADDR		(0x0030)
+#define PHY_INDEP_INIT_MODE_OFFSET		(24)
+#define PHY_INDEP_INIT_MODE_WIDTH		(1)
+
+#define TDFI_CTRLUPD_MIN_ADDR			(0x0774)
+#define TDFI_CTRLUPD_MIN_OFFSET			(8)
+#define TDFI_CTRLUPD_MIN_WIDTH			(16)
+
+#define TDFI_CTRLUPD_MAX_ADDR			(0x074C)
+#define TDFI_CTRLUPD_MAX_OFFSET			(8)
+#define TDFI_CTRLUPD_MAX_WIDTH			(21)
+
+#define CTRLUPD_REQ_ADDR				(0x0230)
+#define CTRLUPD_REQ_OFFSET				(8)
+#define CTRLUPD_REQ_WIDTH				(1)
+
+#define CS_MAP_ADDR						(0x0228)
+#define CS_MAP_OFFSET					(16)
+#define CS_MAP_WIDTH					(2)
+
+#define BANK_DIFF_0_ADDR				(0x0200)
+#define BANK_DIFF_0_OFFSET				(8)
+#define BANK_DIFF_0_WIDTH				(2)
+
+#define COL_DIFF_0_ADDR					(0x0204)
+#define COL_DIFF_0_OFFSET				(8)
+#define COL_DIFF_0_WIDTH				(4)
+
+#define ROW_DIFF_0_ADDR					(0x0200)
+#define ROW_DIFF_0_OFFSET				(24)
+#define ROW_DIFF_0_WIDTH				(3)
+
+#define BANK_DIFF_1_ADDR				(0x0200)
+#define BANK_DIFF_1_OFFSET				(16)
+#define BANK_DIFF_1_WIDTH				(2)
+
+#define COL_DIFF_1_ADDR					(0x0204)
+#define COL_DIFF_1_OFFSET				(16)
+#define COL_DIFF_1_WIDTH				(4)
+
+#define ROW_DIFF_1_ADDR					(0x0204)
+#define ROW_DIFF_1_OFFSET				(0)
+#define ROW_DIFF_1_WIDTH				(3)
+
+#define CS_VAL_LOWER_0_ADDR				(0x0208)
+#define CS_VAL_LOWER_0_OFFSET			(0)
+#define CS_VAL_LOWER_0_WIDTH			(16)
+
+#define CS_VAL_UPPER_0_ADDR				(0x0208)
+#define CS_VAL_UPPER_0_OFFSET			(16)
+#define CS_VAL_UPPER_0_WIDTH			(16)
+
+#define CS_VAL_LOWER_1_ADDR				(0x0210)
+#define CS_VAL_LOWER_1_OFFSET			(0)
+#define CS_VAL_LOWER_1_WIDTH			(16)
+
+#define CS_VAL_UPPER_1_ADDR				(0x0210)
+#define CS_VAL_UPPER_1_OFFSET			(16)
+#define CS_VAL_UPPER_1_WIDTH			(16)
+
+#define ROW_START_VAL_0_ADDR			(0x020C)
+#define ROW_START_VAL_0_OFFSET			(0)
+#define ROW_START_VAL_0_WIDTH			(3)
+
+#define ROW_START_VAL_1_ADDR			(0x0214)
+#define ROW_START_VAL_1_OFFSET			(0)
+#define ROW_START_VAL_1_WIDTH			(3)
+
+#define INT_STATUS_LOWPOWER_ADDR		(0x024C)
+#define INT_STATUS_LOWPOWER_OFFSET		(16)
+#define INT_STATUS_LOWPOWER_WIDTH		(16)
+
+#define INT_ACK_LOWPOWER_ADDR			(0x026C)
+#define INT_ACK_LOWPOWER_OFFSET			(16)
+#define INT_ACK_LOWPOWER_WIDTH			(16)
+
+#define INT_STATUS_ECC_ADDR				(0x024C)
+#define INT_STATUS_ECC_OFFSET			(0)
+#define INT_STATUS_ECC_WIDTH			(16)
+
+#define INT_ACK_ECC_ADDR				(0x026C)
+#define INT_ACK_ECC_OFFSET				(0)
+#define INT_ACK_ECC_WIDTH				(16)
+
+#define INT_MASK_ECC_ADDR				(0x028C)
+#define INT_MASK_ECC_OFFSET				(0)
+#define INT_MASK_ECC_WIDTH				(16)
+
+#define BIST_START_ADDRESS_0_ADDR		(0x0170)
+#define BIST_START_ADDRESS_0_OFFSET		(0)
+#define BIST_START_ADDRESS_0_WIDTH		(32)
+
+#define BIST_START_ADDRESS_1_ADDR		(0x0174)
+#define BIST_START_ADDRESS_1_OFFSET		(0)
+#define BIST_START_ADDRESS_1_WIDTH		(2)
+
+#define ADDR_SPACE_ADDR					(0x016C)
+#define ADDR_SPACE_OFFSET				(0)
+#define ADDR_SPACE_WIDTH				(6)
+
+#define BIST_DATA_CHECK_ADDR			(0x016C)
+#define BIST_DATA_CHECK_OFFSET			(8)
+#define BIST_DATA_CHECK_WIDTH			(1)
+
+#define BIST_ADDR_CHECK_ADDR			(0x016C)
+#define BIST_ADDR_CHECK_OFFSET			(16)
+#define BIST_ADDR_CHECK_WIDTH			(1)
+
+#define BIST_TEST_MODE_ADDR				(0x017C)
+#define BIST_TEST_MODE_OFFSET			(0)
+#define BIST_TEST_MODE_WIDTH			(3)
+
+#define BIST_DATA_PATTERN_0_ADDR		(0x0180)
+#define BIST_DATA_PATTERN_0_OFFSET		(0)
+#define BIST_DATA_PATTERN_0_WIDTH		(32)
+
+#define BIST_DATA_PATTERN_1_ADDR		(0x0184)
+#define BIST_DATA_PATTERN_1_OFFSET		(0)
+#define BIST_DATA_PATTERN_1_WIDTH		(32)
+
+#define BIST_GO_ADDR					(0x0168)
+#define BIST_GO_OFFSET					(16)
+#define BIST_GO_WIDTH					(1)
+
+#define INT_STATUS_BIST_ADDR			(0x025C)
+#define INT_STATUS_BIST_OFFSET			(16)
+#define INT_STATUS_BIST_WIDTH			(8)
+
+#define INT_STATUS_0_BIST_OFFSET		(16)
+#define INT_STATUS_0_BIST_WIDTH			(1)
+
+#define INT_ACK_BIST_ADDR				(0x027C)
+#define INT_ACK_BIST_OFFSET				(16)
+#define INT_ACK_BIST_WIDTH				(8)
+
+#define INT_ACK_0_BIST_OFFSET			(16)
+#define INT_ACK_0_BIST_WIDTH			(1)
+
+#define INT_MASK_BIST_ADDR				(0x029C)
+#define INT_MASK_BIST_OFFSET			(16)
+#define INT_MASK_BIST_WIDTH				(8)
+
+#define USER_DEF_REG_0_ADDR		(0x077C)
+#define USER_DEF_REG_1_ADDR		(0x0780)
+#define USER_DEF_REG_2_ADDR		(0x0784)
+#define USER_DEF_REG_3_ADDR		(0x0788)
+#define USER_DEF_REG_4_ADDR		(0x078C)
+#define USER_DEF_REG_5_ADDR		(0x0790)
+#define USER_DEF_REG_6_ADDR		(0x0794)
+#define USER_DEF_REG_7_ADDR		(0x0798)
+#define USER_DEF_REG_8_ADDR		(0x079C)
+#define USER_DEF_REG_9_ADDR		(0x07A0)
+#define USER_DEF_REG_10_ADDR	(0x07A4)
+#define USER_DEF_REG_11_ADDR	(0x07A8)
+#define USER_DEF_REG_12_ADDR	(0x07AC)
+#define USER_DEF_REG_13_ADDR	(0x07B0)
+#define USER_DEF_REG_14_ADDR	(0x07B4)
+#define USER_DEF_REG_15_ADDR	(0x07B8)
 
 #define	DENALI_CTL_00		(0x0000)
 #define	DENALI_CTL_01		(0x0004)

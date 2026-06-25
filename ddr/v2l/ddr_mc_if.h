@@ -11,8 +11,6 @@
 
 #define MC_INIT_NUM			(507)
 
-#define LP_CMD_OFFSET		(8)
-
 #define DDRMC_R000		DENALI_CTL_00
 #define DDRMC_R001		DENALI_CTL_12
 #define DDRMC_R002		DENALI_CTL_15

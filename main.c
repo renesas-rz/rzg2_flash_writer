@@ -34,6 +34,7 @@ extern const char *const StartMessMonitorV2[START_MESS_MON_LINE];
 extern const char *const StartMessMonitorA[START_MESS_MON_LINE];
 extern const com_menu MonCom[COMMAND_UNIT];
 extern uint8_t	gCOMMAND_Area[COMMAND_BUFFER_SIZE];
+extern const char ddr_an_version[];
 
 char gKeyBuf[64];
 int32_t gComNo;
@@ -132,6 +133,10 @@ void StartMess( void )
 		default:
 		break;
 	}
+#if (INTERNAL_MEMORY_ONLY == 0)
+	PutStr(" DDR config generation tool ", 0);
+	PutStr(ddr_an_version, 1);
+#endif
 	PutStr(">", 0);
 }
 

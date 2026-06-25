@@ -1,5 +1,5 @@
 #
-# Copyright (c) 2021, Renesas Electronics Corporation. All rights reserved.
+# Copyright (c) 2021-2026, Renesas Electronics Corporation. All rights reserved.
 #
 # SPDX-License-Identifier: BSD-3-Clause
 #
@@ -178,6 +178,132 @@ DDR_TYPE = DDR4
 DDR_SIZE = 1GB_1PCS
 SWIZZLE  = T3BCUD2
 DEVICE_TYPE = 1
+else ifeq ("$(BOARD)", "RZG2L_DDR4_CUSTOM")
+#--------------------------------------
+# RZ/G2L DDR4 CUSTOM board
+#--------------------------------------
+FILENAME_ADD = _RZG2L_CUSTOM
+DEVICE   = RZG2L
+DDR_TYPE = DDR4
+DDR_CUSTOM = ENABLE
+else ifeq ("$(BOARD)", "RZG2L_DDR4_1333_CUSTOM")
+#--------------------------------------
+# RZ/G2L DDR4 1333MHz CUSTOM board
+#--------------------------------------
+FILENAME_ADD = _RZG2L_CUSTOM
+DEVICE   = RZG2L
+DDR_TYPE = DDR4_1333
+DDR_CUSTOM = ENABLE
+else ifeq ("$(BOARD)", "RZG2L_DDR3L_CUSTOM")
+#--------------------------------------
+# RZ/G2L DDR3L CUSTOM board
+#--------------------------------------
+FILENAME_ADD = _RZG2L_CUSTOM
+DEVICE   = RZG2L
+DDR_TYPE = DDR3L
+DDR_CUSTOM = ENABLE
+else ifeq ("$(BOARD)", "RZG2LC_DDR4_CUSTOM")
+#--------------------------------------
+# RZ/G2LC DDR4 CUSTOM board
+#--------------------------------------
+FILENAME_ADD = _RZG2LC_CUSTOM
+DEVICE   = RZG2LC
+DDR_TYPE = DDR4
+DDR_CUSTOM = ENABLE
+else ifeq ("$(BOARD)", "RZG2LC_DDR4_1333_CUSTOM")
+#--------------------------------------
+# RZ/G2LC DDR4 1333MHz CUSTOM board
+#--------------------------------------
+FILENAME_ADD = _RZG2LC_CUSTOM
+DEVICE   = RZG2LC
+DDR_TYPE = DDR4_1333
+DDR_CUSTOM = ENABLE
+else ifeq ("$(BOARD)", "RZG2LC_DDR3L_CUSTOM")
+#--------------------------------------
+# RZ/G2LC DDR3L CUSTOM board
+#--------------------------------------
+FILENAME_ADD = _RZG2LC_CUSTOM
+DEVICE   = RZG2LC
+DDR_TYPE = DDR3L
+DDR_CUSTOM = ENABLE
+else ifeq ("$(BOARD)", "RZG2UL_DDR4_CUSTOM")
+#--------------------------------------
+# RZ/G2UL DDR4 CUSTOM board
+#--------------------------------------
+FILENAME_ADD = _RZG2UL_CUSTOM
+DEVICE   = RZG2UL
+DDR_TYPE = DDR4
+DDR_CUSTOM = ENABLE
+DEVICE_TYPE = 1
+else ifeq ("$(BOARD)", "RZG2UL_DDR4_1333_CUSTOM")
+#--------------------------------------
+# RZ/G2UL DDR4 1333MHz CUSTOM board
+#--------------------------------------
+FILENAME_ADD = _RZG2UL_CUSTOM
+DEVICE   = RZG2UL
+DDR_TYPE = DDR4_1333
+DDR_CUSTOM = ENABLE
+DEVICE_TYPE = 1
+else ifeq ("$(BOARD)", "RZG2UL_DDR3L_CUSTOM")
+#--------------------------------------
+# RZ/G2UL DDR3L CUSTOM board
+#--------------------------------------
+FILENAME_ADD = _RZG2UL_CUSTOM
+DEVICE   = RZG2UL
+DDR_TYPE = DDR3L
+DDR_CUSTOM = ENABLE
+DEVICE_TYPE = 1
+else ifeq ("$(BOARD)", "RZA3UL_DDR4_CUSTOM")
+#--------------------------------------
+# RZ/A3UL DDR4 CUSTOM board
+#--------------------------------------
+FILENAME_ADD = _RZA3UL_CUSTOM
+DEVICE   = RZA3UL
+DDR_TYPE = DDR4
+DDR_CUSTOM = ENABLE
+DEVICE_TYPE = 1
+else ifeq ("$(BOARD)", "RZA3UL_DDR4_1333_CUSTOM")
+#--------------------------------------
+# RZ/A3UL DDR4 1333MHz CUSTOM board
+#--------------------------------------
+FILENAME_ADD = _RZA3UL_CUSTOM
+DEVICE   = RZA3UL
+DDR_TYPE = DDR4_1333
+DDR_CUSTOM = ENABLE
+DEVICE_TYPE = 1
+else ifeq ("$(BOARD)", "RZA3UL_DDR3L_CUSTOM")
+#--------------------------------------
+# RZ/A3UL DDR3L CUSTOM board
+#--------------------------------------
+FILENAME_ADD = _RZA3UL_CUSTOM
+DEVICE   = RZG2UL
+DDR_TYPE = DDR3L
+DDR_CUSTOM = ENABLE
+DEVICE_TYPE = 1
+else ifeq ("$(BOARD)", "RZV2L_DDR4_CUSTOM")
+#--------------------------------------
+# RZ/V2L DDR4 CUSTOM board
+#--------------------------------------
+FILENAME_ADD = _RZV2L_CUSTOM
+DEVICE   = RZV2L
+DDR_TYPE = DDR4
+DDR_CUSTOM = ENABLE
+else ifeq ("$(BOARD)", "RZV2L_DDR4_1333_CUSTOM")
+#--------------------------------------
+# RZ/V2L DDR4 1333MHz CUSTOM board
+#--------------------------------------
+FILENAME_ADD = _RZV2L_CUSTOM
+DEVICE   = RZV2L
+DDR_TYPE = DDR4_1333
+DDR_CUSTOM = ENABLE
+else ifeq ("$(BOARD)", "RZV2L_DDR3L_CUSTOM")
+#--------------------------------------
+# RZ/V2L DDR3L CUSTOM board
+#--------------------------------------
+FILENAME_ADD = _RZV2L_CUSTOM
+DEVICE   = RZV2L
+DDR_TYPE = DDR3L
+DDR_CUSTOM = ENABLE
 endif
 
 # Select SERIAL_FLASH("ENABLE"or"DISABLE" )
@@ -221,7 +347,7 @@ OUTPUT_DIR  = AArch64_output
 OBJECT_DIR  = AArch64_obj
 CROSS_COMPILE ?= aarch64-elf-
 
-CFLAGS += -O0 -fno-stack-protector -fno-exceptions -fno-unwind-tables -fno-asynchronous-unwind-tables
+CFLAGS += -O0 -fno-stack-protector -fno-exceptions -fno-unwind-tables -fno-asynchronous-unwind-tables -U_FORTIFY_SOURCE
 BOOT_DEF    = Writer
 FILE_NAME   = $(OUTPUT_DIR)/Flash_Writer_SCIF$(FILENAME_ADD)_$(DDR_TYPE)_$(DDR_SIZE)
 
@@ -243,6 +369,9 @@ endif
 
 ifeq ("$(DDR_TYPE)", "DDR4")
 	CFLAGS += -DDDR4=1
+endif
+ifeq ("$(DDR_TYPE)", "DDR4_1333")
+	CFLAGS += -DDDR4_1333=1
 endif
 ifeq ("$(DDR_TYPE)", "DDR3L")
 	CFLAGS += -DDDR3L=1
@@ -297,6 +426,11 @@ endif
 
 ifeq ("$(SWIZZLE)", "T3BCUD2")
 	CFLAGS += -DSWIZZLE_T3BCUD2=1
+endif
+
+ifeq ("$(DDR_CUSTOM)", "ENABLE")
+	CFLAGS += -DDDR_SIZE_CUSTOM=1
+	CFLAGS += -DSWIZZLE_CUSTOM=1
 endif
 
 ifeq ("$(DEVICE_TYPE)", "1")

@@ -9,14 +9,13 @@
 
 void ddr_ctrl_reten_en_n(uint8_t val)
 {
+	val &= 1;
 	if (sysc_get_device_info() > 1)
 	{
-		val &= 1;
 		write_phy_reg(DDRPHY_R79, (val << 1));
 	}
 	else
 	{
-		val &= 1;
 		rmw_phy_reg(DDRPHY_R78, 0xFFFEFFFF, (val << 16));
 	}
 }

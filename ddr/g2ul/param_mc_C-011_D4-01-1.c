@@ -1,13 +1,13 @@
 /*
- * Copyright (c) 2020-2022, Renesas Electronics Corporation. All rights reserved.
+ * Copyright (c) 2020-2026, Renesas Electronics Corporation. All rights reserved.
  * SPDX-License-Identifier: BSD-3-Clause
- * This code was generated with RZ/G2L, G2UL, Five, A3UL DDR config generation tool v3.0.1
+ * This code was generated with RZ/G2L, G2UL, Five, A3UL DDR config generation tool v4.0.0
  */
 
 #include <stdint.h>
 #include <ddr_mc_regs.h>
 
-const char ddr_an_version[] = "v3.0.1";
+const char ddr_an_version[] = "v4.0.0";
 
 const uint32_t mc_init_tbl[MC_INIT_NUM][2] = {
 	{	DENALI_CTL_00,	0x00000A00	},
@@ -95,7 +95,7 @@ const uint32_t mc_init_tbl[MC_INIT_NUM][2] = {
 	{	DENALI_CTL_82,	0x00000080	},
 	{	DENALI_CTL_83,	0x0000040F	},
 	{	DENALI_CTL_84,	0x0000040F	},
-	{	DENALI_CTL_85,	0x01010000	},
+	{	DENALI_CTL_85,	0x00010000	},
 	{	DENALI_CTL_86,	0x00000000	},
 	{	DENALI_CTL_87,	0x00000000	},
 	{	DENALI_CTL_88,	0x00000000	},
@@ -149,7 +149,7 @@ const uint32_t mc_init_tbl[MC_INIT_NUM][2] = {
 	{	DENALI_CTL_136,	0x00000000	},
 	{	DENALI_CTL_137,	0x00000001	},
 	{	DENALI_CTL_138,	0x00000000	},
-	{	DENALI_CTL_139,	0x00000000	},
+	{	DENALI_CTL_139,	0x00009A40	},
 	{	DENALI_CTL_140,	0x00000000	},
 	{	DENALI_CTL_141,	0x00000000	},
 	{	DENALI_CTL_142,	0x00000000	},
@@ -172,7 +172,7 @@ const uint32_t mc_init_tbl[MC_INIT_NUM][2] = {
 	{	DENALI_CTL_159,	0x00000800	},
 	{	DENALI_CTL_160,	0x00000000	},
 	{	DENALI_CTL_161,	0x00000898	},
-	{	DENALI_CTL_162,	0x03000000	},
+	{	DENALI_CTL_162,	0x03000010	},
 	{	DENALI_CTL_163,	0x00000408	},
 	{	DENALI_CTL_164,	0x00000000	},
 	{	DENALI_CTL_165,	0x00000000	},

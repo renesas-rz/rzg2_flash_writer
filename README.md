@@ -3,7 +3,7 @@
 <Div Align="right">
 Renesas Electronics Corporation
 
-Jul-25-2025
+Jun-25-2026
 </Div>
 
 The RZ/G2L flash writer is sample software for Renesas RZ/G2L Group MPUs.
@@ -201,7 +201,7 @@ This command writes the S-record format image to Serial Flash.
 | Filename                   | Program Top Address | Flash Save Address | Description                                 |
 | -------------------------- | ------------------- | ------------------ | ------------------------------------------- |
 | bl2_bp-`<board_name>`.srec | H'11E00             | H'0000             | Loader                                      |
-| fip-`<board_name>`.srec    | H'0000              | H'1D200            | ARM Trusted Firmware and U-boot in FIP file |
+| fip-`<board_name>`.srec    | H'0000              | H'20000            | ARM Trusted Firmware and U-boot in FIP file |
 
 The following shows the procedure of this command.
 
@@ -707,4 +707,10 @@ Describe the revision history of RZ/G2L flash writer.
 
 - RZG2L, G2UL, Five, A3UL DDR Board Config Structure Generation Tool v3.0.1 compatible
 - RZV2L DDR Board Config Structure Generation Tool v1.13.1 compatible
+- Update README.
+
+### 7.10. v1.09
+
+- RZG2L, G2UL, A3UL DDR Board Config Structure Generation Tool v4.0.0 compatible
+- RZV2L DDR Board Config Structure Generation Tool v1.16.0 compatible
 - Update README.
